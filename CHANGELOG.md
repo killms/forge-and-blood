@@ -6,7 +6,35 @@
 
 ---
 
-## 🔖 RESUME HERE — 2026-05-17 — current state
+## Session 3 — 2026-05-18 — Gear expansion + Bag redesign + compare popup
+
+### Goals
+- Add 5 new equipment slots (2 rings, amulet, vest, pants) — total 9 slots.
+- On the Bag tab: show equipped gear at the top, then the inventory list.
+- When clicking an inventory item, show a popup that compares **current vs new** with stat deltas; player accepts or refuses.
+- For rings with both slots filled, the popup lets the player pick which ring to replace.
+
+### Implementation
+- **SLOT_LABELS** and **SLOT_ORDER** now drive a 3×3 equipment grid: weapon / helm / amulet / armor (renamed "Chestplate") / vest / pants / boots / ring I / ring II.
+- `emptyEquipment()` factory used by `createHero` AND by the new `migrateHero(hero)` which backfills missing slot keys on older saves (so existing accounts don't break on first load after the schema change).
+- **ITEM_POOL +28 items**: 7 rings, 7 amulets, 7 vests, 7 pants spanning common→legendary with effects in line with existing item design (lifesteal, crit, dodge, regen, thorns, burn, execute, firstStrike).
+- Ring items use `slot: 'ring'` in the pool; `generateItem` maps `ring1`/`ring2` hints to the `ring` pool so loot rolls work cleanly.
+- **Bag tab** has a new `#bag-equipment` panel above the inventory list. Click to unequip is mirrored from the Hero tab.
+- **Compare modal** (`#compare-modal`):
+  - Single-target (non-ring or one empty ring slot): two columns (current vs new) + stat deltas + EQUIP/CANCEL.
+  - Both ring slots filled: three columns (Ring I / Ring II / New) + deltas vs each + three buttons (REPLACE I / REPLACE II / CANCEL).
+  - Defensive: re-finds the item by reference in case the inventory shifted between open and confirm.
+
+### Files touched
+- `index.html` (everything is still in one file).
+
+### Decisions
+- Kept the equipment panel on the Hero tab too — visible in both places, no harm.
+- Renamed `armor` label to "Chestplate" to distinguish it from the new "Vest" overlayer; internal slot key remains `armor` for save compatibility.
+
+---
+
+## 🔖 RESUME HERE — 2026-05-18 — current state
 
 ### LIVE on the internet ✅
 - **Play it:** https://killms.github.io/forge-and-blood/
@@ -14,11 +42,13 @@
 - **GitHub Pages** serves from `master` branch root. Each `git push` triggers a rebuild that's live in ~30-60s.
 - Verified: HTTP 200, Content-Type `text/html`, 99,475 bytes.
 
-### Current state (HEAD = `def022f`)
+### Current state
 - All Phase A (combat fix + XP bar) ✅
 - All Phase B (stat points 1→100, new XP curve, level cap) ✅
 - Login + localStorage persistence ✅
 - Deployed to GitHub Pages ✅
+- Session 3 part 1: gear expansion (9 slots) + Bag redesign + compare popup ✅
+- Session 3 part 2 (pending): talent tree rework — 20 talents per class, 10 tiers, mutual exclusion
 
 ### Re-deploy workflow (already automatic)
 ```bash

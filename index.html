@@ -224,7 +224,7 @@
     font-size: 12px; line-height: 18px; color: var(--text);
     text-shadow: 1px 1px 0 #000;
   }
-  .equipment { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .equipment { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .slot {
     background: var(--bg-deep); border: 1px solid var(--border);
     padding: 8px; min-height: 64px; cursor: pointer; transition: all 0.2s;
@@ -316,6 +316,68 @@
     padding: 8px 12px; margin-bottom: 12px;
     font-size: 13px; font-style: italic; color: var(--text-dim);
   }
+
+  /* Compare-and-equip modal */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .modal-panel {
+    background: var(--bg-panel); border: 1px solid var(--gold);
+    padding: 16px; max-width: 460px; width: 100%;
+    box-shadow: 0 0 30px rgba(201,165,87,0.25);
+    position: relative;
+  }
+  .modal-panel::before {
+    content: ''; position: absolute; top: -1px; left: -1px; right: -1px;
+    height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin: 12px 0;
+  }
+  .compare-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .compare-cell {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px;
+  }
+  .compare-cell.new { border-color: var(--gold); }
+  .compare-cell-label {
+    font-size: 10px; letter-spacing: 2px; color: var(--text-dim);
+    text-transform: uppercase; margin-bottom: 6px;
+    font-family: 'Cinzel', serif;
+  }
+  .compare-cell-name {
+    font-family: 'Cinzel', serif; font-size: 13px; margin-bottom: 4px;
+  }
+  .compare-cell-stats { font-size: 12px; color: var(--text); }
+  .compare-cell-effect { font-size: 12px; color: var(--epic); font-style: italic; margin-top: 4px; }
+  .compare-cell-empty { color: var(--text-dim); font-style: italic; font-size: 13px; }
+  .compare-deltas {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px; margin: 8px 0; font-size: 13px;
+  }
+  .compare-deltas-title {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 2px; color: var(--gold); text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .delta-row { display: flex; justify-content: space-between; padding: 2px 0; }
+  .delta-positive { color: var(--uncommon); }
+  .delta-negative { color: var(--blood-bright); }
+  .delta-neutral { color: var(--text-dim); }
+  .modal-actions {
+    display: grid; gap: 6px; grid-template-columns: 1fr; margin-top: 8px;
+  }
+  .modal-actions.two { grid-template-columns: 1fr 1fr; }
+  .modal-actions.three { grid-template-columns: 1fr; }
+  .btn-cancel {
+    background: var(--bg-deep); border-color: var(--border);
+    color: var(--text-dim);
+  }
+  .btn-cancel:hover { background: var(--border); color: var(--text); }
   .auto-close-note {
     text-align: center; color: var(--text-dim); font-style: italic;
     font-size: 12px; padding: 10px 0 4px;
@@ -497,6 +559,10 @@
 
     <div id="tab-inventory" class="tab-content hidden">
       <div class="panel">
+        <div class="section-title">Equipped</div>
+        <div class="equipment" id="bag-equipment"></div>
+      </div>
+      <div class="panel">
         <div class="section-title">Adventurer's Bag</div>
         <div class="inv-list" id="inv-list"></div>
       </div>
@@ -514,6 +580,14 @@
         <div class="section-title">Blood Arena</div>
         <div class="pvp-info">Other heroes await. Each victory brings glory; each defeat, shame.</div>
         <div id="pvp-list"></div>
+      </div>
+    </div>
+
+    <div id="compare-modal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="section-title">Equip Item?</div>
+        <div id="compare-body"></div>
+        <div class="modal-actions" id="compare-actions"></div>
       </div>
     </div>
 
@@ -549,10 +623,22 @@
 // Internal slot keys stay short; labels render in the UI.
 const SLOT_LABELS = {
   weapon: 'Weapon',
-  armor: 'Armor',
   helm: 'Helm',
-  boots: 'Boots'
+  amulet: 'Amulet',
+  armor: 'Chestplate',
+  vest: 'Vest',
+  pants: 'Pants',
+  boots: 'Boots',
+  ring1: 'Ring I',
+  ring2: 'Ring II'
 };
+// Display order in the equipment grid (3 columns × 3 rows).
+const SLOT_ORDER = ['weapon', 'helm', 'amulet', 'armor', 'vest', 'pants', 'boots', 'ring1', 'ring2'];
+// Empty equipment template — used on hero creation and to migrate older saves.
+function emptyEquipment() {
+  return { weapon: null, armor: null, helm: null, boots: null,
+           ring1: null, ring2: null, amulet: null, vest: null, pants: null };
+}
 
 // ============ RACES ============
 const RACES = {
@@ -856,7 +942,43 @@ const ITEM_POOL = [
   { slot: 'boots', name: 'Worn Sandals', rarity: 'common', stats: { agi: 2 } },
   { slot: 'boots', name: 'Leather Boots', rarity: 'uncommon', stats: { agi: 3, def: 1 } },
   { slot: 'boots', name: 'Wind Boots', rarity: 'rare', stats: { agi: 6 }, effect: { type: 'dodge', val: 0.10, desc: '10% dodge' } },
-  { slot: 'boots', name: 'Shadow Steps', rarity: 'epic', stats: { agi: 8, atk: 3 }, effect: { type: 'firstStrike', val: 1, desc: 'Always attacks first' } }
+  { slot: 'boots', name: 'Shadow Steps', rarity: 'epic', stats: { agi: 8, atk: 3 }, effect: { type: 'firstStrike', val: 1, desc: 'Always attacks first' } },
+
+  // Rings (worn in two slots — same pool feeds ring1 and ring2)
+  { slot: 'ring', name: 'Copper Band', rarity: 'common', stats: { atk: 1 } },
+  { slot: 'ring', name: 'Silver Ring', rarity: 'uncommon', stats: { atk: 2, def: 1 } },
+  { slot: 'ring', name: 'Hunter\'s Signet', rarity: 'uncommon', stats: { agi: 3 } },
+  { slot: 'ring', name: 'Bloodstone Ring', rarity: 'rare', stats: { atk: 3, vit: 2 }, effect: { type: 'lifesteal', val: 0.08, desc: '8% lifesteal' } },
+  { slot: 'ring', name: 'Ring of Embers', rarity: 'rare', stats: { atk: 4 }, effect: { type: 'burn', val: 3, desc: 'Burn: 3 damage/turn' } },
+  { slot: 'ring', name: 'Sapphire Loop', rarity: 'epic', stats: { atk: 4, def: 3, agi: 2 }, effect: { type: 'crit', val: 0.10, desc: '+10% crit' } },
+  { slot: 'ring', name: 'Eye of the Tyrant', rarity: 'legendary', stats: { atk: 6, vit: 4 }, effect: { type: 'execute', val: 0.15, desc: 'Executes enemies below 15% HP' } },
+
+  // Amulets
+  { slot: 'amulet', name: 'Bone Pendant', rarity: 'common', stats: { vit: 2 } },
+  { slot: 'amulet', name: 'Silver Talisman', rarity: 'uncommon', stats: { vit: 3, def: 1 } },
+  { slot: 'amulet', name: 'Wolf\'s Fang', rarity: 'uncommon', stats: { atk: 3, agi: 1 } },
+  { slot: 'amulet', name: 'Heart of Oak', rarity: 'rare', stats: { vit: 5 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
+  { slot: 'amulet', name: 'Stormstone Amulet', rarity: 'rare', stats: { atk: 4, agi: 3 }, effect: { type: 'crit', val: 0.10, desc: '+10% crit' } },
+  { slot: 'amulet', name: 'Phylactery of Souls', rarity: 'epic', stats: { atk: 5, vit: 5 }, effect: { type: 'lifesteal', val: 0.15, desc: '15% lifesteal' } },
+  { slot: 'amulet', name: 'Heart of the Mountain', rarity: 'legendary', stats: { vit: 10, def: 5 }, effect: { type: 'regen', val: 5, desc: 'Regenerates 5 HP/turn' } },
+
+  // Vests (lighter overlayer worn over chest armour)
+  { slot: 'vest', name: 'Linen Vest', rarity: 'common', stats: { def: 1, agi: 1 } },
+  { slot: 'vest', name: 'Leather Jerkin', rarity: 'uncommon', stats: { def: 2, agi: 2 } },
+  { slot: 'vest', name: 'Padded Doublet', rarity: 'uncommon', stats: { def: 3, vit: 2 } },
+  { slot: 'vest', name: 'Ranger\'s Vest', rarity: 'rare', stats: { def: 3, agi: 4 }, effect: { type: 'dodge', val: 0.08, desc: '8% dodge' } },
+  { slot: 'vest', name: 'Briarweave Cloak', rarity: 'rare', stats: { def: 4, vit: 3 }, effect: { type: 'thorns', val: 4, desc: 'Thorns: returns 4 damage' } },
+  { slot: 'vest', name: 'Stormcaller Mantle', rarity: 'epic', stats: { def: 5, atk: 4, agi: 2 }, effect: { type: 'crit', val: 0.08, desc: '+8% crit' } },
+  { slot: 'vest', name: 'Shroud of Ages', rarity: 'legendary', stats: { def: 7, vit: 6, agi: 3 }, effect: { type: 'dodge', val: 0.12, desc: '12% dodge' } },
+
+  // Pants (legs)
+  { slot: 'pants', name: 'Cloth Breeches', rarity: 'common', stats: { def: 1 } },
+  { slot: 'pants', name: 'Leather Trousers', rarity: 'uncommon', stats: { def: 2, agi: 2 } },
+  { slot: 'pants', name: 'Chain Greaves', rarity: 'uncommon', stats: { def: 4 } },
+  { slot: 'pants', name: 'Stalker Leggings', rarity: 'rare', stats: { def: 3, agi: 5 }, effect: { type: 'dodge', val: 0.07, desc: '7% dodge' } },
+  { slot: 'pants', name: 'Plated Greaves', rarity: 'rare', stats: { def: 6, vit: 3 } },
+  { slot: 'pants', name: 'Wyrmscale Pants', rarity: 'epic', stats: { def: 7, vit: 4, atk: 2 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
+  { slot: 'pants', name: 'Legs of the Titan', rarity: 'legendary', stats: { def: 9, vit: 8 }, effect: { type: 'thorns', val: 6, desc: 'Thorns: returns 6 damage' } }
 ];
 
 const MONSTERS = [
@@ -963,6 +1085,22 @@ function loadGame() {
   const acc = accounts[user];
   if (!acc) return null;
   return acc.hero || null;
+}
+
+// Run on every hero load. Adds missing fields so older saves don't break
+// when we ship schema additions (e.g. new equipment slots, new state fields).
+function migrateHero(hero) {
+  if (!hero) return hero;
+  // Equipment: backfill any missing slot keys with null
+  const eq = hero.equipment || {};
+  const template = emptyEquipment();
+  for (const k of Object.keys(template)) {
+    if (!(k in eq)) eq[k] = null;
+  }
+  hero.equipment = eq;
+  // Older saves may not have statPoints / xpNext computed against new curve
+  if (typeof hero.statPoints !== 'number') hero.statPoints = 0;
+  return hero;
 }
 
 // ============ SCREEN ROUTING ============
@@ -1131,7 +1269,7 @@ function createHero() {
       agi: cls.base.agi + race.mods.agi
     },
     hp: 0, maxHp: 0,
-    equipment: { weapon: null, armor: null, helm: null, boots: null },
+    equipment: emptyEquipment(),
     inventory: [generateItem('common', 'weapon'), generateItem('common', 'armor')]
   };
   recalculate();
@@ -1156,7 +1294,9 @@ function spendStatPoint(stat) {
 // ============ ITEMS ============
 function generateItem(rarityHint, slotHint) {
   let pool = ITEM_POOL;
-  if (slotHint) pool = pool.filter(i => i.slot === slotHint);
+  // ring1 / ring2 both pull from the 'ring' pool
+  const effectiveSlot = (slotHint === 'ring1' || slotHint === 'ring2') ? 'ring' : slotHint;
+  if (effectiveSlot) pool = pool.filter(i => i.slot === effectiveSlot);
   if (rarityHint) {
     const filtered = pool.filter(i => i.rarity === rarityHint);
     if (filtered.length) pool = filtered;
@@ -1320,16 +1460,10 @@ function renderHero() {
   }
 
   const eq = document.getElementById('equipment');
-  const slots = [
-    { key: 'weapon', label: SLOT_LABELS.weapon },
-    { key: 'armor', label: SLOT_LABELS.armor },
-    { key: 'helm', label: SLOT_LABELS.helm },
-    { key: 'boots', label: SLOT_LABELS.boots }
-  ];
-  eq.innerHTML = slots.map(s => {
-    const item = h.equipment[s.key];
-    return `<div class="slot" data-slot="${s.key}">
-      <div class="slot-label">${s.label}</div>
+  eq.innerHTML = SLOT_ORDER.map(key => {
+    const item = h.equipment[key];
+    return `<div class="slot" data-slot="${key}">
+      <div class="slot-label">${SLOT_LABELS[key]}</div>
       ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
     </div>`;
   }).join('');
@@ -1395,6 +1529,31 @@ function renderTalents() {
 }
 
 function renderInventory() {
+  // Equipped panel at the top of the Bag tab (same data as Hero tab,
+  // separate DOM target so both can mount).
+  const eqPanel = document.getElementById('bag-equipment');
+  if (eqPanel) {
+    const h = state.hero;
+    eqPanel.innerHTML = SLOT_ORDER.map(key => {
+      const item = h.equipment[key];
+      return `<div class="slot" data-bagslot="${key}">
+        <div class="slot-label">${SLOT_LABELS[key]}</div>
+        ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
+      </div>`;
+    }).join('');
+    eqPanel.querySelectorAll('[data-bagslot]').forEach(el => {
+      el.addEventListener('click', () => {
+        const slot = el.dataset.bagslot;
+        if (h.equipment[slot]) {
+          h.inventory.push(h.equipment[slot]);
+          h.equipment[slot] = null;
+          recalculate(); saveGame(); renderAll();
+        }
+      });
+    });
+  }
+
+  // Inventory list below
   const list = document.getElementById('inv-list');
   if (state.hero.inventory.length === 0) {
     list.innerHTML = '<div style="text-align:center; color: var(--text-dim); font-style: italic; padding: 20px;">The bag is empty.</div>';
@@ -1402,10 +1561,11 @@ function renderInventory() {
   }
   list.innerHTML = state.hero.inventory.map((item, idx) => {
     const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+    const slotLabel = item.slot === 'ring' ? 'Ring' : (SLOT_LABELS[item.slot] || item.slot);
     return `<div class="inv-item" data-idx="${idx}">
       <div class="inv-item-header">
         <span class="inv-item-name r-${item.rarity}">${item.name}</span>
-        <span class="inv-item-slot">${SLOT_LABELS[item.slot] || item.slot}</span>
+        <span class="inv-item-slot">${slotLabel}</span>
       </div>
       <div class="inv-item-stats">${statStr}</div>
       ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
@@ -1414,14 +1574,157 @@ function renderInventory() {
   list.querySelectorAll('[data-idx]').forEach(el => {
     el.addEventListener('click', () => {
       const idx = parseInt(el.dataset.idx);
-      const item = state.hero.inventory[idx];
-      const current = state.hero.equipment[item.slot];
-      state.hero.equipment[item.slot] = item;
-      state.hero.inventory.splice(idx, 1);
-      if (current) state.hero.inventory.push(current);
-      recalculate(); saveGame(); renderAll(); switchTab('hero');
+      openCompareModal(idx);
     });
   });
+}
+
+// ============ COMPARE & EQUIP MODAL ============
+// Decide which slot(s) the inventory item targets. For rings the answer can
+// be either ring1 or ring2 — if both are full the modal will let the player
+// pick which to replace.
+function resolveEquipTargets(item) {
+  if (item.slot === 'ring') {
+    const eq = state.hero.equipment;
+    if (!eq.ring1) return ['ring1'];
+    if (!eq.ring2) return ['ring2'];
+    return ['ring1', 'ring2']; // both filled — let the user choose
+  }
+  return [item.slot];
+}
+
+function renderItemCell(item, labelText, isNew) {
+  const cls = isNew ? 'compare-cell new' : 'compare-cell';
+  if (!item) {
+    return `<div class="${cls}">
+      <div class="compare-cell-label">${labelText}</div>
+      <div class="compare-cell-empty">— empty —</div>
+    </div>`;
+  }
+  const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+  return `<div class="${cls}">
+    <div class="compare-cell-label">${labelText}</div>
+    <div class="compare-cell-name r-${item.rarity}">${item.name}</div>
+    <div class="compare-cell-stats">${statStr}</div>
+    ${item.effect ? `<div class="compare-cell-effect">✦ ${item.effect.desc}</div>` : ''}
+  </div>`;
+}
+
+function renderDeltas(current, candidate) {
+  const stats = ['atk', 'def', 'vit', 'agi'];
+  const cur = current ? current.stats : {};
+  const cand = candidate.stats || {};
+  const rows = [];
+  for (const s of stats) {
+    const a = cur[s] || 0;
+    const b = cand[s] || 0;
+    const diff = b - a;
+    if (a === 0 && b === 0) continue;
+    let cls = 'delta-neutral';
+    let sign = '';
+    if (diff > 0) { cls = 'delta-positive'; sign = '+'; }
+    else if (diff < 0) { cls = 'delta-negative'; sign = ''; }
+    rows.push(`<div class="delta-row"><span>${s.toUpperCase()}</span><span class="${cls}">${a} → ${b} (${sign}${diff})</span></div>`);
+  }
+  if (rows.length === 0) {
+    rows.push('<div class="delta-row"><span class="delta-neutral">No stat changes.</span></div>');
+  }
+  return `<div class="compare-deltas">
+    <div class="compare-deltas-title">Stat changes</div>
+    ${rows.join('')}
+  </div>`;
+}
+
+let _pendingEquip = null; // { invIdx, item, targets[] }
+
+function openCompareModal(invIdx) {
+  const item = state.hero.inventory[invIdx];
+  if (!item) return;
+  const targets = resolveEquipTargets(item);
+  _pendingEquip = { invIdx, item, targets };
+
+  const body = document.getElementById('compare-body');
+  const actions = document.getElementById('compare-actions');
+
+  if (targets.length === 1) {
+    // Single target — simple two-column compare
+    const slotKey = targets[0];
+    const current = state.hero.equipment[slotKey];
+    const slotLabel = SLOT_LABELS[slotKey];
+    body.innerHTML = `
+      <div class="compare-grid">
+        ${renderItemCell(current, 'Current ' + slotLabel, false)}
+        ${renderItemCell(item, 'New', true)}
+      </div>
+      ${renderDeltas(current, item)}
+    `;
+    actions.className = 'modal-actions two';
+    actions.innerHTML = `
+      <button class="btn btn-cancel" data-action="cancel">CANCEL</button>
+      <button class="btn" data-action="equip">EQUIP</button>
+    `;
+  } else {
+    // Two ring slots filled — pick which to replace
+    const r1 = state.hero.equipment.ring1;
+    const r2 = state.hero.equipment.ring2;
+    body.innerHTML = `
+      <div class="compare-grid three-col">
+        ${renderItemCell(r1, 'Ring I', false)}
+        ${renderItemCell(r2, 'Ring II', false)}
+        ${renderItemCell(item, 'New ring', true)}
+      </div>
+      <div class="compare-deltas">
+        <div class="compare-deltas-title">vs Ring I</div>
+        ${renderDeltas(r1, item).replace('<div class="compare-deltas-title">Stat changes</div>', '')}
+      </div>
+      <div class="compare-deltas">
+        <div class="compare-deltas-title">vs Ring II</div>
+        ${renderDeltas(r2, item).replace('<div class="compare-deltas-title">Stat changes</div>', '')}
+      </div>
+    `;
+    actions.className = 'modal-actions';
+    actions.innerHTML = `
+      <button class="btn" data-action="replace-ring1">REPLACE RING I</button>
+      <button class="btn" data-action="replace-ring2">REPLACE RING II</button>
+      <button class="btn btn-cancel" data-action="cancel">CANCEL</button>
+    `;
+  }
+
+  actions.querySelectorAll('[data-action]').forEach(b => {
+    b.addEventListener('click', () => handleCompareAction(b.dataset.action));
+  });
+
+  document.getElementById('compare-modal').classList.remove('hidden');
+}
+
+function closeCompareModal() {
+  document.getElementById('compare-modal').classList.add('hidden');
+  _pendingEquip = null;
+}
+
+function handleCompareAction(action) {
+  if (action === 'cancel') { closeCompareModal(); return; }
+  if (!_pendingEquip) { closeCompareModal(); return; }
+  const { invIdx, item, targets } = _pendingEquip;
+  let slotKey = null;
+  if (action === 'equip') slotKey = targets[0];
+  else if (action === 'replace-ring1') slotKey = 'ring1';
+  else if (action === 'replace-ring2') slotKey = 'ring2';
+  if (!slotKey) { closeCompareModal(); return; }
+
+  // Some defensive bounds: the inventory might have shifted under us if
+  // the user spammed somehow; re-find by reference.
+  const realIdx = state.hero.inventory.indexOf(item);
+  if (realIdx === -1) { closeCompareModal(); return; }
+
+  const current = state.hero.equipment[slotKey];
+  state.hero.equipment[slotKey] = item;
+  state.hero.inventory.splice(realIdx, 1);
+  if (current) state.hero.inventory.push(current);
+  recalculate();
+  saveGame();
+  renderAll();
+  closeCompareModal();
 }
 
 function renderPve() {
@@ -2272,7 +2575,7 @@ async function handleAuthSubmit() {
     }
     // Logged in — route based on whether this account has a hero
     if (result.account.hero) {
-      state.hero = result.account.hero;
+      state.hero = migrateHero(result.account.hero);
       recalculate();
       generatePvpOpponents();
       showGameScreen();
@@ -2314,7 +2617,7 @@ function init() {
     return;
   }
   if (acc.hero) {
-    state.hero = acc.hero;
+    state.hero = migrateHero(acc.hero);
     recalculate();
     generatePvpOpponents();
     showGameScreen();
