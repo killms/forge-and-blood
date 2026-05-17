@@ -6,6 +6,56 @@
 
 ---
 
+## Session 3 (continued) — 2026-05-18 — Phase 3: talent tree rework (300 talents)
+
+### Goal
+- Replace the 6-talent-per-class system with a proper branching tree: **10 tiers × 2 mutually exclusive options = 20 talents per class × 15 classes = 300 total talents**.
+- No "talent points" — choice happens automatically when a tier unlocks at a specific character level. The unchosen option is permanently locked out.
+
+### Tier unlock levels
+`TIER_UNLOCKS = [1, 3, 6, 10, 15, 22, 32, 45, 60, 80]` — front-loaded so the early game feels rich, then milestone choices later.
+
+### Data structure
+- `class.talents: [...]` (flat list) → `class.talentTree: [[opt1a, opt1b], [opt2a, opt2b], ...]` (array of tier pairs).
+- `hero.talentPicks: { tier: talentKey }` replaces `hero.unlockedTalents` + `hero.talentPoints`.
+
+### Refactor
+- `getPickedTalents()` resolves picks to full talent objects via the current class's tree.
+- `getActiveAbilities()`, `getAllPassiveBonuses()`, and `recalculate()` all rewritten to use the picks.
+- `pickTalent(tier, key)` enforces: tier unlocked, no existing pick, valid option.
+- `migrateHero()` clears legacy `unlockedTalents` / `talentPoints` fields — players keep level/stats/gear but **start fresh on talents**.
+- `finishVictory()` no longer grants talent points; instead it announces "Talent tier N unlocked!" when the level matches a `TIER_UNLOCKS` entry.
+
+### UI
+- Talents tab badge: "X to choose" (green, pulsing) when there are pending picks; "X picked" (gold) otherwise.
+- Each tier renders as a labelled row: `— TIER N · Lv X · [picked / choose one / unlocks at Lv X] —` followed by the two option cards side-by-side.
+- Picked: gold border (existing `.unlocked` style).
+- Other option once picked: dimmed `.locked`.
+- Unpicked + unlocked: bright green `.available` (clickable).
+- Unpicked + locked: dimmed `.locked` (waiting on level).
+- Active talents show `CD N` instead of the old talent-point cost.
+
+### Design notes per class
+All 15 classes redesigned around 10-tier flow:
+- T1-2 foundation (stat invest, basic ability)
+- T3 power expansion
+- T4 class-passive override or signature ability
+- T5-7 specialization choices (offense / defense / utility)
+- T8 defining choice (savior, true damage, lifesteal, etc.)
+- T9 high-end stat or burst
+- T10 capstone (regen + crit, or massive single-shot ability)
+
+### Known/honest notes
+- Existing accounts lose their talent allocations. Fresh start under the new system.
+- Talent overflow is solved: no more wasted points.
+- Some talents lean on existing effect schema (e.g. `def`, `vit`, `atk`, `agi` keys on `effect`); new combinations work because `recalculate` already iterates all numeric stat keys.
+- Bug fix (also in this commit): `.hidden { display: none !important; }` — the compare modal was showing on login because `.modal-overlay { display: flex }` was declared after `.hidden` and won the cascade.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 3 — 2026-05-18 — Gear expansion + Bag redesign + compare popup
 
 ### Goals
@@ -48,7 +98,7 @@
 - Login + localStorage persistence ✅
 - Deployed to GitHub Pages ✅
 - Session 3 part 1: gear expansion (9 slots) + Bag redesign + compare popup ✅
-- Session 3 part 2 (pending): talent tree rework — 20 talents per class, 10 tiers, mutual exclusion
+- Session 3 part 2: talent tree rework (300 talents, 10 tiers, mutual exclusion) ✅
 
 ### Re-deploy workflow (already automatic)
 ```bash
