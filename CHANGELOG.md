@@ -6,6 +6,47 @@
 
 ---
 
+## Session 2 (continued) — 2026-05-17 — Auth + localStorage persistence
+
+### Goal
+- Add a login system so the player has a persistent identity and progress is saved across refreshes.
+- Came with the practical bonus of implementing the long-pending **persistence** task (was Session 2 in the original roadmap).
+
+### What was implemented
+- **Auth screen** (`#auth-screen`) that loads before `#creation` / `#game`.
+  - Two-tab toggle: **Log In** / **Create Account**.
+  - Username (2-24 chars) + password (≥4 chars).
+  - Errors shown inline ("No account with that username", "Wrong password", etc.).
+- **Session strip** in the header showing `◆ username` + LOG OUT button when logged in.
+- **Account storage** in `localStorage`:
+  - `forgeBlood.v1.accounts` → `{ [username]: { passwordHash, createdAt, lastSavedAt, hero } }`
+  - `forgeBlood.v1.activeUser` → string username of the active session
+- **Password hashing:**
+  - Primary: SHA-256 via `crypto.subtle` (secure context only — HTTPS / localhost).
+  - Fallback: djb2 string hash for `file://` (NOT secure, but lets the user double-click `index.html` on disk and still have working auth for local testing).
+- **`saveGame()` / `loadGame()`** helpers. `saveGame` is called from:
+  - `createHero` (initial save)
+  - `spendStatPoint`
+  - Talent unlock
+  - Equip / unequip
+  - `finishVictory` / `finishDefeat`
+  - `logout` (one last save before clearing)
+- **Init flow** (`init()` at the end of the script): if active user + account + hero → load + go to game. If account but no hero → creation. Otherwise → auth screen.
+
+### Honest caveats (called out in the UI)
+- **Per-device only.** A login created on PC ≠ a login on phone. For cross-device sync we'd need a backend (Supabase candidate, ~separate session of work).
+- **Not real security.** Client-side hash, no salt, no rate-limiting. Anyone with dev tools can read the data. Good enough for a personal idle game.
+
+### Files touched
+- `index.html` only.
+
+### Decisions
+- One hero per account (simplest). If the player wants alts, they create a new account.
+- LOG OUT confirms before clearing the active session (data is saved, just clears the pointer).
+- Active-user pointer is checked against accounts on init; if stale, it's cleared automatically and the user lands on auth.
+
+---
+
 ## Session 2 (continued) — 2026-05-17 — Deploy prep (rename to index.html, README)
 
 ### Goal

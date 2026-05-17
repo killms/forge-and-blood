@@ -88,6 +88,60 @@
     padding: 6px 12px; font-size: 11px; letter-spacing: 1.5px;
     margin-top: 0; width: auto;
   }
+
+  /* Auth screen */
+  .auth-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    background: var(--bg-deep); padding: 4px; border: 1px solid var(--border);
+  }
+  .auth-tab {
+    flex: 1; padding: 10px 4px; background: transparent;
+    color: var(--text-dim); border: none;
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .auth-tab.active { background: var(--border); color: var(--gold-bright); }
+  .auth-form { display: grid; gap: 6px; }
+  .auth-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .auth-form input[type="text"], .auth-form input[type="password"] {
+    width: 100%; padding: 12px; background: var(--bg-deep);
+    border: 1px solid var(--border); color: var(--text);
+    font-family: 'EB Garamond', serif; font-size: 16px;
+  }
+  .auth-form input:focus { outline: none; border-color: var(--gold); }
+  .auth-error {
+    color: var(--blood-bright); font-style: italic; font-size: 13px;
+    text-align: center; padding: 6px 0;
+  }
+  .auth-note {
+    color: var(--text-dim); font-style: italic; font-size: 12px;
+    text-align: center; padding: 10px 0 0;
+  }
+
+  /* Session strip in header */
+  .session-strip {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; margin-top: 8px; padding-top: 8px;
+    border-top: 1px dashed rgba(74,56,38,0.5);
+  }
+  .session-user {
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px;
+    color: var(--gold);
+  }
+  .session-user::before { content: '◆ '; color: var(--text-dim); }
+  .session-logout {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); padding: 4px 10px;
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .session-logout:hover {
+    border-color: var(--blood-bright); color: var(--blood-bright);
+  }
   .hero-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .hero-name { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-bright); }
   .hero-meta { font-size: 12px; color: var(--text-dim); font-style: italic; }
@@ -339,9 +393,32 @@
   <header>
     <h1>FORGE &amp; BLOOD</h1>
     <div class="subtitle">— an RPG of the mists —</div>
+    <div class="session-strip hidden" id="session-strip">
+      <span class="session-user" id="session-user"></span>
+      <button class="session-logout" id="session-logout">LOG OUT</button>
+    </div>
   </header>
 
-  <div id="creation" class="panel">
+  <div id="auth-screen" class="panel hidden">
+    <div class="creation-step">
+      <h2 id="auth-title">ENTER THE SAGA</h2>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-mode="login">LOG IN</button>
+        <button class="auth-tab" data-auth-mode="signup">CREATE ACCOUNT</button>
+      </div>
+      <div class="auth-form">
+        <label class="auth-label">Username</label>
+        <input type="text" id="auth-username" maxlength="24" autocomplete="username" placeholder="hero name...">
+        <label class="auth-label">Password</label>
+        <input type="password" id="auth-password" maxlength="64" autocomplete="current-password" placeholder="password...">
+        <div class="auth-error hidden" id="auth-error"></div>
+        <button class="btn" id="auth-submit">SIGN IN</button>
+        <div class="auth-note">Data is saved in this browser only. Use the same browser to find your hero again.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="creation" class="panel hidden">
     <div class="creation-step">
       <h2 id="step-title">FORGE YOUR HERO</h2>
       <div id="step-content"></div>
@@ -794,6 +871,134 @@ const MONSTERS = [
 
 const PVP_NAMES = ['Aldric the Black', 'Sylvana Silverleaf', 'Grosh Skullbreaker', 'Mira the Whisper', 'Kael Ironhand', 'Lirien of the Vales', 'Drogath the Cruel', 'Vendra Catseye', 'Borin Deepforge', 'Skarn Faceless'];
 
+// ============ AUTH & PERSISTENCE ============
+// Client-side only. Accounts live in localStorage; passwords are SHA-256
+// hashed (no salt — basic, not real security). Per-device only.
+const STORAGE_KEY_ACCOUNTS = 'forgeBlood.v1.accounts';
+const STORAGE_KEY_ACTIVE = 'forgeBlood.v1.activeUser';
+
+async function hashPassword(password) {
+  // SubtleCrypto only works in secure contexts (HTTPS / localhost). When the
+  // file is opened via file:// (double-click on disk) we fall back to a
+  // simple djb2 hash so the auth flow still works for local testing.
+  if (window.isSecureContext && window.crypto && window.crypto.subtle) {
+    const enc = new TextEncoder().encode(password);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return 'sha256:' + Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  // Fallback — NOT secure, just prevents casual peeking
+  let h = 5381;
+  for (let i = 0; i < password.length; i++) {
+    h = ((h * 33) ^ password.charCodeAt(i)) >>> 0;
+  }
+  return 'djb2:' + h.toString(16);
+}
+
+function getAccounts() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY_ACCOUNTS) || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+function setAccounts(accounts) {
+  localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(accounts));
+}
+function getActiveUser() {
+  return localStorage.getItem(STORAGE_KEY_ACTIVE) || null;
+}
+function setActiveUser(username) {
+  localStorage.setItem(STORAGE_KEY_ACTIVE, username);
+}
+function clearActiveUser() {
+  localStorage.removeItem(STORAGE_KEY_ACTIVE);
+}
+
+async function tryLogin(username, password) {
+  const accounts = getAccounts();
+  const acc = accounts[username];
+  if (!acc) return { ok: false, error: 'No account with that username.' };
+  const hash = await hashPassword(password);
+  if (hash !== acc.passwordHash) return { ok: false, error: 'Wrong password.' };
+  setActiveUser(username);
+  return { ok: true, account: acc };
+}
+
+async function tryCreateAccount(username, password) {
+  if (username.length < 2) return { ok: false, error: 'Username must be at least 2 characters.' };
+  if (password.length < 4) return { ok: false, error: 'Password must be at least 4 characters.' };
+  const accounts = getAccounts();
+  if (accounts[username]) return { ok: false, error: 'That username is already taken in this browser.' };
+  const passwordHash = await hashPassword(password);
+  accounts[username] = { passwordHash, createdAt: Date.now(), hero: null };
+  setAccounts(accounts);
+  setActiveUser(username);
+  return { ok: true, account: accounts[username] };
+}
+
+function logout() {
+  saveGame(); // persist any pending change
+  clearActiveUser();
+  state.hero = null;
+  state.step = 0;
+  state.pendingHero = { race: null, class: null, name: '' };
+  showAuthScreen();
+}
+
+// Persist the live hero into the active account.
+function saveGame() {
+  const user = getActiveUser();
+  if (!user || !state.hero) return;
+  const accounts = getAccounts();
+  if (!accounts[user]) return;
+  accounts[user].hero = state.hero;
+  accounts[user].lastSavedAt = Date.now();
+  setAccounts(accounts);
+}
+
+function loadGame() {
+  const user = getActiveUser();
+  if (!user) return null;
+  const accounts = getAccounts();
+  const acc = accounts[user];
+  if (!acc) return null;
+  return acc.hero || null;
+}
+
+// ============ SCREEN ROUTING ============
+function showAuthScreen() {
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('creation').classList.add('hidden');
+  document.getElementById('game').classList.add('hidden');
+  document.getElementById('session-strip').classList.add('hidden');
+  // Reset form
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-error').classList.add('hidden');
+}
+function showCreationScreen() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('creation').classList.remove('hidden');
+  document.getElementById('game').classList.add('hidden');
+  showSessionStrip();
+  state.step = 0;
+  state.pendingHero = { race: null, class: null, name: '' };
+  renderCreation();
+}
+function showGameScreen() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('creation').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  showSessionStrip();
+  renderAll();
+}
+function showSessionStrip() {
+  const user = getActiveUser();
+  if (!user) return;
+  document.getElementById('session-user').textContent = user;
+  document.getElementById('session-strip').classList.remove('hidden');
+}
+
 // ============ STATE ============
 let state = {
   step: 0,
@@ -932,9 +1137,8 @@ function createHero() {
   recalculate();
   state.hero.hp = state.hero.maxHp;
   generatePvpOpponents();
-  document.getElementById('creation').classList.add('hidden');
-  document.getElementById('game').classList.remove('hidden');
-  renderAll();
+  saveGame();
+  showGameScreen();
 }
 
 // Spend one unspent stat point on a given attribute (atk/def/vit/agi).
@@ -945,6 +1149,7 @@ function spendStatPoint(stat) {
   h.statPoints--;
   h.base[stat] = (h.base[stat] || 0) + 1;
   recalculate();
+  saveGame();
   renderAll();
 }
 
@@ -1134,7 +1339,7 @@ function renderHero() {
       if (h.equipment[slot]) {
         h.inventory.push(h.equipment[slot]);
         h.equipment[slot] = null;
-        recalculate(); renderAll();
+        recalculate(); saveGame(); renderAll();
       }
     });
   });
@@ -1183,6 +1388,7 @@ function renderTalents() {
       h.talentPoints -= talent.cost;
       h.unlockedTalents.push(key);
       recalculate();
+      saveGame();
       renderAll();
     });
   });
@@ -1213,7 +1419,7 @@ function renderInventory() {
       state.hero.equipment[item.slot] = item;
       state.hero.inventory.splice(idx, 1);
       if (current) state.hero.inventory.push(current);
-      recalculate(); renderAll(); switchTab('hero');
+      recalculate(); saveGame(); renderAll(); switchTab('hero');
     });
   });
 }
@@ -1983,6 +2189,7 @@ function finishVictory(enemy, mode, log, heroFighter) {
   }
   recalculate();
   if (mode === 'pvp') generatePvpOpponents();
+  saveGame();
 }
 
 function finishDefeat(log, draw) {
@@ -1993,6 +2200,7 @@ function finishDefeat(log, draw) {
   }
   state.hero.hp = Math.max(1, Math.floor(state.hero.maxHp * 0.15));
   appendLog(log, `<div style="text-align:center; font-style:italic; color:var(--text-dim); padding:8px;">You wake wounded. You've recovered just enough to breathe.</div>`);
+  saveGame();
 }
 
 function appendLog(log, html) {
@@ -2027,7 +2235,95 @@ function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-renderCreation();
+// ============ AUTH FORM WIRING ============
+let _authMode = 'login'; // 'login' or 'signup'
+
+function setAuthMode(mode) {
+  _authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.authMode === mode);
+  });
+  document.getElementById('auth-submit').textContent = mode === 'login' ? 'SIGN IN' : 'CREATE & ENTER';
+  document.getElementById('auth-error').classList.add('hidden');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+async function handleAuthSubmit() {
+  const submitBtn = document.getElementById('auth-submit');
+  const username = document.getElementById('auth-username').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!username || !password) {
+    showAuthError('Username and password required.');
+    return;
+  }
+  submitBtn.disabled = true;
+  try {
+    const result = _authMode === 'login'
+      ? await tryLogin(username, password)
+      : await tryCreateAccount(username, password);
+    if (!result.ok) {
+      showAuthError(result.error);
+      return;
+    }
+    // Logged in — route based on whether this account has a hero
+    if (result.account.hero) {
+      state.hero = result.account.hero;
+      recalculate();
+      generatePvpOpponents();
+      showGameScreen();
+    } else {
+      showCreationScreen();
+    }
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+document.querySelectorAll('.auth-tab').forEach(t => {
+  t.addEventListener('click', () => setAuthMode(t.dataset.authMode));
+});
+document.getElementById('auth-submit').addEventListener('click', handleAuthSubmit);
+document.getElementById('auth-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleAuthSubmit();
+});
+document.getElementById('auth-username').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('auth-password').focus();
+});
+document.getElementById('session-logout').addEventListener('click', () => {
+  if (confirm('Log out? Your progress is saved.')) logout();
+});
+
+// ============ INIT ============
+function init() {
+  const user = getActiveUser();
+  if (!user) {
+    showAuthScreen();
+    return;
+  }
+  const accounts = getAccounts();
+  const acc = accounts[user];
+  if (!acc) {
+    // Active user pointer is stale; clear and start fresh
+    clearActiveUser();
+    showAuthScreen();
+    return;
+  }
+  if (acc.hero) {
+    state.hero = acc.hero;
+    recalculate();
+    generatePvpOpponents();
+    showGameScreen();
+  } else {
+    showCreationScreen();
+  }
+}
+
+init();
 </script>
 </body>
 </html>
