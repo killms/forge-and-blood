@@ -124,11 +124,40 @@
   .xp-bar-big .bar-text { line-height: 22px; font-size: 13px; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
   .stat-row {
-    display: flex; justify-content: space-between;
+    display: flex; justify-content: space-between; align-items: center;
     padding: 4px 0; border-bottom: 1px dashed rgba(74,56,38,0.5);
   }
   .stat-label { color: var(--text-dim); }
   .stat-val { color: var(--gold-bright); font-weight: 600; }
+  .stat-val-wrap { display: inline-flex; align-items: center; gap: 8px; }
+  .stat-add-btn {
+    background: var(--bg-deep);
+    border: 1px solid var(--uncommon);
+    color: var(--uncommon);
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 13px;
+    width: 22px; height: 22px; line-height: 1;
+    cursor: pointer; padding: 0;
+    box-shadow: 0 0 6px rgba(95,168,95,0.25);
+    transition: background 0.15s, color 0.15s;
+  }
+  .stat-add-btn:hover { background: var(--uncommon); color: var(--bg-deep); }
+  .attributes-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .stat-points-badge {
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px;
+    color: var(--uncommon); text-transform: uppercase;
+    background: var(--bg-deep);
+    border: 1px solid var(--uncommon);
+    padding: 4px 10px;
+    box-shadow: 0 0 8px rgba(95,168,95,0.25);
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 8px rgba(95,168,95,0.25); }
+    50% { box-shadow: 0 0 14px rgba(95,168,95,0.55); }
+  }
   .bar {
     height: 18px; background: var(--bg-deep); border: 1px solid var(--border);
     position: relative; overflow: hidden; margin: 4px 0;
@@ -360,7 +389,10 @@
       </div>
 
       <div class="panel">
-        <div class="section-title">Attributes</div>
+        <div class="attributes-header">
+          <div class="section-title" style="margin: 0;">Attributes</div>
+          <div class="stat-points-badge hidden" id="stat-points-badge">0 to spend</div>
+        </div>
         <div class="stats-grid" id="stats-grid"></div>
       </div>
 
@@ -854,6 +886,23 @@ document.getElementById('step-back').addEventListener('click', () => {
   }
 });
 
+// ============ LEVELING CONSTANTS ============
+// Soft cap: a hero stops gaining XP/levels after MAX_LEVEL. Future seasons
+// could raise this, or paragon levels could kick in.
+const MAX_LEVEL = 100;
+
+// XP needed to go from `level` to `level + 1`. Polynomial curve so the early
+// game is fast and the late game gets meaningfully slower without becoming
+// an impossible exponential like the old `xpNext *= 1.5`.
+//   L1→L2  ≈     80 XP
+//   L10→L11 ≈ 2,530 XP
+//   L50→L51 ≈ 28,284 XP
+//   L99→L100 ≈ 78,838 XP
+// Cumulative L1→L100 ≈ 2.5M XP.
+function xpForLevel(level) {
+  return Math.floor(80 * Math.pow(level, 1.5));
+}
+
 function createHero() {
   const ph = state.pendingHero;
   const cls = CLASSES[ph.class];
@@ -865,10 +914,11 @@ function createHero() {
     class: ph.class,
     level: 1,
     xp: 0,
-    xpNext: 100,
+    xpNext: xpForLevel(1),
     gold: 50,
     talentPoints: 1,
     unlockedTalents: [],
+    statPoints: 0,    // unspent attribute points; +1 per level
     base: {
       atk: cls.base.atk + race.mods.atk,
       def: cls.base.def + race.mods.def,
@@ -884,6 +934,17 @@ function createHero() {
   generatePvpOpponents();
   document.getElementById('creation').classList.add('hidden');
   document.getElementById('game').classList.remove('hidden');
+  renderAll();
+}
+
+// Spend one unspent stat point on a given attribute (atk/def/vit/agi).
+function spendStatPoint(stat) {
+  const h = state.hero;
+  if (!h || h.statPoints <= 0) return;
+  if (!['atk', 'def', 'vit', 'agi'].includes(stat)) return;
+  h.statPoints--;
+  h.base[stat] = (h.base[stat] || 0) + 1;
+  recalculate();
   renderAll();
 }
 
@@ -993,19 +1054,46 @@ function renderHero() {
   const hpPct = (h.hp / h.maxHp) * 100;
   document.getElementById('hp-bar').style.width = hpPct + '%';
   document.getElementById('hp-text').textContent = `${h.hp} / ${h.maxHp} HP`;
-  const xpPct = (h.xp / h.xpNext) * 100;
+
+  const atCap = h.level >= MAX_LEVEL;
+  const xpPct = atCap ? 100 : (h.xpNext > 0 ? (h.xp / h.xpNext) * 100 : 0);
   document.getElementById('xp-bar').style.width = xpPct + '%';
-  document.getElementById('xp-text').textContent = `${h.xp} / ${h.xpNext} XP`;
+  document.getElementById('xp-text').textContent = atCap ? 'MAX' : `${h.xp} / ${h.xpNext} XP`;
   document.getElementById('xp-level-badge').textContent = `Lv ${h.level}`;
-  document.getElementById('xp-next-value').textContent = `${h.xp} / ${h.xpNext}`;
+  document.getElementById('xp-next-value').textContent = atCap ? 'Max level reached' : `${h.xp} / ${h.xpNext}`;
 
   const grid = document.getElementById('stats-grid');
-  grid.innerHTML = `
-    <div class="stat-row"><span class="stat-label">Attack</span><span class="stat-val">${h.stats.atk}</span></div>
-    <div class="stat-row"><span class="stat-label">Defense</span><span class="stat-val">${h.stats.def}</span></div>
-    <div class="stat-row"><span class="stat-label">Vitality</span><span class="stat-val">${h.stats.vit}</span></div>
-    <div class="stat-row"><span class="stat-label">Agility</span><span class="stat-val">${h.stats.agi}</span></div>
-  `;
+  const canSpend = (h.statPoints || 0) > 0;
+  const rows = [
+    { key: 'atk', label: 'Attack', val: h.stats.atk },
+    { key: 'def', label: 'Defense', val: h.stats.def },
+    { key: 'vit', label: 'Vitality', val: h.stats.vit },
+    { key: 'agi', label: 'Agility', val: h.stats.agi }
+  ];
+  grid.innerHTML = rows.map(r => `
+    <div class="stat-row">
+      <span class="stat-label">${r.label}</span>
+      <span class="stat-val-wrap">
+        <span class="stat-val">${r.val}</span>
+        ${canSpend ? `<button class="stat-add-btn" data-stat="${r.key}" title="Spend 1 point on ${r.label}">+</button>` : ''}
+      </span>
+    </div>
+  `).join('');
+  if (canSpend) {
+    grid.querySelectorAll('[data-stat]').forEach(btn => {
+      btn.addEventListener('click', () => spendStatPoint(btn.dataset.stat));
+    });
+  }
+  // Stat-points badge next to the section title
+  const badge = document.getElementById('stat-points-badge');
+  if (badge) {
+    if (canSpend) {
+      badge.classList.remove('hidden');
+      badge.textContent = `${h.statPoints} to spend`;
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
 
   // Class passive + abilities
   const cls = CLASSES[h.class];
@@ -1859,7 +1947,11 @@ function finishVictory(enemy, mode, log, heroFighter) {
   // Human passive: +10% XP
   if (state.hero.race === 'human') xp = Math.floor(xp * 1.1);
   state.hero.gold += gold;
-  state.hero.xp += xp;
+
+  // XP is capped at MAX_LEVEL — no point accruing past the level cap.
+  if (state.hero.level < MAX_LEVEL) {
+    state.hero.xp += xp;
+  }
   // Persist post-combat HP from the live fighter (more reliable than reading the DOM)
   if (heroFighter) state.hero.hp = Math.max(1, Math.floor(heroFighter.hp));
 
@@ -1872,16 +1964,22 @@ function finishVictory(enemy, mode, log, heroFighter) {
   appendLog(log, `<div class="log-victory">⚔ VICTORY ⚔</div>`);
   appendLog(log, `<div class="reward">+${gold} gold · +${xp} XP${lootMsg}</div>`);
 
-  while (state.hero.xp >= state.hero.xpNext) {
+  // Level up. Each level grants 1 stat point and 1 talent point.
+  // Base stats no longer auto-increment — the player allocates them.
+  while (state.hero.level < MAX_LEVEL && state.hero.xp >= state.hero.xpNext) {
     state.hero.xp -= state.hero.xpNext;
     state.hero.level++;
     state.hero.talentPoints++;
-    state.hero.xpNext = Math.floor(state.hero.xpNext * 1.5);
-    state.hero.base.atk += 2;
-    state.hero.base.def += 2;
-    state.hero.base.vit += 3;
-    state.hero.base.agi += 1;
-    appendLog(log, `<div class="log-victory">★ LEVEL ${state.hero.level} ★<br><span style="font-size:13px; color: var(--text);">+1 talent point</span></div>`);
+    state.hero.statPoints++;
+    state.hero.xpNext = xpForLevel(state.hero.level);
+    appendLog(log,
+      `<div class="log-victory">★ LEVEL ${state.hero.level} ★<br>` +
+      `<span style="font-size:13px; color: var(--text);">+1 stat point · +1 talent point</span></div>`);
+  }
+  // If we reached the cap, freeze XP and clear xpNext so the bar reads "MAX".
+  if (state.hero.level >= MAX_LEVEL) {
+    state.hero.xp = 0;
+    state.hero.xpNext = 0;
   }
   recalculate();
   if (mode === 'pvp') generatePvpOpponents();
