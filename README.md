@@ -30,3 +30,7 @@ Active prototype. Built iteratively with Claude Code.
 
 - Sprite assets in `expansion_pack-0.04/` from the Liberated Pixel Cup expansion by Johannes Sjölund ("wulax"), via [OpenGameArt](https://opengameart.org/).
 - "LPC imp" pack in `assets/sprites/imp-*.gif` (derived from the original PNG sprite sheets) — original via [OpenGameArt — LPC imp](https://opengameart.org/content/lpc-imp). LPC assets are typically CC-BY-SA 3.0 / GPL 3.0 — check the upload page for the exact licence.
+- 3D model packs and UI pack by [Kenney](https://kenney.nl) (CC0 — no attribution required, but credited here anyway):
+  - `assets/town/` — Fantasy Town pack (3D models, used as a decorative render on the Hero tab)
+  - `assets/dungeon/` — Mini Dungeon pack (3D models, used as a decorative render on the Hunt tab)
+  - `assets/ui/` — UI Pack RPG Expansion (PNG + SVG, not yet wired in)

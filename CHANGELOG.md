@@ -6,6 +6,44 @@
 
 ---
 
+## Session 15 — 2026-05-18 — Kenney assets ingested (vistas + future 3D)
+
+### What the user did
+Dropped 3 Kenney packs at the repo root:
+- **Mini Dungeon** (3D, ~4MB) — dungeon tiles + characters
+- **Fantasy Town** (3D, ~12MB) — buildings, props, scenery
+- **UI Pack RPG Expansion** (2D, ~434KB) — buttons, panels, icons, bars
+
+### What was done this session
+- **Cleanup**: removed orphan duplicates that ended up at the repo root from re-extractions (loose `Models/`, `PNG/`, `Spritesheet/`, `Vector/`, `Previews/`, `Overview.html`, etc.).
+- **Reorganised** into clean paths:
+  - `assets/town/` (from Fantasy Town)
+  - `assets/dungeon/` (from Mini Dungeon)
+  - `assets/ui/` (from UI pack)
+- **Vistas wired in**: each pack's `Preview (Variation A).png` was copied to a simple-named `vista.png` and used as a decorative header:
+  - `assets/town/vista.png` → Hero tab header
+  - `assets/dungeon/vista.png` → Hunt tab (expedition list view only — not during an active expedition)
+- CSS treatment on `.vista`: 130px tall, `cover` background, vignette + bottom gradient to dark, slight desaturation. Blends with the dark fantasy theme.
+- Credits added in `README.md` (Kenney packs are CC0, no attribution required, but noted anyway).
+
+### What was DEFERRED (and why)
+- **UI pack integration** — the Kenney UI style is medieval-parchment / wood / earthy tones. The game's current aesthetic is dark fantasy gold/blood (closer to Diablo / Darkest Dungeon). Mixing would look incoherent. Two viable paths for later:
+  - Use only specific brown-toned UI elements (buttonLong_brown, buttonSquare_brown) that match the gold accents.
+  - Fully commit to the Kenney aesthetic and redo the CSS theme. Bigger work.
+- **3D scenes** — the GLB models in both packs are unused. Path forward:
+  - Add Three.js (~150KB) and render the town as a rotating scene on the Hero tab.
+  - Render the dungeon as a 3D mini-map per expedition. ~2-3 sessions of work, ~16MB of assets actually loaded.
+
+### Files touched
+- `index.html` — vista markup + CSS
+- `README.md` — credits
+- New: `assets/town/`, `assets/dungeon/`, `assets/ui/` (full packs committed for future use)
+
+### Repo size note
+The new packs add ~16MB to the repo. GitHub Pages serves them on demand — the page only loads the two `vista.png` files (~1MB total). The rest sits ready for when we wire up 3D or fuller UI.
+
+---
+
 ## Session 14 — 2026-05-18 — Visual expedition map (Slay-the-Spire style)
 
 ### What changed

@@ -43,6 +43,26 @@
   }
   .tab.active { background: var(--border); color: var(--gold-bright); }
 
+  /* Decorative vista images (Kenney 3D renders used as flat backgrounds).
+     Treated with a vignette + gradient so they blend with the dark theme. */
+  .vista {
+    height: 130px; margin-bottom: 14px;
+    background-size: cover; background-position: center 35%;
+    background-repeat: no-repeat;
+    border: 1px solid var(--border);
+    position: relative;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.65),
+                inset 0 -40px 50px -20px var(--bg);
+    filter: saturate(0.85);
+  }
+  .vista::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(8,8,8,0.7) 100%);
+    pointer-events: none;
+  }
+  .vista-town    { background-image: url('assets/town/vista.png'); }
+  .vista-dungeon { background-image: url('assets/dungeon/vista.png'); }
+
   /* Hunt — expeditions */
   .hunt-intro {
     font-style: italic; color: var(--text-dim); font-size: 13px;
@@ -989,6 +1009,7 @@
     </div>
 
     <div id="tab-hero" class="tab-content">
+      <div class="vista vista-town" aria-hidden="true"></div>
       <div class="panel">
         <div class="hero-header">
           <div>
@@ -3205,6 +3226,7 @@ function renderPve() {
       </div>`;
     }).join('');
     list.innerHTML = `
+      <div class="vista vista-dungeon" aria-hidden="true"></div>
       <div class="hunt-intro">Choose a path. Each expedition is a sequence of encounters — combat, treasure, choices, and a boss at the end.</div>
       ${cards}
       <details class="hunt-quick">
