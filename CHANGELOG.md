@@ -2,7 +2,34 @@
 
 > Running log of every meaningful change. **Newest at the top.** A future Claude reading this should understand the current state of the project without having to read the full source.
 >
-> When continuing in a new chat, paste this file in and say "read this, then read `rpg-prototype-v2.html`, then we'll continue."
+> When continuing in a new chat, paste this file in and say "read this, then read `index.html`, then we'll continue."
+
+---
+
+## Session 2 (continued) — 2026-05-17 — Deploy prep (rename to index.html, README)
+
+### Goal
+- Get a public URL the user can open on their phone (working remotely via remote-desktop, can't open the local file).
+
+### Changes
+- Renamed `rpg-prototype-v2.html` → `index.html` so the GitHub Pages URL is clean (`/` instead of `/rpg-prototype-v2.html`). Used `git mv` so history is preserved.
+- Created `README.md` for the GitHub repo page.
+- Updated `PROJECT-SUMMARY.md` and `CLAUDE-CODE-STEPS.md` references to the new filename.
+- Hosting choice: **GitHub Pages** (public repo under user account `killms`, free, auto-deploys on push).
+- `gh` CLI is installed (2.92.0) but not authenticated locally — the user needs to run `gh auth login` once. After that, the repo create + Pages enable is a single command.
+
+### Deploy commands (run from `F:\Jogo`, after `gh auth login`)
+```bash
+gh repo create killms/forge-and-blood --public --source=. --remote=origin --push
+gh api -X POST /repos/killms/forge-and-blood/pages -f source[branch]=main -f source[path]=/
+```
+Final URL: **https://killms.github.io/forge-and-blood/**
+
+### Files touched
+- `index.html` (renamed from `rpg-prototype-v2.html`)
+- `README.md` (new)
+- `PROJECT-SUMMARY.md`, `CLAUDE-CODE-STEPS.md` (filename refs)
+- `CHANGELOG.md` (this entry)
 
 ---
 

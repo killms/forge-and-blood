@@ -228,6 +228,6 @@ forge-and-blood/
 
 ## How to continue from the current code
 
-The `rpg-prototype-v2.html` file has EVERYTHING in a single file. The first step on Claude Code will be to split it into modules following the structure above.
+The `index.html` file has EVERYTHING in a single file. The first step on Claude Code will be to split it into modules following the structure above.
 
 All the logic is already there — it just needs to be reorganised and expanded.

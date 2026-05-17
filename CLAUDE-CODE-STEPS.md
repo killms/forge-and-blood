@@ -4,7 +4,7 @@
 
 This folder contains a working prototype of **Forge & Blood**, a fully idle turn-based RPG.
 
-- `rpg-prototype-v2.html` — the prototype, single file (HTML + CSS + JS)
+- `index.html` — the prototype, single file (HTML + CSS + JS)
 - `PROJECT-SUMMARY.md` — full design context (races, classes, combat, roadmap)
 - `CLAUDE-CODE-STEPS.md` — this file
 
@@ -17,7 +17,7 @@ Git is initialised in this folder. Each meaningful change should be committed.
 Pick ONE task per session. Test in the browser before moving on.
 
 ### Session 1 — Modularise
-Split `rpg-prototype-v2.html` into the file structure proposed at the bottom of `PROJECT-SUMMARY.md` (HTML shell, separate CSS, JS split per system). **Test that the game still runs identically before continuing.**
+Split `index.html` into the file structure proposed at the bottom of `PROJECT-SUMMARY.md` (HTML shell, separate CSS, JS split per system). **Test that the game still runs identically before continuing.**
 
 ### Session 2 — Persistence (localStorage)
 Auto-save / auto-load the hero state. Add a "Wipe progress" button with a confirmation prompt.
@@ -40,7 +40,7 @@ Once everything else is solid: bouncing sprites, floating damage numbers, screen
 
 - **One task per session.** Small change → test → next.
 - **Always commit before risky refactors** so you can `git reset` if needed.
-- **Test in the browser**, not just in the code. Open `rpg-prototype-v2.html` directly.
+- **Test in the browser**, not just in the code. Open `index.html` directly.
 - **When the chat gets long, start a new one.** Claude Code reads the project files, so it doesn't need to remember everything — just point it at the file you're editing.
 
 ---
