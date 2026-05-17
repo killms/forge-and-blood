@@ -63,6 +63,80 @@
   .vista-town    { background-image: url('assets/town/vista.png'); }
   .vista-dungeon { background-image: url('assets/dungeon/vista.png'); }
 
+  /* Toast notifications (achievements, level-ups, rare loot) */
+  .toast-stack {
+    position: fixed; top: 12px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000; display: flex; flex-direction: column; gap: 6px;
+    pointer-events: none;
+    max-width: 460px; width: calc(100% - 24px);
+  }
+  .toast {
+    background: var(--bg-deep); border: 1px solid var(--gold);
+    padding: 10px 14px; display: flex; gap: 10px; align-items: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 16px rgba(201,165,87,0.3);
+    animation: toast-in 0.35s ease-out, toast-out 0.4s ease-in 3.6s forwards;
+    pointer-events: auto;
+  }
+  .toast.achievement { border-color: var(--legendary); box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 22px rgba(232,149,48,0.5); }
+  .toast.levelup     { border-color: var(--rare); box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 22px rgba(74,143,214,0.5); }
+  .toast.loot        { border-color: var(--epic); box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 22px rgba(168,95,214,0.5); }
+  .toast-icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
+  .toast-body { flex: 1; min-width: 0; }
+  .toast-title {
+    font-family: 'Cinzel', serif; font-size: 13px;
+    color: var(--gold-bright); letter-spacing: 1px;
+  }
+  .toast-desc { font-size: 12px; color: var(--text); margin-top: 2px; }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toast-out {
+    to   { opacity: 0; transform: translateY(-8px); }
+  }
+
+  /* Active item sets in Hero/Equipment panel */
+  .active-sets { margin-top: 10px; }
+  .active-set-row {
+    background: var(--bg-deep); border: 1px solid var(--uncommon);
+    padding: 8px 10px; margin-top: 6px; font-size: 12px;
+  }
+  .active-set-name {
+    font-family: 'Cinzel', serif; color: var(--uncommon);
+    letter-spacing: 1px; margin-bottom: 2px;
+  }
+  .active-set-bonus { color: var(--text-dim); font-style: italic; }
+
+  /* Achievements list */
+  .ach-count {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--gold-bright); margin-left: 8px;
+    letter-spacing: 1px;
+  }
+  .ach-list { display: grid; gap: 6px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+  .ach-row {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 8px 10px; display: flex; gap: 10px; align-items: center;
+    font-size: 12px;
+  }
+  .ach-row.unlocked { border-color: var(--legendary); }
+  .ach-row.unlocked .ach-name { color: var(--legendary); }
+  .ach-icon { font-size: 20px; line-height: 1; flex-shrink: 0; width: 24px; text-align: center; }
+  .ach-row.locked .ach-icon { filter: grayscale(1); opacity: 0.4; }
+  .ach-info { flex: 1; min-width: 0; }
+  .ach-name {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    color: var(--gold-bright); letter-spacing: 0.5px;
+  }
+  .ach-row.locked .ach-name { color: var(--text-dim); }
+  .ach-desc { color: var(--text-dim); font-size: 11px; font-style: italic; }
+  .ach-reward {
+    font-size: 11px; color: var(--uncommon);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .ach-row.locked .ach-reward { color: var(--text-dim); }
+
   /* Hunt — expeditions */
   .hunt-intro {
     font-style: italic; color: var(--text-dim); font-size: 13px;
@@ -1059,6 +1133,12 @@
       <div class="panel">
         <div class="section-title">Equipment</div>
         <div class="equipment" id="equipment"></div>
+        <div id="active-sets" class="active-sets"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">Achievements <span class="ach-count" id="ach-count"></span></div>
+        <div class="ach-list" id="ach-list"></div>
       </div>
     </div>
 
@@ -1125,6 +1205,8 @@
         </div>
       </div>
     </div>
+
+    <div id="toast-stack" class="toast-stack"></div>
 
     <div id="combat" class="hidden">
       <div class="panel">
@@ -1258,7 +1340,15 @@ const MONSTER_PORTRAITS = {
   'Skeleton Warrior': { glyph: '💀', tint: '#cfc7a8' },
   'Cave Ogre':        { glyph: '👺', tint: '#8b6a3e' },
   'Awakened Lich':    { glyph: '☠',  tint: '#7b5fd6' },
-  'Young Dragon':     { glyph: '🐉', tint: '#e89530' }
+  'Young Dragon':     { glyph: '🐉', tint: '#e89530' },
+  // Burning Wastes
+  'Fire Imp':         { glyph: '😈', tint: '#e85a30' },
+  'Lava Hound':       { glyph: '🔥', tint: '#c93030' },
+  'Salamander King':  { glyph: '🦎', tint: '#e89530' },
+  // Frozen Spires
+  'Frost Wolf':       { glyph: '❄️', tint: '#9ec5d8' },
+  'Ice Wraith':       { glyph: '👻', tint: '#cfe0ff' },
+  'Glacial Golem':    { glyph: '🗿', tint: '#7fa3c8' }
 };
 
 // ============ CLASSES ============
@@ -1820,7 +1910,17 @@ const MONSTERS = [
   { name: 'Skeleton Warrior', tier: 4, baseAtk: 16, baseDef: 10, baseVit: 24, baseAgi: 6, baseInt: 0, abilities: ['bone_strike', 'bone_shield'] },
   { name: 'Cave Ogre', tier: 5, baseAtk: 22, baseDef: 12, baseVit: 38, baseAgi: 4, baseInt: 0, abilities: ['smash', 'roar_fear'] },
   { name: 'Awakened Lich', tier: 7, baseAtk: 22, baseDef: 14, baseVit: 50, baseAgi: 10, baseInt: 30, abilities: ['arcane_bolt', 'curse_mob', 'drain_life'] },
-  { name: 'Young Dragon', tier: 10, baseAtk: 42, baseDef: 22, baseVit: 80, baseAgi: 12, baseInt: 20, abilities: ['fire_breath', 'tail_swipe', 'dragon_roar'] }
+  { name: 'Young Dragon', tier: 10, baseAtk: 42, baseDef: 22, baseVit: 80, baseAgi: 12, baseInt: 20, abilities: ['fire_breath', 'tail_swipe', 'dragon_roar'] },
+
+  // === Burning Wastes (fire biome) ===
+  { name: 'Fire Imp', tier: 3, baseAtk: 13, baseDef: 4, baseVit: 16, baseAgi: 11, baseInt: 12, abilities: ['ember_dart', 'quick_jab'] },
+  { name: 'Lava Hound', tier: 5, baseAtk: 24, baseDef: 8, baseVit: 32, baseAgi: 10, baseInt: 0, abilities: ['rend', 'fire_bite'] },
+  { name: 'Salamander King', tier: 8, baseAtk: 30, baseDef: 14, baseVit: 55, baseAgi: 8, baseInt: 25, abilities: ['fire_breath', 'molten_strike', 'fire_bite'] },
+
+  // === Frozen Spires (ice biome) ===
+  { name: 'Frost Wolf', tier: 4, baseAtk: 18, baseDef: 6, baseVit: 22, baseAgi: 13, baseInt: 0, abilities: ['rend', 'icy_bite'] },
+  { name: 'Ice Wraith', tier: 6, baseAtk: 16, baseDef: 8, baseVit: 32, baseAgi: 14, baseInt: 28, abilities: ['frost_bolt', 'chilling_touch', 'drain_life'] },
+  { name: 'Glacial Golem', tier: 9, baseAtk: 36, baseDef: 24, baseVit: 75, baseAgi: 4, baseInt: 10, abilities: ['smash', 'ice_armor', 'frost_bolt'] }
 ];
 
 // Monster-only abilities (not class talents). Keyed by id, referenced from
@@ -1838,7 +1938,16 @@ const MONSTER_ABILITIES = {
   drain_life:    { name: 'Drain Life',   type: 'active', school: 'magical', ability: { dmgMult: 1.5, lifestealOnce: 0.8, magical: true, cd: 5 } },
   fire_breath:   { name: 'Fire Breath',  type: 'active', school: 'magical', ability: { dmgMult: 2, dot: 8, dur: 3, magical: true, cd: 5 } },
   tail_swipe:    { name: 'Tail Swipe',   type: 'active', school: 'melee',   ability: { dmgMult: 1.8, stun: 1, cd: 4 } },
-  dragon_roar:   { name: "Dragon's Roar", type: 'active', school: 'melee',  ability: { debuffAtk: 0.4, debuffAgi: 0.3, dur: 3, cd: 7 } }
+  dragon_roar:   { name: "Dragon's Roar", type: 'active', school: 'melee',  ability: { debuffAtk: 0.4, debuffAgi: 0.3, dur: 3, cd: 7 } },
+  // Fire biome
+  ember_dart:    { name: 'Ember Dart',   type: 'active', school: 'magical', ability: { dmgMult: 1.3, magical: true, dot: 4, dur: 3, cd: 3 } },
+  fire_bite:     { name: 'Fire Bite',    type: 'active', school: 'melee',   ability: { dmgMult: 1.4, dot: 5, dur: 3, cd: 4 } },
+  molten_strike: { name: 'Molten Strike', type: 'active', school: 'melee',  ability: { dmgMult: 2, armorPen: 0.4, dot: 6, dur: 3, cd: 5 } },
+  // Ice biome
+  icy_bite:      { name: 'Icy Bite',     type: 'active', school: 'melee',   ability: { dmgMult: 1.3, debuffAgi: 0.3, dur: 2, cd: 4 } },
+  frost_bolt:    { name: 'Frost Bolt',   type: 'active', school: 'magical', ability: { dmgMult: 1.5, magical: true, debuffAgi: 0.4, dur: 3, cd: 4 } },
+  chilling_touch:{ name: 'Chilling Touch', type: 'active', school: 'magical', ability: { dmgMult: 1.2, magical: true, debuffAtk: 0.35, dur: 3, cd: 5 } },
+  ice_armor:     { name: 'Ice Armor',    type: 'active', school: 'magical', ability: { buffDef: 0.8, magical: true, dur: 3, cd: 6 } }
 };
 
 // Scale a monster template by hero level. Effective monster level matches
@@ -1916,6 +2025,32 @@ const EXPEDITIONS = [
     boss: 'Young Dragon',
     treasureChance: 0.20,
     eventChance: 0.10
+  },
+  {
+    key: 'burning-wastes',
+    name: 'The Burning Wastes',
+    desc: 'Cracked earth, ash skies, and things that crawl from the lava.',
+    glyph: '🌋',
+    tint: '#e85a30',
+    minLevel: 25,
+    nodes: 7,
+    monsters: ['Fire Imp', 'Lava Hound', 'Ash Wolf', 'Awakened Lich'],
+    boss: 'Salamander King',
+    treasureChance: 0.22,
+    eventChance: 0.13
+  },
+  {
+    key: 'frozen-spires',
+    name: 'The Frozen Spires',
+    desc: 'Wind cuts deeper than steel. Eyes glint in the white.',
+    glyph: '🏔️',
+    tint: '#9ec5d8',
+    minLevel: 40,
+    nodes: 8,
+    monsters: ['Frost Wolf', 'Skeleton Warrior', 'Ice Wraith', 'Cave Ogre'],
+    boss: 'Glacial Golem',
+    treasureChance: 0.20,
+    eventChance: 0.15
   }
 ];
 
@@ -1986,6 +2121,191 @@ const EXPEDITION_EVENTS = [
           }
           return `You pocket ${g} ◊ and slip away.`;
         } }
+    ]
+  },
+  {
+    key: 'mysterious-merchant',
+    title: 'A mysterious merchant',
+    text: 'A cloaked figure spreads three wares on a cloth: a sealed crate.',
+    choices: [
+      { key: 'buy_uncommon', label: 'Buy sealed crate (80 ◊)',
+        cost: 80,
+        effect: (h) => {
+          if (h.gold < 80) return 'You can\'t afford it.';
+          h.gold -= 80;
+          const loot = rollLootByLevel(h.level);
+          h.inventory.push(loot);
+          return `You unsealed: ${loot.name}.`;
+        } },
+      { key: 'walk',  label: 'Walk on', effect: () => 'You walk on.' }
+    ]
+  },
+  {
+    key: 'lone-grave',
+    title: 'A lone grave',
+    text: 'A grave marker with a rusted sword stuck in the earth.',
+    choices: [
+      { key: 'pull', label: 'Pull the sword (random item)',
+        effect: (h) => {
+          const loot = rollLootByLevel(h.level);
+          h.inventory.push(loot);
+          if (Math.random() < 0.4) {
+            const dmg = Math.floor(h.maxHp * 0.2);
+            h.hp = Math.max(1, h.hp - dmg);
+            return `A ghostly hand grabs at you. -${dmg} HP. You took: ${loot.name}.`;
+          }
+          return `The sword comes loose easily. You took: ${loot.name}.`;
+        } },
+      { key: 'pray',  label: 'Pay respects', effect: () => 'You bow your head and move on.' }
+    ]
+  },
+  {
+    key: 'gambling-cultist',
+    title: 'A gambling cultist',
+    text: 'A robed gambler offers double-or-nothing on 50 ◊.',
+    choices: [
+      { key: 'bet', label: 'Bet 50 ◊',
+        cost: 50,
+        effect: (h) => {
+          if (h.gold < 50) return 'You can\'t afford the bet.';
+          h.gold -= 50;
+          if (Math.random() < 0.5) { h.gold += 100; return 'You won! +100 ◊.'; }
+          return 'You lost the wager.';
+        } },
+      { key: 'pass', label: 'Refuse', effect: () => 'The cultist shrugs and pockets the dice.' }
+    ]
+  },
+  {
+    key: 'training-dummy',
+    title: 'A training dummy',
+    text: 'A straw dummy in a clearing. Some hero left it here years ago.',
+    choices: [
+      { key: 'train', label: 'Train (+50 XP)',
+        xp: 50,
+        effect: () => 'You drill the basics. The dummy hisses sand.' },
+      { key: 'skip', label: 'Skip', effect: () => 'No time for drills.' }
+    ]
+  },
+  {
+    key: 'ambush',
+    title: 'Ambush!',
+    text: 'Bandits leap from the bushes! You can fight or try to flee.',
+    choices: [
+      { key: 'fight', label: 'Stand and fight (auto)',
+        effect: (h) => {
+          const g = randInt(30, 70); h.gold += g;
+          const xp = 30 + h.level * 3;
+          if (h.level < MAX_LEVEL) h.xp += xp;
+          const dmg = Math.floor(h.maxHp * 0.2);
+          h.hp = Math.max(1, h.hp - dmg);
+          return `You drive them off. -${dmg} HP, +${g} ◊, +${xp} XP.`;
+        } },
+      { key: 'flee',  label: 'Flee',
+        effect: (h) => {
+          if (Math.random() < 0.5) {
+            const lost = Math.min(h.gold, randInt(20, 50));
+            h.gold -= lost;
+            return `They catch up and snatch ${lost} ◊ from you.`;
+          }
+          return 'You escape clean.';
+        } }
+    ]
+  },
+  {
+    key: 'oasis',
+    title: 'A small oasis',
+    text: 'Clear water against the dust. A few moments of peace.',
+    choices: [
+      { key: 'rest', label: 'Rest (heal to full)',
+        effect: (h) => { h.hp = h.maxHp; if (h.maxMp) h.mp = h.maxMp; return 'You rise refreshed.'; } },
+      { key: 'press', label: 'Press on',
+        effect: (h) => { const xp = 20; if (h.level < MAX_LEVEL) h.xp += xp; return `You push through. +${xp} XP.`; },
+        xp: 20 }
+    ]
+  },
+  {
+    key: 'broken-altar',
+    title: 'A shattered altar',
+    text: 'Dark stones, scorch marks, broken icons. Something terrible happened here.',
+    choices: [
+      { key: 'kneel', label: 'Kneel briefly',
+        effect: (h) => {
+          const g = randInt(30, 60); h.gold += g;
+          return `You find ${g} ◊ scattered among the stones.`;
+        } },
+      { key: 'desecrate', label: 'Desecrate further',
+        effect: (h) => {
+          if (Math.random() < 0.4) {
+            const loot = rollLootByLevel(h.level);
+            h.inventory.push(loot);
+            return `Something shifts. You find: ${loot.name}.`;
+          }
+          const dmg = Math.floor(h.maxHp * 0.3);
+          h.hp = Math.max(1, h.hp - dmg);
+          return `Lightning cracks. -${dmg} HP.`;
+        } }
+    ]
+  },
+  {
+    key: 'wandering-bard',
+    title: 'A wandering bard',
+    text: 'A bard offers to play you a song of courage.',
+    choices: [
+      { key: 'pay',   label: 'Pay 25 ◊',
+        cost: 25,
+        effect: (h) => {
+          if (h.gold < 25) return 'Coin is short.';
+          h.gold -= 25;
+          h.hp = Math.min(h.maxHp, h.hp + Math.floor(h.maxHp * 0.4));
+          return 'Your wounds feel lighter. Healed for 40% maxHP.';
+        } },
+      { key: 'pass', label: 'Move along', effect: () => 'You leave the bard mid-verse.' }
+    ]
+  },
+  {
+    key: 'ancient-statue',
+    title: 'An ancient statue',
+    text: 'A weather-worn statue of a forgotten king holds out an open hand.',
+    choices: [
+      { key: 'offer', label: 'Offer 100 ◊',
+        cost: 100,
+        effect: (h) => {
+          if (h.gold < 100) return 'You don\'t have 100 ◊.';
+          h.gold -= 100;
+          const xp = 200; if (h.level < MAX_LEVEL) h.xp += xp;
+          return `The statue thrums faintly. +${xp} XP.`;
+        }, xp: 200 },
+      { key: 'pass', label: 'Move along', effect: () => 'You move along.' }
+    ]
+  },
+  {
+    key: 'forgotten-cache',
+    title: 'A forgotten cache',
+    text: 'A hidden compartment in the wall. Old explorer\'s stash.',
+    choices: [
+      { key: 'take', label: 'Take it all',
+        effect: (h) => {
+          const g = randInt(60, 140); h.gold += g;
+          if (Math.random() < 0.8) {
+            const loot = rollLootByLevel(h.level);
+            h.inventory.push(loot);
+            return `+${g} ◊  ·  ${loot.name}.`;
+          }
+          return `+${g} ◊.`;
+        } }
+    ]
+  },
+  {
+    key: 'lost-pilgrim',
+    title: 'A lost pilgrim',
+    text: 'A pilgrim asks the way out of here. They have nothing to give.',
+    choices: [
+      { key: 'guide', label: 'Guide them',
+        effect: (h) => {
+          const xp = 80; if (h.level < MAX_LEVEL) h.xp += xp;
+          return `A small kindness. +${xp} XP.`;
+        }, xp: 80 },
+      { key: 'ignore', label: 'Pretend not to hear', effect: () => 'You walk past.' }
     ]
   }
 ];
@@ -2121,6 +2441,7 @@ function migrateHero(hero) {
   }
   if (typeof hero.maxMp !== 'number') hero.maxMp = 0;
   if (typeof hero.mp !== 'number') hero.mp = 0;
+  ensureTracking(hero);
   return hero;
 }
 
@@ -2156,6 +2477,204 @@ function showSessionStrip() {
   if (!user) return;
   document.getElementById('session-user').textContent = user;
   document.getElementById('session-strip').classList.remove('hidden');
+}
+
+// ============ ACHIEVEMENTS ============
+// Permanent stat bonuses + one-time rewards for milestones. Each entry:
+//   key, name, desc, check(tracking, hero) -> bool, reward { atk/def/vit/agi/int permanent | goldOnce }
+const ACHIEVEMENTS = [
+  // Combat
+  { key: 'first_blood', name: 'First Blood', desc: 'Win your first fight.', icon: '⚔',
+    check: t => t.monstersKilled >= 1, reward: { goldOnce: 10 } },
+  { key: 'slayer_1', name: 'Slayer I', desc: 'Defeat 10 monsters.', icon: '⚔',
+    check: t => t.monstersKilled >= 10, reward: { atk: 1 } },
+  { key: 'slayer_2', name: 'Slayer II', desc: 'Defeat 50 monsters.', icon: '⚔',
+    check: t => t.monstersKilled >= 50, reward: { atk: 3 } },
+  { key: 'slayer_3', name: 'Slayer III', desc: 'Defeat 250 monsters.', icon: '⚔',
+    check: t => t.monstersKilled >= 250, reward: { atk: 6, vit: 4 } },
+  { key: 'slayer_4', name: 'Reaper', desc: 'Defeat 1000 monsters.', icon: '💀',
+    check: t => t.monstersKilled >= 1000, reward: { atk: 12, vit: 8, agi: 4 } },
+  // Bosses
+  { key: 'boss_first', name: 'Boss Hunter', desc: 'Slay your first boss.', icon: '👑',
+    check: t => t.bossesKilled >= 1, reward: { atk: 2, vit: 2 } },
+  { key: 'boss_unique_3', name: 'Wide Hunter', desc: 'Slay 3 different boss types.', icon: '👑',
+    check: t => Object.keys(t.bossesByName || {}).length >= 3, reward: { atk: 5, vit: 5 } },
+  // Levels
+  { key: 'lvl_10', name: 'Apprentice', desc: 'Reach level 10.', icon: '★',
+    check: (t, h) => h.level >= 10, reward: { atk: 1, def: 1, vit: 1, agi: 1, int: 1 } },
+  { key: 'lvl_25', name: 'Veteran', desc: 'Reach level 25.', icon: '★',
+    check: (t, h) => h.level >= 25, reward: { atk: 3, def: 3, vit: 3, agi: 3, int: 3 } },
+  { key: 'lvl_50', name: 'Champion', desc: 'Reach level 50.', icon: '★',
+    check: (t, h) => h.level >= 50, reward: { atk: 6, def: 6, vit: 6, agi: 6, int: 6 } },
+  { key: 'lvl_100', name: 'Legendary', desc: 'Reach the level cap.', icon: '★',
+    check: (t, h) => h.level >= 100, reward: { atk: 15, def: 15, vit: 15, agi: 15, int: 15 } },
+  // Expeditions
+  { key: 'expedition_1', name: 'Explorer', desc: 'Complete your first expedition.', icon: '🗺',
+    check: t => t.expeditionsCompleted >= 1, reward: { goldOnce: 100 } },
+  { key: 'expedition_10', name: 'Pathfinder', desc: 'Complete 10 expeditions.', icon: '🗺',
+    check: t => t.expeditionsCompleted >= 10, reward: { atk: 3, agi: 3 } },
+  // Loot
+  { key: 'loot_rare', name: 'Lucky', desc: 'Find your first rare item.', icon: '✦',
+    check: t => (t.itemsByRarity && t.itemsByRarity.rare >= 1) || (t.itemsByRarity && (t.itemsByRarity.epic >= 1 || t.itemsByRarity.legendary >= 1)),
+    reward: { agi: 1 } },
+  { key: 'loot_epic', name: 'Treasure Hunter', desc: 'Find your first epic item.', icon: '✦',
+    check: t => (t.itemsByRarity && t.itemsByRarity.epic >= 1) || (t.itemsByRarity && t.itemsByRarity.legendary >= 1),
+    reward: { agi: 3 } },
+  { key: 'loot_legendary', name: 'Mythbreaker', desc: 'Find your first legendary item.', icon: '✦',
+    check: t => t.itemsByRarity && t.itemsByRarity.legendary >= 1, reward: { atk: 5, agi: 3 } },
+  // Wealth
+  { key: 'gold_1000', name: 'Coin Stack', desc: 'Earn 1,000 gold total.', icon: '◊',
+    check: t => t.totalGoldEarned >= 1000, reward: { goldOnce: 100 } },
+  { key: 'gold_10000', name: 'Wealthy', desc: 'Earn 10,000 gold total.', icon: '◊',
+    check: t => t.totalGoldEarned >= 10000, reward: { vit: 5 } },
+  // Misc
+  { key: 'talent_all_tiers', name: 'Talented', desc: 'Pick a talent in every tier.', icon: '◈',
+    check: (t, h) => h.talentPicks && Object.keys(h.talentPicks).length >= TIER_UNLOCKS.length,
+    reward: { atk: 4, int: 4 } }
+];
+
+function ensureTracking(hero) {
+  if (!hero.tracking) {
+    hero.tracking = {
+      monstersKilled: 0,
+      bossesKilled: 0,
+      bossesByName: {},
+      expeditionsCompleted: 0,
+      itemsByRarity: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 },
+      totalGoldEarned: 0,
+      unlockedAchievements: []
+    };
+  }
+  // Backfill any missing sub-fields
+  if (!hero.tracking.bossesByName) hero.tracking.bossesByName = {};
+  if (!hero.tracking.itemsByRarity) hero.tracking.itemsByRarity = { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 };
+  if (!hero.tracking.unlockedAchievements) hero.tracking.unlockedAchievements = [];
+  return hero.tracking;
+}
+
+function getAchievementBonusStats() {
+  const bonus = { atk: 0, def: 0, vit: 0, agi: 0, int: 0 };
+  if (!state.hero || !state.hero.tracking) return bonus;
+  state.hero.tracking.unlockedAchievements.forEach(key => {
+    const ach = ACHIEVEMENTS.find(a => a.key === key);
+    if (!ach || !ach.reward) return;
+    ['atk', 'def', 'vit', 'agi', 'int'].forEach(s => {
+      if (ach.reward[s]) bonus[s] += ach.reward[s];
+    });
+  });
+  return bonus;
+}
+
+// Run checks; for each newly satisfied achievement, mark unlocked, apply
+// one-time gold, fire a toast. Returns the list of newly unlocked ones.
+function checkAchievements() {
+  if (!state.hero) return [];
+  const t = ensureTracking(state.hero);
+  const newlyUnlocked = [];
+  ACHIEVEMENTS.forEach(ach => {
+    if (t.unlockedAchievements.includes(ach.key)) return;
+    let ok = false;
+    try { ok = ach.check(t, state.hero); } catch (e) { ok = false; }
+    if (ok) {
+      t.unlockedAchievements.push(ach.key);
+      newlyUnlocked.push(ach);
+      if (ach.reward && ach.reward.goldOnce) {
+        state.hero.gold += ach.reward.goldOnce;
+      }
+    }
+  });
+  if (newlyUnlocked.length > 0) {
+    recalculate();
+    newlyUnlocked.forEach(ach => showToast({
+      icon: ach.icon || '🏆',
+      title: 'Achievement: ' + ach.name,
+      desc: ach.desc + (ach.reward ? ' · ' + formatReward(ach.reward) : ''),
+      kind: 'achievement'
+    }));
+    saveGame();
+  }
+  return newlyUnlocked;
+}
+
+function formatReward(r) {
+  const parts = [];
+  ['atk', 'def', 'vit', 'agi', 'int'].forEach(s => {
+    if (r[s]) parts.push(`+${r[s]} ${statLabel(s)}`);
+  });
+  if (r.goldOnce) parts.push(`+${r.goldOnce} ◊`);
+  return parts.join(', ');
+}
+
+// ============ ITEM SETS ============
+// Wearing N pieces of the same set grants stacking stat bonuses.
+// Items reference their set via an optional `set` string on the item template.
+const ITEM_SETS = {
+  iron_guard: {
+    name: "Iron Guard",
+    pieces: ['Iron Helm', 'Ring Mail', 'Chain Greaves'],
+    bonuses: {
+      2: { def: 4, vit: 3 },
+      3: { def: 8, vit: 8, atk: 4 }
+    }
+  },
+  ranger: {
+    name: "Ranger's Wind",
+    pieces: ['Wolf Leathers', 'Wind Boots', "Hunter's Dagger"],
+    bonuses: {
+      2: { agi: 5, atk: 3 },
+      3: { agi: 10, atk: 8 }
+    }
+  },
+  arcane: {
+    name: "Arcane Mastery",
+    pieces: ['Initiate Robes', 'Crown of Knowledge', 'Pendant of Wisdom', 'Initiate Staff'],
+    bonuses: {
+      2: { int: 5, vit: 2 },
+      3: { int: 10, vit: 5 },
+      4: { int: 18, vit: 10, atk: 4 }
+    }
+  },
+  vampyric: {
+    name: "Vampyric Pact",
+    pieces: ["Berserker's Axe", "Necromancer's Cloak", 'Eye of the Beholder'],
+    bonuses: {
+      2: { atk: 6, vit: 4 },
+      3: { atk: 12, vit: 10, int: 4 }
+    }
+  }
+};
+
+// Reverse lookup: item name -> set key (for fast tagging on equip)
+const ITEM_NAME_TO_SET = {};
+Object.entries(ITEM_SETS).forEach(([key, set]) => {
+  set.pieces.forEach(name => { ITEM_NAME_TO_SET[name] = key; });
+});
+
+// Compute the bonus stats from all currently equipped sets.
+function getSetBonuses() {
+  const counts = {};
+  Object.values(state.hero.equipment).forEach(item => {
+    if (!item) return;
+    const setKey = ITEM_NAME_TO_SET[item.name];
+    if (setKey) counts[setKey] = (counts[setKey] || 0) + 1;
+  });
+  const totals = { atk: 0, def: 0, vit: 0, agi: 0, int: 0 };
+  const activeSets = []; // [{ name, pieces, max, current, bonus }] for UI display
+  Object.entries(counts).forEach(([setKey, count]) => {
+    const set = ITEM_SETS[setKey];
+    if (!set) return;
+    // Apply the highest threshold the player meets
+    let applied = null;
+    Object.keys(set.bonuses).map(Number).sort((a, b) => a - b).forEach(threshold => {
+      if (count >= threshold) {
+        const b = set.bonuses[threshold];
+        Object.entries(b).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; });
+        applied = threshold;
+      }
+    });
+    activeSets.push({ key: setKey, name: set.name, current: count, max: set.pieces.length, appliedThreshold: applied });
+  });
+  return { totals, activeSets };
 }
 
 // ============ STATE ============
@@ -2295,6 +2814,7 @@ function createHero() {
     equipment: emptyEquipment(),
     inventory: [generateItem('common', 'weapon'), generateItem('common', 'armor')]
   };
+  ensureTracking(state.hero);
   recalculate();
   state.hero.hp = state.hero.maxHp;
   generatePvpOpponents();
@@ -2383,6 +2903,15 @@ function recalculate() {
       });
     }
   });
+  // Item set bonuses (Iron Guard, Ranger, Arcane, Vampyric)
+  const setRes = getSetBonuses();
+  Object.entries(setRes.totals).forEach(([k, v]) => { total[k] = (total[k] || 0) + v; });
+  h.activeSets = setRes.activeSets; // surfaced for the Hero tab display
+
+  // Achievement permanent stat bonuses
+  const achBonus = getAchievementBonusStats();
+  Object.entries(achBonus).forEach(([k, v]) => { total[k] = (total[k] || 0) + v; });
+
   // LIFE (vit) contributes to defense — folds DEF and LIFE together so the
   // user-facing model is "Life = HP + defense" while existing items/talents
   // that grant DEF keep working as additional armor.
@@ -2439,6 +2968,46 @@ function renderAll() {
   renderShop();
   renderPve();
   renderPvp();
+  renderAchievements();
+}
+
+// ============ TOAST NOTIFICATIONS ============
+function showToast({ icon, title, desc, kind }) {
+  const stack = document.getElementById('toast-stack');
+  if (!stack) return;
+  const el = document.createElement('div');
+  el.className = 'toast ' + (kind || '');
+  el.innerHTML = `
+    <div class="toast-icon">${icon || '✦'}</div>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      ${desc ? `<div class="toast-desc">${desc}</div>` : ''}
+    </div>
+  `;
+  stack.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 4200);
+}
+
+// ============ ACHIEVEMENT RENDER ============
+function renderAchievements() {
+  const list = document.getElementById('ach-list');
+  const count = document.getElementById('ach-count');
+  if (!list || !state.hero) return;
+  ensureTracking(state.hero);
+  const unlocked = state.hero.tracking.unlockedAchievements;
+  if (count) count.textContent = `(${unlocked.length}/${ACHIEVEMENTS.length})`;
+  list.innerHTML = ACHIEVEMENTS.map(ach => {
+    const isUnlocked = unlocked.includes(ach.key);
+    const rewardStr = ach.reward ? formatReward(ach.reward) : '';
+    return `<div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'}">
+      <div class="ach-icon">${ach.icon || '🏆'}</div>
+      <div class="ach-info">
+        <div class="ach-name">${ach.name}</div>
+        <div class="ach-desc">${ach.desc}</div>
+      </div>
+      <div class="ach-reward">${rewardStr}</div>
+    </div>`;
+  }).join('');
 }
 
 // ============ SHOP ============
@@ -2519,14 +3088,14 @@ function renderHero() {
   const grid = document.getElementById('stats-grid');
   const canSpend = (h.statPoints || 0) > 0;
   const rows = [
-    { key: 'atk', label: 'Melee dmg', val: h.stats.atk },
-    { key: 'int', label: 'Magic dmg', val: h.stats.int || 0 },
-    { key: 'def', label: 'Defense',  val: h.stats.def },
-    { key: 'vit', label: 'Life',     val: h.stats.vit },
-    { key: 'agi', label: 'Agility',  val: h.stats.agi }
+    { key: 'atk', label: 'Melee dmg', val: h.stats.atk,        tip: 'Scales melee (non-magical) ability damage. Items with +Melee boost this.' },
+    { key: 'int', label: 'Magic dmg', val: h.stats.int || 0,   tip: 'Scales magical ability damage. Also adds to your max mana (INT × 3 + 20). Useless for melee classes.' },
+    { key: 'def', label: 'Defense',  val: h.stats.def,         tip: 'Reduces incoming damage. Half of your Life is added here too.' },
+    { key: 'vit', label: 'Life',     val: h.stats.vit,         tip: 'Max HP = Life × 5 + 20. Each point of Life also gives +0.5 Defense.' },
+    { key: 'agi', label: 'Agility',  val: h.stats.agi,         tip: 'Determines turn order. Also +0.5% crit and +0.3% dodge per point.' }
   ];
   grid.innerHTML = rows.map(r => `
-    <div class="stat-row">
+    <div class="stat-row" title="${r.tip}">
       <span class="stat-label">${r.label}</span>
       <span class="stat-val-wrap">
         <span class="stat-val">${r.val}</span>
@@ -2587,6 +3156,26 @@ function renderHero() {
   eq.querySelectorAll('[data-slot]').forEach(el => {
     el.addEventListener('click', () => openSlotPicker(el.dataset.slot));
   });
+
+  // Active sets summary (under the Equipment grid)
+  const setsEl = document.getElementById('active-sets');
+  if (setsEl) {
+    const active = h.activeSets || [];
+    if (active.length === 0) {
+      setsEl.innerHTML = '';
+    } else {
+      setsEl.innerHTML = active.map(s => {
+        const set = ITEM_SETS[s.key];
+        const bonusStr = s.appliedThreshold
+          ? formatReward(set.bonuses[s.appliedThreshold])
+          : 'Wear ' + Math.min(...Object.keys(set.bonuses).map(Number)) + ' for a bonus';
+        return `<div class="active-set-row">
+          <div class="active-set-name">${s.name} · ${s.current}/${s.max}</div>
+          <div class="active-set-bonus">${bonusStr}</div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function renderTalents() {
@@ -3199,6 +3788,11 @@ function finishExpedition() {
   // Called when the boss has been beaten (or you decide to stop after final)
   if (!state.expedition) return;
   state.expedition.finished = true;
+  // Tracking
+  const t = ensureTracking(state.hero);
+  t.expeditionsCompleted = (t.expeditionsCompleted || 0) + 1;
+  showToast({ icon: '🗺', title: 'Expedition complete!', desc: state.expedition.name, kind: 'achievement' });
+  checkAchievements();
   saveGame();
   renderPve();
 }
@@ -4433,6 +5027,30 @@ function finishVictory(enemy, mode, log, heroFighter) {
   state.hero.hp = state.hero.maxHp;
   if (state.hero.maxMp) state.hero.mp = state.hero.maxMp;
   if (mode === 'pvp') generatePvpOpponents();
+  // Tracking
+  const t = ensureTracking(state.hero);
+  t.monstersKilled = (t.monstersKilled || 0) + 1;
+  t.totalGoldEarned = (t.totalGoldEarned || 0) + gold;
+  if (enemy.name && enemy.name.startsWith('Boss · ')) {
+    const bname = enemy.name.replace('Boss · ', '');
+    t.bossesKilled = (t.bossesKilled || 0) + 1;
+    t.bossesByName[bname] = true;
+  }
+  if (loot && loot.rarity) {
+    t.itemsByRarity[loot.rarity] = (t.itemsByRarity[loot.rarity] || 0) + 1;
+    if (loot.rarity === 'rare' || loot.rarity === 'epic' || loot.rarity === 'legendary') {
+      showToast({ icon: '✦', title: 'Loot: ' + loot.name, desc: loot.rarity.toUpperCase(), kind: 'loot' });
+    }
+  }
+  if (state.hero.level > levelsBefore) {
+    showToast({
+      icon: '★',
+      title: `Level ${levelsBefore} → ${state.hero.level}`,
+      desc: '+1 stat point' + (state.hero.level === MAX_LEVEL ? ' · Max level reached!' : ''),
+      kind: 'levelup'
+    });
+  }
+  checkAchievements();
   saveGame();
   return { gold, xp, loot, levelsBefore, levelsAfter: state.hero.level, tierUnlocks };
 }

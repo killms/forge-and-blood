@@ -6,6 +6,62 @@
 
 ---
 
+## Session 16 — 2026-05-18 — Big content pass: monsters, biomes, events, sets, achievements, toasts, tooltips
+
+### New content
+
+**6 new monsters with abilities** (now 13 total):
+- *Burning Wastes*: Fire Imp (tier 3, magical+melee), Lava Hound (tier 5, melee+dot), Salamander King (tier 8, fire mage)
+- *Frozen Spires*: Frost Wolf (tier 4, melee+slow), Ice Wraith (tier 6, magical+drain), Glacial Golem (tier 9, tank+armor)
+- 7 new monster abilities: ember_dart, fire_bite, molten_strike, icy_bite, frost_bolt, chilling_touch, ice_armor.
+
+**2 new expeditions** (now 5 total):
+- *The Burning Wastes* (Lv 25+, 7 nodes, boss: Salamander King) — fire biome
+- *The Frozen Spires* (Lv 40+, 8 nodes, boss: Glacial Golem) — ice biome
+
+**12 new events** (now 16 in pool):
+mysterious-merchant, lone-grave, gambling-cultist, training-dummy, ambush, oasis, broken-altar, wandering-bard, ancient-statue, forgotten-cache, lost-pilgrim, plus the original 4.
+
+**4 item sets with bonuses**:
+- *Iron Guard*: Iron Helm + Ring Mail + Chain Greaves (2pc → +DEF/VIT, 3pc → +DEF/VIT/ATK)
+- *Ranger's Wind*: Wolf Leathers + Wind Boots + Hunter's Dagger (AGI + ATK)
+- *Arcane Mastery*: Initiate Robes + Crown of Knowledge + Pendant of Wisdom + Initiate Staff (INT-focused, scales 2→3→4 pieces)
+- *Vampyric Pact*: Berserker's Axe + Necromancer's Cloak + Eye of the Beholder (ATK + VIT + INT)
+- Set status shown under the Equipment grid: `Iron Guard · 2/3 — +4 Defense, +3 Life`.
+
+### Achievements (~20)
+- New `state.hero.tracking` object: monstersKilled, bossesKilled, bossesByName, expeditionsCompleted, itemsByRarity, totalGoldEarned, unlockedAchievements.
+- Achievement categories: Combat (Slayer I-IV, Reaper), Bosses (Boss Hunter, Wide Hunter), Levels (Apprentice/Veteran/Champion/Legendary at L10/25/50/100), Expeditions (Explorer/Pathfinder), Loot (Lucky/Treasure Hunter/Mythbreaker for rare/epic/legendary), Wealth (Coin Stack, Wealthy), Misc (Talented).
+- Rewards are **permanent stat bonuses** (applied in `recalculate` via `getAchievementBonusStats`) or **one-time gold** (`goldOnce`).
+- `checkAchievements()` runs after key events (finishVictory, finishExpedition) — newly unlocked ones fire a toast.
+- Migration: `ensureTracking(hero)` backfills the tracking object on load for older saves.
+
+### Toast notification system
+- Fixed top-of-screen stack with z-index 2000.
+- Three flavours: `achievement` (gold glow), `levelup` (blue glow), `loot` (purple glow).
+- Auto-dismisses after ~4s. Slide-in / fade-out animations.
+- Fired on: level up, rare+ loot drop, achievement unlock, expedition complete.
+
+### Tooltips
+- Native `title` tooltips on the Hero attribute rows explaining what each stat does:
+  - Melee dmg → "Scales melee (non-magical) ability damage. Items with +Melee boost this."
+  - Magic dmg → "Scales magical ability damage. Also adds to max mana. Useless for melee classes."
+  - Defense → "Reduces incoming damage. Half of your Life is added here too."
+  - Life → "Max HP = Life × 5 + 20. Each point also gives +0.5 Defense."
+  - Agility → "Determines turn order. Also +0.5% crit and +0.3% dodge per point."
+- Future: richer custom tooltips on talent nodes / items / abilities (deferred).
+
+### Deferred for future sessions
+- **Sub-classes / specs** (rework of class system, big design work).
+- **Daily quests** (needs real-time scheduling + reset logic).
+- **Full sprite-animated monsters** for the new biomes (needs art acquisition).
+- **Rich custom tooltips** beyond native title attribute.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 15 — 2026-05-18 — Kenney assets ingested (vistas + future 3D)
 
 ### What the user did
