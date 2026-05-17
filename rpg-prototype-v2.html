@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge & Blood</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1a1410; --bg-panel: #221a14; --bg-deep: #0f0a07;
+    --border: #4a3826; --gold: #c9a557; --gold-bright: #f0d27a;
+    --blood: #8b1e1e; --blood-bright: #c93030;
+    --text: #e8dcc4; --text-dim: #9a8868;
+    --common: #b0a890; --uncommon: #5fa85f; --rare: #4a8fd6;
+    --epic: #a85fd6; --legendary: #e89530;
+  }
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at top, rgba(139,30,30,0.08), transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(201,165,87,0.05), transparent 60%);
+    color: var(--text); font-family: 'EB Garamond', serif;
+    min-height: 100vh; padding: 16px; font-size: 16px; line-height: 1.5;
+  }
+  .app { max-width: 480px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  h1 {
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 28px;
+    letter-spacing: 4px; color: var(--gold-bright);
+    text-shadow: 0 0 20px rgba(201,165,87,0.3);
+  }
+  .subtitle { font-style: italic; color: var(--text-dim); font-size: 14px; margin-top: 4px; }
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    background: var(--bg-deep); padding: 4px; border: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1; padding: 10px 4px; background: transparent;
+    color: var(--text-dim); border: none;
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active { background: var(--border); color: var(--gold-bright); }
+  .panel {
+    background: var(--bg-panel); border: 1px solid var(--border);
+    padding: 16px; margin-bottom: 12px; position: relative;
+  }
+  .panel::before {
+    content: ''; position: absolute; top: -1px; left: -1px; right: -1px;
+    height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .section-title {
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 3px;
+    color: var(--gold); margin-bottom: 12px; text-transform: uppercase;
+  }
+  .creation-step h2 {
+    font-family: 'Cinzel', serif; text-align: center; color: var(--gold-bright);
+    margin-bottom: 16px; font-size: 18px; letter-spacing: 2px;
+  }
+  .options { display: grid; gap: 8px; }
+  .option {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .option:hover, .option.selected {
+    border-color: var(--gold); background: rgba(201,165,87,0.08);
+  }
+  .option-title { font-family: 'Cinzel', serif; color: var(--gold-bright); font-size: 14px; letter-spacing: 1px; }
+  .option-desc { font-size: 13px; color: var(--text-dim); font-style: italic; margin-top: 4px; }
+  .option-stats { margin-top: 6px; font-size: 12px; color: var(--text); }
+  .option-passive { margin-top: 4px; font-size: 12px; color: var(--epic); font-style: italic; }
+  input[type="text"] {
+    width: 100%; padding: 12px; background: var(--bg-deep);
+    border: 1px solid var(--border); color: var(--text);
+    font-family: 'EB Garamond', serif; font-size: 16px;
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--gold); }
+  .btn {
+    width: 100%; padding: 14px; background: var(--blood);
+    color: var(--gold-bright); border: 1px solid var(--blood-bright);
+    font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px;
+    cursor: pointer; transition: all 0.2s; margin-top: 12px;
+  }
+  .btn:hover:not(:disabled) { background: var(--blood-bright); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-small {
+    padding: 6px 12px; font-size: 11px; letter-spacing: 1.5px;
+    margin-top: 0; width: auto;
+  }
+  .hero-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .hero-name { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-bright); }
+  .hero-meta { font-size: 12px; color: var(--text-dim); font-style: italic; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
+  .stat-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; border-bottom: 1px dashed rgba(74,56,38,0.5);
+  }
+  .stat-label { color: var(--text-dim); }
+  .stat-val { color: var(--gold-bright); font-weight: 600; }
+  .bar {
+    height: 18px; background: var(--bg-deep); border: 1px solid var(--border);
+    position: relative; overflow: hidden; margin: 4px 0;
+  }
+  .bar-fill { height: 100%; transition: width 0.4s; }
+  .bar-fill.hp { background: linear-gradient(90deg, #6b1010, var(--blood-bright)); }
+  .bar-fill.xp { background: linear-gradient(90deg, #3d6b9a, #5fa8d6); }
+  .bar-text {
+    position: absolute; inset: 0; text-align: center;
+    font-size: 12px; line-height: 18px; color: var(--text);
+    text-shadow: 1px 1px 0 #000;
+  }
+  .equipment { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .slot {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 8px; min-height: 64px; cursor: pointer; transition: all 0.2s;
+  }
+  .slot:hover { border-color: var(--gold); }
+  .slot-label {
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .slot-item { font-family: 'Cinzel', serif; font-size: 13px; margin-top: 4px; }
+  .slot-empty { color: var(--text-dim); font-style: italic; font-size: 13px; margin-top: 4px; }
+  .r-common { color: var(--common); }
+  .r-uncommon { color: var(--uncommon); }
+  .r-rare { color: var(--rare); }
+  .r-epic { color: var(--epic); }
+  .r-legendary { color: var(--legendary); text-shadow: 0 0 8px rgba(232,149,48,0.4); }
+  .inv-list { display: grid; gap: 6px; max-height: 400px; overflow-y: auto; }
+  .inv-item {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  .inv-item:hover { border-color: var(--gold); }
+  .inv-item-header { display: flex; justify-content: space-between; align-items: center; }
+  .inv-item-name { font-family: 'Cinzel', serif; font-size: 14px; }
+  .inv-item-slot {
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .inv-item-stats { font-size: 12px; color: var(--text); margin-top: 4px; }
+  .inv-item-effect { font-size: 12px; color: var(--epic); font-style: italic; margin-top: 2px; }
+  .enemy-card {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .enemy-card:hover { border-color: var(--blood-bright); }
+  .enemy-info { flex: 1; }
+  .enemy-name { font-family: 'Cinzel', serif; color: var(--text); font-size: 14px; }
+  .enemy-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .enemy-power {
+    font-family: 'Cinzel', serif; color: var(--blood-bright);
+    font-size: 16px; text-align: right;
+  }
+  .combat-arena {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 8px; align-items: center; margin-bottom: 12px;
+  }
+  .fighter { text-align: center; }
+  .fighter-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright); margin-bottom: 4px; }
+  .vs { font-family: 'Cinzel', serif; color: var(--blood-bright); font-size: 14px; font-weight: 900; }
+  .combat-log {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; max-height: 300px; overflow-y: auto; font-size: 14px;
+  }
+  .log-entry {
+    padding: 4px 0; border-bottom: 1px dashed rgba(74,56,38,0.3);
+    animation: appear 0.3s;
+  }
+  @keyframes appear {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .log-turn {
+    color: var(--gold); font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 2px; margin-top: 8px;
+  }
+  .log-hit { color: var(--blood-bright); }
+  .log-crit { color: var(--legendary); font-weight: 600; }
+  .log-effect { color: var(--epic); font-style: italic; }
+  .log-ability { color: var(--rare); font-weight: 600; }
+  .log-victory {
+    color: var(--gold-bright); font-family: 'Cinzel', serif;
+    text-align: center; padding: 12px;
+  }
+  .log-defeat {
+    color: var(--blood-bright); font-family: 'Cinzel', serif;
+    text-align: center; padding: 12px;
+  }
+  .reward {
+    background: rgba(201,165,87,0.1); border: 1px solid var(--gold);
+    padding: 8px; margin-top: 8px; text-align: center; font-size: 13px;
+  }
+  .reward-item { color: var(--gold-bright); font-family: 'Cinzel', serif; display: block; margin-top: 4px; }
+  .gold-display { color: var(--gold-bright); font-family: 'Cinzel', serif; }
+  .hidden { display: none; }
+  .pvp-info {
+    background: rgba(139,30,30,0.1); border-left: 3px solid var(--blood-bright);
+    padding: 8px 12px; margin-bottom: 12px;
+    font-size: 13px; font-style: italic; color: var(--text-dim);
+  }
+  .auto-close-note {
+    text-align: center; color: var(--text-dim); font-style: italic;
+    font-size: 12px; padding: 10px 0 4px;
+  }
+
+  /* Talent Tree */
+  .talent-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .talent-points {
+    font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright);
+    background: var(--bg-deep); padding: 6px 12px; border: 1px solid var(--gold);
+  }
+  .talent-tree {
+    display: grid; gap: 12px;
+  }
+  .talent-tier {
+    display: grid; gap: 8px;
+  }
+  .tier-label {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+    color: var(--text-dim); text-align: center;
+    border-bottom: 1px dashed var(--border); padding-bottom: 4px;
+  }
+  .talent-node {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px; cursor: pointer; transition: all 0.2s;
+    position: relative;
+  }
+  .talent-node.unlocked {
+    border-color: var(--gold); background: rgba(201,165,87,0.06);
+  }
+  .talent-node.locked {
+    opacity: 0.4; cursor: not-allowed;
+  }
+  .talent-node.available {
+    border-color: var(--uncommon);
+    box-shadow: 0 0 8px rgba(95,168,95,0.2);
+  }
+  .talent-name {
+    font-family: 'Cinzel', serif; font-size: 13px;
+    color: var(--gold-bright); margin-bottom: 4px;
+  }
+  .talent-name.passive::before { content: '◈ '; color: var(--epic); }
+  .talent-name.active::before { content: '⚔ '; color: var(--blood-bright); }
+  .talent-name.upgrade::before { content: '↑ '; color: var(--rare); }
+  .talent-desc { font-size: 12px; color: var(--text); }
+  .talent-cost {
+    position: absolute; top: 8px; right: 8px;
+    font-size: 11px; color: var(--gold);
+    background: var(--bg); padding: 2px 6px; border: 1px solid var(--border);
+  }
+  .ability-bar {
+    display: grid; gap: 6px; margin-top: 8px;
+  }
+  .ability-chip {
+    background: var(--bg-deep); border: 1px solid var(--rare);
+    padding: 6px 10px; font-size: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ability-chip-name { font-family: 'Cinzel', serif; color: var(--rare); }
+  .ability-chip-cd { color: var(--text-dim); font-size: 11px; }
+
+  .passive-chip {
+    background: var(--bg-deep); border: 1px solid var(--epic);
+    padding: 6px 10px; font-size: 12px; margin-top: 6px;
+    color: var(--epic); font-style: italic;
+  }
+  .passive-chip::before { content: '◈ '; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>FORGE &amp; BLOOD</h1>
+    <div class="subtitle">— an RPG of the mists —</div>
+  </header>
+
+  <div id="creation" class="panel">
+    <div class="creation-step">
+      <h2 id="step-title">FORGE YOUR HERO</h2>
+      <div id="step-content"></div>
+      <button class="btn" id="step-next" disabled>CONTINUE</button>
+      <button class="btn btn-secondary hidden" id="step-back" style="background: var(--bg-deep); color: var(--text-dim); border-color: var(--border);">BACK</button>
+    </div>
+  </div>
+
+  <div id="game" class="hidden">
+    <div class="tabs">
+      <button class="tab active" data-tab="hero">HERO</button>
+      <button class="tab" data-tab="talents">TALENTS</button>
+      <button class="tab" data-tab="inventory">BAG</button>
+      <button class="tab" data-tab="pve">HUNT</button>
+      <button class="tab" data-tab="pvp">ARENA</button>
+    </div>
+
+    <div id="tab-hero" class="tab-content">
+      <div class="panel">
+        <div class="hero-header">
+          <div>
+            <div class="hero-name" id="hero-name"></div>
+            <div class="hero-meta" id="hero-meta"></div>
+          </div>
+          <div class="gold-display" id="hero-gold"></div>
+        </div>
+        <div class="bar">
+          <div class="bar-fill hp" id="hp-bar"></div>
+          <div class="bar-text" id="hp-text"></div>
+        </div>
+        <div class="bar">
+          <div class="bar-fill xp" id="xp-bar"></div>
+          <div class="bar-text" id="xp-text"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">Attributes</div>
+        <div class="stats-grid" id="stats-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">Class Abilities</div>
+        <div id="class-passive"></div>
+        <div class="ability-bar" id="ability-bar"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">Equipment</div>
+        <div class="equipment" id="equipment"></div>
+      </div>
+    </div>
+
+    <div id="tab-talents" class="tab-content hidden">
+      <div class="panel">
+        <div class="talent-header">
+          <div class="section-title" style="margin: 0;">Talent Tree</div>
+          <div class="talent-points" id="talent-points">0 pts</div>
+        </div>
+        <div class="talent-tree" id="talent-tree"></div>
+      </div>
+    </div>
+
+    <div id="tab-inventory" class="tab-content hidden">
+      <div class="panel">
+        <div class="section-title">Adventurer's Bag</div>
+        <div class="inv-list" id="inv-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-pve" class="tab-content hidden">
+      <div class="panel">
+        <div class="section-title">Creatures to Hunt</div>
+        <div id="pve-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-pvp" class="tab-content hidden">
+      <div class="panel">
+        <div class="section-title">Blood Arena</div>
+        <div class="pvp-info">Other heroes await. Each victory brings glory; each defeat, shame.</div>
+        <div id="pvp-list"></div>
+      </div>
+    </div>
+
+    <div id="combat" class="hidden">
+      <div class="panel">
+        <div class="section-title" id="combat-title">Combat</div>
+        <div class="combat-arena">
+          <div class="fighter">
+            <div class="fighter-name" id="f1-name"></div>
+            <div class="bar">
+              <div class="bar-fill hp" id="f1-hp"></div>
+              <div class="bar-text" id="f1-hp-text"></div>
+            </div>
+          </div>
+          <div class="vs">VS</div>
+          <div class="fighter">
+            <div class="fighter-name" id="f2-name"></div>
+            <div class="bar">
+              <div class="bar-fill hp" id="f2-hp"></div>
+              <div class="bar-text" id="f2-hp-text"></div>
+            </div>
+          </div>
+        </div>
+        <div class="combat-log" id="combat-log"></div>
+        <div class="auto-close-note hidden" id="combat-autoclose">— returning to the world —</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ SLOT LABELS ============
+// Internal slot keys stay short; labels render in the UI.
+const SLOT_LABELS = {
+  weapon: 'Weapon',
+  armor: 'Armor',
+  helm: 'Helm',
+  boots: 'Boots'
+};
+
+// ============ RACES ============
+const RACES = {
+  human: {
+    name: 'Human',
+    desc: 'Versatile and ambitious. They adapt to any path.',
+    mods: { atk: 2, def: 2, vit: 2, agi: 2 },
+    summary: '+2 to all attributes',
+    passive: { key: 'humanXp', name: 'Resilience', desc: '+10% XP from each victory.' },
+    classes: ['knight', 'cleric', 'bountyHunter']
+  },
+  elf: {
+    name: 'Elf',
+    desc: 'Agile and ancient. They move like wind through leaves.',
+    mods: { atk: 1, def: 0, vit: 0, agi: 6 },
+    summary: '+6 Agility, +1 Attack',
+    passive: { key: 'elfCrit', name: 'Ancient Gaze', desc: '+5% critical chance on all attacks.' },
+    classes: ['archer', 'druid', 'bladeDancer']
+  },
+  orc: {
+    name: 'Orc',
+    desc: 'Strong and fierce. Their fury is a tempest.',
+    mods: { atk: 5, def: 3, vit: 2, agi: -3 },
+    summary: '+5 ATK, +3 DEF, +2 VIT, -3 AGI',
+    passive: { key: 'orcFury', name: 'Blood Fury', desc: 'When below 50% HP, +30% attack.' },
+    classes: ['berserker', 'shaman', 'devourer']
+  },
+  dwarf: {
+    name: 'Dwarf',
+    desc: 'Tenacious as ancient stone. Born in the deeps.',
+    mods: { atk: 2, def: 6, vit: 5, agi: -2 },
+    summary: '+6 DEF, +5 VIT, +2 ATK, -2 AGI',
+    passive: { key: 'dwarfHide', name: 'Granite Skin', desc: 'Reduces all damage taken by 2.' },
+    classes: ['guardian', 'priest', 'engineer']
+  },
+  shifter: {
+    name: 'Shifter',
+    desc: 'Their flesh is a lie. They change form like others change cloaks.',
+    mods: { atk: 3, def: 1, vit: 3, agi: 3 },
+    summary: '+3 ATK, +3 VIT, +3 AGI, +1 DEF',
+    passive: { key: 'shifterAdapt', name: 'Adaptation', desc: 'Each turn, +1 to a random stat (combat only).' },
+    classes: ['stalker', 'bearForm', 'chaos']
+  }
+};
+
+// ============ CLASSES ============
+// Each class has: base stats, a passive ability, and a talent tree (6 nodes across 3 tiers)
+const CLASSES = {
+  // HUMAN
+  knight: {
+    name: 'Knight',
+    race: 'human',
+    desc: 'Honoured defender, shield and faith.',
+    base: { atk: 11, def: 12, vit: 13, agi: 5 },
+    passive: { name: 'Oath', desc: '15% chance to block half the damage.', proc: 'block', val: 0.15 },
+    talents: [
+      { tier: 1, key: 'invest_def', name: 'Defensive Training', type: 'passive', desc: '+5 Defense permanently.', cost: 1, effect: { stat: 'def', val: 5 } },
+      { tier: 1, key: 'shield_bash', name: 'Shield Bash', type: 'active', desc: 'Deals 130% attack and stuns for 1 turn. CD: 4', cost: 1, ability: { dmgMult: 1.3, stun: 1, cd: 4 } },
+      { tier: 2, key: 'invest_vit', name: 'Steel Vigour', type: 'passive', desc: '+8 Vitality permanently.', cost: 1, effect: { stat: 'vit', val: 8 }, req: 'invest_def' },
+      { tier: 2, key: 'taunt', name: 'Taunt', type: 'active', desc: 'Enemy loses 30% attack for 2 turns. CD: 5', cost: 1, ability: { debuffAtk: 0.3, dur: 2, cd: 5 }, req: 'shield_bash' },
+      { tier: 3, key: 'fortify', name: 'Fortify', type: 'passive', desc: 'Block chance up to 25% and reduces damage by 70%.', cost: 2, override: { proc: 'block', val: 0.25, mult: 0.3 } },
+      { tier: 3, key: 'holy_strike', name: 'Holy Strike', type: 'active', desc: 'Deals 180% attack, heals for 30% of damage. CD: 6', cost: 2, ability: { dmgMult: 1.8, lifestealOnce: 0.3, cd: 6 } }
+    ]
+  },
+  cleric: {
+    name: 'Cleric',
+    race: 'human',
+    desc: 'Devoted to the light. Heals and punishes.',
+    base: { atk: 10, def: 8, vit: 11, agi: 7 },
+    passive: { name: 'Blessing', desc: 'Regenerates 4 HP per turn in combat.', proc: 'regen', val: 4 },
+    talents: [
+      { tier: 1, key: 'invest_vit', name: 'Devotion', type: 'passive', desc: '+6 Vitality.', cost: 1, effect: { stat: 'vit', val: 6 } },
+      { tier: 1, key: 'heal', name: 'Heal', type: 'active', desc: 'Restores 25% of max HP. CD: 5', cost: 1, ability: { heal: 0.25, cd: 5 } },
+      { tier: 2, key: 'invest_atk', name: 'Punishment', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 }, req: 'invest_vit' },
+      { tier: 2, key: 'smite', name: 'Smite', type: 'active', desc: 'Deals 150% attack as holy damage (ignores defense). CD: 4', cost: 1, ability: { dmgMult: 1.5, trueDmg: true, cd: 4 }, req: 'heal' },
+      { tier: 3, key: 'aura', name: 'Aura of Light', type: 'passive', desc: 'Regenerates 8 HP per turn (replaces Blessing).', cost: 2, override: { proc: 'regen', val: 8 } },
+      { tier: 3, key: 'divine_intervention', name: 'Divine Intervention', type: 'active', desc: 'Heals 50% HP and removes debuffs. CD: 8', cost: 2, ability: { heal: 0.5, cleanse: true, cd: 8 } }
+    ]
+  },
+  bountyHunter: {
+    name: 'Bounty Hunter',
+    race: 'human',
+    desc: 'Cold hunter. Always knows where to strike.',
+    base: { atk: 13, def: 7, vit: 10, agi: 10 },
+    passive: { name: "Hunter's Mark", desc: '+15% damage against enemies at full HP.', proc: 'markedShot' },
+    talents: [
+      { tier: 1, key: 'invest_atk', name: 'Aim', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 } },
+      { tier: 1, key: 'precise_shot', name: 'Precise Shot', type: 'active', desc: 'Deals 140% attack with +30% crit chance. CD: 3', cost: 1, ability: { dmgMult: 1.4, critBonus: 0.3, cd: 3 } },
+      { tier: 2, key: 'invest_agi', name: 'Reflexes', type: 'passive', desc: '+5 Agility.', cost: 1, effect: { stat: 'agi', val: 5 }, req: 'invest_atk' },
+      { tier: 2, key: 'trap', name: 'Trap', type: 'active', desc: 'Reduces enemy agility by 50% for 3 turns. CD: 5', cost: 1, ability: { debuffAgi: 0.5, dur: 3, cd: 5 }, req: 'precise_shot' },
+      { tier: 3, key: 'deadeye', name: 'Eagle Eye', type: 'passive', desc: '+15% permanent crit chance.', cost: 2, effect: { critBonus: 0.15 } },
+      { tier: 3, key: 'execute', name: 'Execute', type: 'active', desc: 'Deals 300% attack if enemy is below 30% HP. CD: 6', cost: 2, ability: { dmgMult: 3, execThreshold: 0.3, cd: 6 } }
+    ]
+  },
+  // ELF
+  archer: {
+    name: 'Wild Archer',
+    race: 'elf',
+    desc: "Hawk's eye, silken hand.",
+    base: { atk: 14, def: 5, vit: 9, agi: 12 },
+    passive: { name: 'First Arrow', desc: 'Always attacks first in combat.', proc: 'firstStrike' },
+    talents: [
+      { tier: 1, key: 'invest_atk', name: 'Bowstring Tension', type: 'passive', desc: '+6 Attack.', cost: 1, effect: { stat: 'atk', val: 6 } },
+      { tier: 1, key: 'rapid_fire', name: 'Rapid Fire', type: 'active', desc: 'Fires twice for 70% damage each. CD: 3', cost: 1, ability: { multiHit: 2, dmgMult: 0.7, cd: 3 } },
+      { tier: 2, key: 'invest_agi', name: 'Light Step', type: 'passive', desc: '+6 Agility.', cost: 1, effect: { stat: 'agi', val: 6 }, req: 'invest_atk' },
+      { tier: 2, key: 'piercing', name: 'Piercing Arrow', type: 'active', desc: 'Ignores 80% defense, deals 120% attack. CD: 4', cost: 1, ability: { dmgMult: 1.2, armorPen: 0.8, cd: 4 }, req: 'rapid_fire' },
+      { tier: 3, key: 'hawkeye', name: 'Hawk Eye', type: 'passive', desc: '+20% crit chance.', cost: 2, effect: { critBonus: 0.2 } },
+      { tier: 3, key: 'volley', name: 'Volley', type: 'active', desc: 'Fires three times for 90% damage each. CD: 6', cost: 2, ability: { multiHit: 3, dmgMult: 0.9, cd: 6 } }
+    ]
+  },
+  druid: {
+    name: 'Druid',
+    race: 'elf',
+    desc: 'Voice of the forests. Natural magic.',
+    base: { atk: 12, def: 7, vit: 12, agi: 8 },
+    passive: { name: 'Renewal', desc: 'Heals 5 HP on each damaging attack.', proc: 'healOnHit', val: 5 },
+    talents: [
+      { tier: 1, key: 'invest_vit', name: 'Deep Roots', type: 'passive', desc: '+8 Vitality.', cost: 1, effect: { stat: 'vit', val: 8 } },
+      { tier: 1, key: 'thorns', name: 'Thistle Skin', type: 'active', desc: 'For 4 turns, returns 30% of damage taken. CD: 6', cost: 1, ability: { thornsBuff: 0.3, dur: 4, cd: 6 } },
+      { tier: 2, key: 'invest_atk', name: 'Wild Fury', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 }, req: 'invest_vit' },
+      { tier: 2, key: 'entangle', name: 'Entangle', type: 'active', desc: 'Enemy loses all agility for 2 turns. CD: 5', cost: 1, ability: { debuffAgi: 1.0, dur: 2, cd: 5 }, req: 'thorns' },
+      { tier: 3, key: 'photosynth', name: 'Photosynthesis', type: 'passive', desc: 'Regenerates 6 HP per turn.', cost: 2, effect: { regen: 6 } },
+      { tier: 3, key: 'wildshape', name: 'Bear Form', type: 'active', desc: 'For 3 turns: +50% attack and +30% defense. CD: 7', cost: 2, ability: { buffAtk: 0.5, buffDef: 0.3, dur: 3, cd: 7 } }
+    ]
+  },
+  bladeDancer: {
+    name: 'Blade Dancer',
+    race: 'elf',
+    desc: 'Steel in motion. Lethal beauty.',
+    base: { atk: 12, def: 6, vit: 9, agi: 13 },
+    passive: { name: 'Dance of Blades', desc: '15% chance to dodge attacks.', proc: 'dodge', val: 0.15 },
+    talents: [
+      { tier: 1, key: 'invest_agi', name: 'Wind Step', type: 'passive', desc: '+7 Agility.', cost: 1, effect: { stat: 'agi', val: 7 } },
+      { tier: 1, key: 'flurry', name: 'Flurry', type: 'active', desc: 'Hits 3x for 60% damage each. CD: 4', cost: 1, ability: { multiHit: 3, dmgMult: 0.6, cd: 4 } },
+      { tier: 2, key: 'invest_atk', name: 'Honed Blades', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 }, req: 'invest_agi' },
+      { tier: 2, key: 'evasion', name: 'Evasion', type: 'active', desc: 'For 3 turns, +50% dodge. CD: 6', cost: 1, ability: { dodgeBuff: 0.5, dur: 3, cd: 6 }, req: 'flurry' },
+      { tier: 3, key: 'phantom', name: 'Phantom Steps', type: 'passive', desc: 'Raises base dodge to 25%.', cost: 2, override: { proc: 'dodge', val: 0.25 } },
+      { tier: 3, key: 'thousand_cuts', name: 'Thousand Cuts', type: 'active', desc: 'Hits 5x for 50% damage each. CD: 7', cost: 2, ability: { multiHit: 5, dmgMult: 0.5, cd: 7 } }
+    ]
+  },
+  // ORC
+  berserker: {
+    name: 'Berserker',
+    race: 'orc',
+    desc: 'Bloody madness. Fearless.',
+    base: { atk: 16, def: 5, vit: 14, agi: 6 },
+    passive: { name: 'Bloodlust', desc: 'The lower the HP, the higher the attack (up to +50%).', proc: 'bloodThirst' },
+    talents: [
+      { tier: 1, key: 'invest_atk', name: 'Raw Fury', type: 'passive', desc: '+7 Attack.', cost: 1, effect: { stat: 'atk', val: 7 } },
+      { tier: 1, key: 'reckless', name: 'Reckless Blow', type: 'active', desc: 'Deals 200% attack but you take 10% of your HP. CD: 3', cost: 1, ability: { dmgMult: 2, selfDmgPct: 0.1, cd: 3 } },
+      { tier: 2, key: 'invest_vit', name: 'Flesh Armour', type: 'passive', desc: '+8 Vitality.', cost: 1, effect: { stat: 'vit', val: 8 }, req: 'invest_atk' },
+      { tier: 2, key: 'rage', name: 'Rage', type: 'active', desc: 'For 3 turns: +80% attack, -30% defense. CD: 6', cost: 1, ability: { buffAtk: 0.8, debuffSelfDef: 0.3, dur: 3, cd: 6 }, req: 'reckless' },
+      { tier: 3, key: 'undying', name: 'Refuses to Fall', type: 'passive', desc: 'Once per fight, survive a killing blow at 1 HP.', cost: 2, effect: { savior: true } },
+      { tier: 3, key: 'cleave', name: 'Devastate', type: 'active', desc: 'Deals 250% attack, ignores 50% defense. CD: 6', cost: 2, ability: { dmgMult: 2.5, armorPen: 0.5, cd: 6 } }
+    ]
+  },
+  shaman: {
+    name: 'Blood Shaman',
+    race: 'orc',
+    desc: 'Primal magic through blood.',
+    base: { atk: 13, def: 7, vit: 13, agi: 7 },
+    passive: { name: 'Blood Pact', desc: 'Each attack drains 10% of damage as HP.', proc: 'lifesteal', val: 0.1 },
+    talents: [
+      { tier: 1, key: 'invest_atk', name: 'Hot Blood', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 } },
+      { tier: 1, key: 'curse', name: 'Curse', type: 'active', desc: 'Enemy suffers 8 damage/turn for 3 turns. CD: 4', cost: 1, ability: { dot: 8, dur: 3, cd: 4 } },
+      { tier: 2, key: 'invest_vit', name: 'Iron Veins', type: 'passive', desc: '+6 Vitality.', cost: 1, effect: { stat: 'vit', val: 6 }, req: 'invest_atk' },
+      { tier: 2, key: 'blood_bolt', name: 'Blood Bolt', type: 'active', desc: 'Deals 180% attack, heals for 50% of damage. CD: 4', cost: 1, ability: { dmgMult: 1.8, lifestealOnce: 0.5, cd: 4 }, req: 'curse' },
+      { tier: 3, key: 'pact', name: 'Greater Pact', type: 'passive', desc: 'Lifesteal raised to 25%.', cost: 2, override: { proc: 'lifesteal', val: 0.25 } },
+      { tier: 3, key: 'hexbolt', name: 'Death Hex', type: 'active', desc: 'Deals 100% attack and 15 damage/turn for 4 turns. CD: 6', cost: 2, ability: { dmgMult: 1, dot: 15, dur: 4, cd: 6 } }
+    ]
+  },
+  devourer: {
+    name: 'Soul Devourer',
+    race: 'orc',
+    desc: 'Consumes the essence of the fallen.',
+    base: { atk: 14, def: 6, vit: 12, agi: 6 },
+    passive: { name: 'Devour', desc: 'After killing an enemy, recovers 30% HP.', proc: 'devour' },
+    talents: [
+      { tier: 1, key: 'invest_atk', name: 'Maw', type: 'passive', desc: '+6 Attack.', cost: 1, effect: { stat: 'atk', val: 6 } },
+      { tier: 1, key: 'soul_rip', name: 'Soul Rip', type: 'active', desc: 'Deals 150% attack, steals 50% of damage. CD: 4', cost: 1, ability: { dmgMult: 1.5, lifestealOnce: 0.5, cd: 4 } },
+      { tier: 2, key: 'invest_vit', name: 'Endless Stomach', type: 'passive', desc: '+7 Vitality.', cost: 1, effect: { stat: 'vit', val: 7 }, req: 'invest_atk' },
+      { tier: 2, key: 'terrify', name: 'Terrify', type: 'active', desc: 'Enemy loses 40% attack for 3 turns. CD: 5', cost: 1, ability: { debuffAtk: 0.4, dur: 3, cd: 5 }, req: 'soul_rip' },
+      { tier: 3, key: 'feast', name: 'Feast', type: 'passive', desc: 'Lifesteal on every attack: 20%.', cost: 2, effect: { lifesteal: 0.2 } },
+      { tier: 3, key: 'consume', name: 'Consume', type: 'active', desc: 'Deals 250% attack, steals 100% of damage. CD: 7', cost: 2, ability: { dmgMult: 2.5, lifestealOnce: 1, cd: 7 } }
+    ]
+  },
+  // DWARF
+  guardian: {
+    name: 'Forge Guardian',
+    race: 'dwarf',
+    desc: 'Living wall. Unshakeable.',
+    base: { atk: 11, def: 14, vit: 15, agi: 4 },
+    passive: { name: 'Stone Stance', desc: '20% chance to block 80% of damage.', proc: 'block', val: 0.2, mult: 0.2 },
+    talents: [
+      { tier: 1, key: 'invest_def', name: 'Forged Armour', type: 'passive', desc: '+8 Defense.', cost: 1, effect: { stat: 'def', val: 8 } },
+      { tier: 1, key: 'shield_wall', name: 'Shield Wall', type: 'active', desc: 'For 3 turns, +60% defense. CD: 6', cost: 1, ability: { buffDef: 0.6, dur: 3, cd: 6 } },
+      { tier: 2, key: 'invest_vit', name: 'Stone Lungs', type: 'passive', desc: '+10 Vitality.', cost: 1, effect: { stat: 'vit', val: 10 }, req: 'invest_def' },
+      { tier: 2, key: 'retaliate', name: 'Retaliate', type: 'active', desc: 'For 3 turns, returns 100% of damage. CD: 6', cost: 1, ability: { thornsBuff: 1, dur: 3, cd: 6 }, req: 'shield_wall' },
+      { tier: 3, key: 'unbreakable', name: 'Unbreakable', type: 'passive', desc: 'Reduces damage taken by another 4.', cost: 2, effect: { dmgReduce: 4 } },
+      { tier: 3, key: 'judgment', name: 'Judgment', type: 'active', desc: 'Deals damage equal to 50% defense + 100% attack. CD: 5', cost: 2, ability: { dmgMult: 1, defAsDmg: 0.5, cd: 5 } }
+    ]
+  },
+  priest: {
+    name: 'Stone Priest',
+    race: 'dwarf',
+    desc: 'Voice of ancestors. Stone and faith.',
+    base: { atk: 12, def: 10, vit: 13, agi: 5 },
+    passive: { name: 'Ancestral Blessing', desc: 'Regenerates 6 HP per turn.', proc: 'regen', val: 6 },
+    talents: [
+      { tier: 1, key: 'invest_vit', name: 'Granite Heart', type: 'passive', desc: '+8 Vitality.', cost: 1, effect: { stat: 'vit', val: 8 } },
+      { tier: 1, key: 'stone_heal', name: 'Stone Healing', type: 'active', desc: 'Heals 30% of max HP. CD: 5', cost: 1, ability: { heal: 0.3, cd: 5 } },
+      { tier: 2, key: 'invest_def', name: 'Sacred Mail', type: 'passive', desc: '+6 Defense.', cost: 1, effect: { stat: 'def', val: 6 }, req: 'invest_vit' },
+      { tier: 2, key: 'earthquake', name: 'Earthquake', type: 'active', desc: 'Deals 160% attack and stuns for 1 turn. CD: 5', cost: 1, ability: { dmgMult: 1.6, stun: 1, cd: 5 }, req: 'stone_heal' },
+      { tier: 3, key: 'ancestral_shield', name: 'Ancestral Shield', type: 'passive', desc: 'Reduces damage taken by 3.', cost: 2, effect: { dmgReduce: 3 } },
+      { tier: 3, key: 'resurrection', name: 'Voice of the Dead', type: 'active', desc: 'Heals 60% HP and gains +30% defense for 3 turns. CD: 9', cost: 2, ability: { heal: 0.6, buffDef: 0.3, dur: 3, cd: 9 } }
+    ]
+  },
+  engineer: {
+    name: 'War Engineer',
+    race: 'dwarf',
+    desc: 'Gunpowder, gears, and death.',
+    base: { atk: 14, def: 9, vit: 11, agi: 6 },
+    passive: { name: 'Gunpowder', desc: '20% chance to deal +50% damage (burst).', proc: 'burst', val: 0.2 },
+    talents: [
+      { tier: 1, key: 'invest_atk', name: 'Calibration', type: 'passive', desc: '+6 Attack.', cost: 1, effect: { stat: 'atk', val: 6 } },
+      { tier: 1, key: 'grenade', name: 'Grenade', type: 'active', desc: 'Deals 170% attack, applies 6 damage/turn for 3 turns. CD: 4', cost: 1, ability: { dmgMult: 1.7, dot: 6, dur: 3, cd: 4 } },
+      { tier: 2, key: 'invest_vit', name: 'Anvil Chest', type: 'passive', desc: '+6 Vitality.', cost: 1, effect: { stat: 'vit', val: 6 }, req: 'invest_atk' },
+      { tier: 2, key: 'turret', name: 'Automatic Turret', type: 'active', desc: 'For 4 turns, extra attack for 40% damage per turn. CD: 7', cost: 1, ability: { turret: 0.4, dur: 4, cd: 7 }, req: 'grenade' },
+      { tier: 3, key: 'gunpowder', name: 'Refined Powder', type: 'passive', desc: 'Burst proc raised to 35% and +80% damage.', cost: 2, override: { proc: 'burst', val: 0.35, mult: 1.8 } },
+      { tier: 3, key: 'cannon', name: 'Hand Cannon', type: 'active', desc: 'Deals 300% attack, ignores 70% defense. CD: 7', cost: 2, ability: { dmgMult: 3, armorPen: 0.7, cd: 7 } }
+    ]
+  },
+  // SHIFTER
+  stalker: {
+    name: 'Stalker',
+    race: 'shifter',
+    desc: 'Faceless flesh. Assassin between forms.',
+    base: { atk: 14, def: 6, vit: 10, agi: 11 },
+    passive: { name: 'Mimic Form', desc: 'First attack has +100% crit (always critical).', proc: 'guaranteedFirstCrit' },
+    talents: [
+      { tier: 1, key: 'invest_agi', name: 'Fluid Form', type: 'passive', desc: '+6 Agility.', cost: 1, effect: { stat: 'agi', val: 6 } },
+      { tier: 1, key: 'backstab', name: 'Backstab', type: 'active', desc: 'Deals 200% attack with guaranteed crit. CD: 4', cost: 1, ability: { dmgMult: 2, guaranteedCrit: true, cd: 4 } },
+      { tier: 2, key: 'invest_atk', name: 'Hidden Claws', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 }, req: 'invest_agi' },
+      { tier: 2, key: 'mimic', name: 'Mimicry', type: 'active', desc: "Copies 30% of enemy's stats for 3 turns. CD: 6", cost: 1, ability: { mimic: 0.3, dur: 3, cd: 6 }, req: 'backstab' },
+      { tier: 3, key: 'sharp_senses', name: 'Sharpened Senses', type: 'passive', desc: '+15% permanent crit chance.', cost: 2, effect: { critBonus: 0.15 } },
+      { tier: 3, key: 'death_mask', name: 'Death Mask', type: 'active', desc: 'Deals 250% attack, executes if HP < 25%. CD: 6', cost: 2, ability: { dmgMult: 2.5, execThreshold: 0.25, cd: 6 } }
+    ]
+  },
+  bearForm: {
+    name: 'Bear Form',
+    race: 'shifter',
+    desc: 'Embodies the primal beast.',
+    base: { atk: 13, def: 10, vit: 14, agi: 5 },
+    passive: { name: 'Thick Fur', desc: 'Reduces damage taken by 3.', proc: 'dmgReduce', val: 3 },
+    talents: [
+      { tier: 1, key: 'invest_vit', name: 'Brutal Mass', type: 'passive', desc: '+9 Vitality.', cost: 1, effect: { stat: 'vit', val: 9 } },
+      { tier: 1, key: 'maul', name: 'Maul', type: 'active', desc: 'Deals 150% attack and 8 damage/turn for 3 turns. CD: 4', cost: 1, ability: { dmgMult: 1.5, dot: 8, dur: 3, cd: 4 } },
+      { tier: 2, key: 'invest_atk', name: 'Steel Claws', type: 'passive', desc: '+5 Attack.', cost: 1, effect: { stat: 'atk', val: 5 }, req: 'invest_vit' },
+      { tier: 2, key: 'roar', name: 'Roar', type: 'active', desc: 'Reduces enemy attack by 40% for 3 turns. CD: 5', cost: 1, ability: { debuffAtk: 0.4, dur: 3, cd: 5 }, req: 'maul' },
+      { tier: 3, key: 'thick_hide', name: 'Armoured Hide', type: 'passive', desc: 'Reduces damage by another 4 (total 7).', cost: 2, override: { proc: 'dmgReduce', val: 7 } },
+      { tier: 3, key: 'frenzy', name: 'Bear Frenzy', type: 'active', desc: 'For 4 turns: +60% attack and regen 5 HP/turn. CD: 8', cost: 2, ability: { buffAtk: 0.6, regenBuff: 5, dur: 4, cd: 8 } }
+    ]
+  },
+  chaos: {
+    name: 'Chaos Shifter',
+    race: 'shifter',
+    desc: 'Their very flesh is unstable magic.',
+    base: { atk: 12, def: 8, vit: 11, agi: 9 },
+    passive: { name: 'Mutation', desc: 'Each turn, +2 to a random stat (stackable).', proc: 'mutate' },
+    talents: [
+      { tier: 1, key: 'invest_all', name: 'Plastic Flesh', type: 'passive', desc: '+3 to all stats.', cost: 1, effect: { atk: 3, def: 3, vit: 3, agi: 3 } },
+      { tier: 1, key: 'chaos_bolt', name: 'Chaos Bolt', type: 'active', desc: 'Deals 100-250% attack (random). CD: 3', cost: 1, ability: { dmgMult: [1, 2.5], cd: 3 } },
+      { tier: 2, key: 'rapid_mutate', name: 'Rapid Mutation', type: 'passive', desc: 'Mutation gains +3 instead of +2.', cost: 1, override: { proc: 'mutate', val: 3 }, req: 'invest_all' },
+      { tier: 2, key: 'unstable', name: 'Unstable Form', type: 'active', desc: 'For 3 turns, attacks deal +50% damage but -30% accuracy. CD: 6', cost: 1, ability: { buffAtk: 0.5, missChance: 0.3, dur: 3, cd: 6 }, req: 'chaos_bolt' },
+      { tier: 3, key: 'evolution', name: 'Evolution', type: 'passive', desc: 'Mutation affects 2 stats per turn.', cost: 2, effect: { doubleMutate: true } },
+      { tier: 3, key: 'total_chaos', name: 'Total Chaos', type: 'active', desc: 'Deals 50-400% attack. CD: 7', cost: 2, ability: { dmgMult: [0.5, 4], cd: 7 } }
+    ]
+  }
+};
+
+// ============ ITEMS ============
+const ITEM_POOL = [
+  { slot: 'weapon', name: 'Rusty Sword', rarity: 'common', stats: { atk: 3 } },
+  { slot: 'weapon', name: "Hunter's Dagger", rarity: 'uncommon', stats: { atk: 4, agi: 2 } },
+  { slot: 'weapon', name: 'Oak Staff', rarity: 'uncommon', stats: { atk: 5 } },
+  { slot: 'weapon', name: "Berserker's Axe", rarity: 'rare', stats: { atk: 8 }, effect: { type: 'lifesteal', val: 0.15, desc: '15% lifesteal' } },
+  { slot: 'weapon', name: 'Mistblade', rarity: 'rare', stats: { atk: 7, agi: 3 }, effect: { type: 'crit', val: 0.15, desc: '+15% crit chance' } },
+  { slot: 'weapon', name: 'Flame Staff', rarity: 'epic', stats: { atk: 10 }, effect: { type: 'burn', val: 4, desc: 'Burn: 4 damage/turn' } },
+  { slot: 'weapon', name: 'Runic Hammer', rarity: 'epic', stats: { atk: 12, def: 3 }, effect: { type: 'crit', val: 0.20, desc: '+20% crit chance' } },
+  { slot: 'weapon', name: "Aldebrand's Vengeance", rarity: 'legendary', stats: { atk: 14, vit: 4 }, effect: { type: 'execute', val: 0.20, desc: 'Executes enemies below 20% HP' } },
+  { slot: 'armor', name: 'Tattered Tunic', rarity: 'common', stats: { def: 2 } },
+  { slot: 'armor', name: 'Ring Mail', rarity: 'uncommon', stats: { def: 4, vit: 2 } },
+  { slot: 'armor', name: 'Wolf Leathers', rarity: 'uncommon', stats: { def: 3, agi: 3 } },
+  { slot: 'armor', name: "Necromancer's Cloak", rarity: 'rare', stats: { def: 5, atk: 3 }, effect: { type: 'thorns', val: 3, desc: 'Thorns: returns 3 damage' } },
+  { slot: 'armor', name: 'Dragon Cuirass', rarity: 'epic', stats: { def: 9, vit: 5 }, effect: { type: 'regen', val: 3, desc: 'Regenerates 3 HP/turn' } },
+  { slot: 'armor', name: 'Robes of Eternity', rarity: 'legendary', stats: { def: 8, atk: 5, vit: 6 }, effect: { type: 'dodge', val: 0.15, desc: '15% dodge' } },
+  { slot: 'helm', name: 'Cloth Hood', rarity: 'common', stats: { def: 1 } },
+  { slot: 'helm', name: 'Iron Helm', rarity: 'uncommon', stats: { def: 3 } },
+  { slot: 'helm', name: 'Arcane Diadem', rarity: 'rare', stats: { def: 2, atk: 4 }, effect: { type: 'crit', val: 0.10, desc: '+10% crit chance' } },
+  { slot: 'helm', name: 'Crown of Thorns', rarity: 'epic', stats: { def: 5, atk: 4 }, effect: { type: 'thorns', val: 5, desc: 'Thorns: returns 5 damage' } },
+  { slot: 'boots', name: 'Worn Sandals', rarity: 'common', stats: { agi: 2 } },
+  { slot: 'boots', name: 'Leather Boots', rarity: 'uncommon', stats: { agi: 3, def: 1 } },
+  { slot: 'boots', name: 'Wind Boots', rarity: 'rare', stats: { agi: 6 }, effect: { type: 'dodge', val: 0.10, desc: '10% dodge' } },
+  { slot: 'boots', name: 'Shadow Steps', rarity: 'epic', stats: { agi: 8, atk: 3 }, effect: { type: 'firstStrike', val: 1, desc: 'Always attacks first' } }
+];
+
+const MONSTERS = [
+  { name: 'Giant Rat', level: 1, atk: 6, def: 2, vit: 8, agi: 4, gold: [5, 12], xp: 15 },
+  { name: 'Goblin Raider', level: 2, atk: 9, def: 4, vit: 14, agi: 7, gold: [10, 20], xp: 25 },
+  { name: 'Ash Wolf', level: 3, atk: 14, def: 5, vit: 18, agi: 12, gold: [18, 30], xp: 40 },
+  { name: 'Skeleton Warrior', level: 4, atk: 16, def: 10, vit: 24, agi: 6, gold: [30, 50], xp: 60 },
+  { name: 'Cave Ogre', level: 5, atk: 22, def: 12, vit: 38, agi: 4, gold: [50, 80], xp: 90 },
+  { name: 'Awakened Lich', level: 7, atk: 30, def: 14, vit: 50, agi: 10, gold: [80, 140], xp: 150 },
+  { name: 'Young Dragon', level: 10, atk: 42, def: 22, vit: 80, agi: 12, gold: [150, 250], xp: 300 }
+];
+
+const PVP_NAMES = ['Aldric the Black', 'Sylvana Silverleaf', 'Grosh Skullbreaker', 'Mira the Whisper', 'Kael Ironhand', 'Lirien of the Vales', 'Drogath the Cruel', 'Vendra Catseye', 'Borin Deepforge', 'Skarn Faceless'];
+
+// ============ STATE ============
+let state = {
+  step: 0,
+  pendingHero: { race: null, class: null, name: '' },
+  hero: null,
+  pvpOpponents: []
+};
+
+// ============ CHARACTER CREATION ============
+function renderCreation() {
+  const title = document.getElementById('step-title');
+  const content = document.getElementById('step-content');
+  const next = document.getElementById('step-next');
+  const back = document.getElementById('step-back');
+
+  back.classList.toggle('hidden', state.step === 0);
+
+  if (state.step === 0) {
+    title.textContent = 'CHOOSE YOUR RACE';
+    content.innerHTML = '<div class="options">' +
+      Object.entries(RACES).map(([k, r]) => `
+        <div class="option ${state.pendingHero.race === k ? 'selected' : ''}" data-race="${k}">
+          <div class="option-title">${r.name}</div>
+          <div class="option-desc">${r.desc}</div>
+          <div class="option-stats">${r.summary}</div>
+          <div class="option-passive">◈ ${r.passive.name}: ${r.passive.desc}</div>
+        </div>`).join('') + '</div>';
+    content.querySelectorAll('[data-race]').forEach(el => {
+      el.addEventListener('click', () => {
+        if (state.pendingHero.race !== el.dataset.race) {
+          state.pendingHero.class = null;
+        }
+        state.pendingHero.race = el.dataset.race;
+        renderCreation();
+      });
+    });
+    next.disabled = !state.pendingHero.race;
+    next.textContent = 'CONTINUE';
+  }
+  else if (state.step === 1) {
+    title.textContent = 'CHOOSE YOUR CLASS';
+    const availableClasses = RACES[state.pendingHero.race].classes;
+    content.innerHTML = '<div class="options">' +
+      availableClasses.map(k => {
+        const c = CLASSES[k];
+        return `
+          <div class="option ${state.pendingHero.class === k ? 'selected' : ''}" data-class="${k}">
+            <div class="option-title">${c.name}</div>
+            <div class="option-desc">${c.desc}</div>
+            <div class="option-stats">ATK ${c.base.atk} · DEF ${c.base.def} · VIT ${c.base.vit} · AGI ${c.base.agi}</div>
+            <div class="option-passive">◈ ${c.passive.name}: ${c.passive.desc}</div>
+          </div>`;
+      }).join('') + '</div>';
+    content.querySelectorAll('[data-class]').forEach(el => {
+      el.addEventListener('click', () => {
+        state.pendingHero.class = el.dataset.class;
+        renderCreation();
+      });
+    });
+    next.disabled = !state.pendingHero.class;
+    next.textContent = 'CONTINUE';
+  }
+  else if (state.step === 2) {
+    title.textContent = 'NAME YOUR HERO';
+    content.innerHTML = '<input type="text" id="hero-name-input" placeholder="Your name..." maxlength="20" value="' + state.pendingHero.name + '">';
+    const input = document.getElementById('hero-name-input');
+    input.focus();
+    input.addEventListener('input', () => {
+      state.pendingHero.name = input.value.trim();
+      next.disabled = state.pendingHero.name.length < 2;
+    });
+    next.textContent = 'ENTER THE WORLD';
+    next.disabled = state.pendingHero.name.length < 2;
+  }
+}
+
+document.getElementById('step-next').addEventListener('click', () => {
+  if (state.step < 2) {
+    state.step++;
+    renderCreation();
+  } else {
+    createHero();
+  }
+});
+
+document.getElementById('step-back').addEventListener('click', () => {
+  if (state.step > 0) {
+    state.step--;
+    renderCreation();
+  }
+});
+
+function createHero() {
+  const ph = state.pendingHero;
+  const cls = CLASSES[ph.class];
+  const race = RACES[ph.race];
+
+  state.hero = {
+    name: ph.name,
+    race: ph.race,
+    class: ph.class,
+    level: 1,
+    xp: 0,
+    xpNext: 100,
+    gold: 50,
+    talentPoints: 1,
+    unlockedTalents: [],
+    base: {
+      atk: cls.base.atk + race.mods.atk,
+      def: cls.base.def + race.mods.def,
+      vit: cls.base.vit + race.mods.vit,
+      agi: cls.base.agi + race.mods.agi
+    },
+    hp: 0, maxHp: 0,
+    equipment: { weapon: null, armor: null, helm: null, boots: null },
+    inventory: [generateItem('common', 'weapon'), generateItem('common', 'armor')]
+  };
+  recalculate();
+  state.hero.hp = state.hero.maxHp;
+  generatePvpOpponents();
+  document.getElementById('creation').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  renderAll();
+}
+
+// ============ ITEMS ============
+function generateItem(rarityHint, slotHint) {
+  let pool = ITEM_POOL;
+  if (slotHint) pool = pool.filter(i => i.slot === slotHint);
+  if (rarityHint) {
+    const filtered = pool.filter(i => i.rarity === rarityHint);
+    if (filtered.length) pool = filtered;
+  }
+  const tpl = pool[Math.floor(Math.random() * pool.length)];
+  return JSON.parse(JSON.stringify(tpl));
+}
+
+function rollLootByLevel(monsterLevel) {
+  const roll = Math.random();
+  let rarity = 'common';
+  const lvlBonus = monsterLevel * 0.03;
+  if (roll < 0.02 + lvlBonus * 0.5) rarity = 'legendary';
+  else if (roll < 0.10 + lvlBonus) rarity = 'epic';
+  else if (roll < 0.30 + lvlBonus) rarity = 'rare';
+  else if (roll < 0.60) rarity = 'uncommon';
+  return generateItem(rarity);
+}
+
+// ============ STATS & TALENTS ============
+function recalculate() {
+  const h = state.hero;
+  const cls = CLASSES[h.class];
+  const total = { ...h.base };
+  Object.values(h.equipment).forEach(item => {
+    if (!item) return;
+    Object.entries(item.stats).forEach(([k, v]) => {
+      total[k] = (total[k] || 0) + v;
+    });
+  });
+  // Apply passive talents
+  h.unlockedTalents.forEach(key => {
+    const talent = cls.talents.find(t => t.key === key);
+    if (talent && talent.type === 'passive' && talent.effect) {
+      Object.entries(talent.effect).forEach(([k, v]) => {
+        if (typeof v === 'number' && ['atk', 'def', 'vit', 'agi'].includes(k)) {
+          total[k] += v;
+        }
+        if (k === 'stat' && talent.effect.val) {
+          total[talent.effect.stat] = (total[talent.effect.stat] || 0) + talent.effect.val;
+        }
+      });
+    }
+  });
+  h.stats = total;
+  const newMax = total.vit * 5 + 20;
+  if (!h.maxHp) {
+    h.maxHp = newMax; h.hp = newMax;
+  } else {
+    const ratio = h.hp / h.maxHp;
+    h.maxHp = newMax;
+    h.hp = Math.min(h.maxHp, Math.max(1, Math.floor(h.maxHp * ratio)));
+  }
+}
+
+function getActiveAbilities() {
+  const cls = CLASSES[state.hero.class];
+  return state.hero.unlockedTalents
+    .map(k => cls.talents.find(t => t.key === k))
+    .filter(t => t && t.type === 'active');
+}
+
+function getAllPassiveBonuses() {
+  const h = state.hero;
+  const cls = CLASSES[h.class];
+  const bonuses = {
+    critBonus: 0, regen: 0, dmgReduce: 0, lifesteal: 0,
+    overrides: {}, savior: false, doubleMutate: false
+  };
+  h.unlockedTalents.forEach(key => {
+    const t = cls.talents.find(t => t.key === key);
+    if (!t) return;
+    if (t.effect) {
+      if (t.effect.critBonus) bonuses.critBonus += t.effect.critBonus;
+      if (t.effect.regen) bonuses.regen += t.effect.regen;
+      if (t.effect.dmgReduce) bonuses.dmgReduce += t.effect.dmgReduce;
+      if (t.effect.lifesteal) bonuses.lifesteal += t.effect.lifesteal;
+      if (t.effect.savior) bonuses.savior = true;
+      if (t.effect.doubleMutate) bonuses.doubleMutate = true;
+    }
+    if (t.override) bonuses.overrides[t.override.proc] = t.override;
+  });
+  return bonuses;
+}
+
+// ============ RENDERING ============
+function renderAll() {
+  renderHero();
+  renderTalents();
+  renderInventory();
+  renderPve();
+  renderPvp();
+}
+
+function renderHero() {
+  const h = state.hero;
+  document.getElementById('hero-name').textContent = h.name;
+  document.getElementById('hero-meta').textContent = `${RACES[h.race].name} · ${CLASSES[h.class].name} · Level ${h.level}`;
+  document.getElementById('hero-gold').innerHTML = `${h.gold} ◊`;
+  const hpPct = (h.hp / h.maxHp) * 100;
+  document.getElementById('hp-bar').style.width = hpPct + '%';
+  document.getElementById('hp-text').textContent = `${h.hp} / ${h.maxHp} HP`;
+  const xpPct = (h.xp / h.xpNext) * 100;
+  document.getElementById('xp-bar').style.width = xpPct + '%';
+  document.getElementById('xp-text').textContent = `${h.xp} / ${h.xpNext} XP`;
+
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = `
+    <div class="stat-row"><span class="stat-label">Attack</span><span class="stat-val">${h.stats.atk}</span></div>
+    <div class="stat-row"><span class="stat-label">Defense</span><span class="stat-val">${h.stats.def}</span></div>
+    <div class="stat-row"><span class="stat-label">Vitality</span><span class="stat-val">${h.stats.vit}</span></div>
+    <div class="stat-row"><span class="stat-label">Agility</span><span class="stat-val">${h.stats.agi}</span></div>
+  `;
+
+  // Class passive + abilities
+  const cls = CLASSES[h.class];
+  document.getElementById('class-passive').innerHTML = `
+    <div class="passive-chip">${cls.passive.name}: ${cls.passive.desc}</div>
+    <div class="passive-chip">${RACES[h.race].passive.name}: ${RACES[h.race].passive.desc}</div>
+  `;
+  const abilities = getActiveAbilities();
+  const abilityBar = document.getElementById('ability-bar');
+  if (abilities.length === 0) {
+    abilityBar.innerHTML = '<div style="color: var(--text-dim); font-style: italic; font-size: 13px; margin-top: 8px;">No active abilities. Unlock them in the talent tree.</div>';
+  } else {
+    abilityBar.innerHTML = abilities.map(a => `
+      <div class="ability-chip">
+        <span class="ability-chip-name">⚔ ${a.name}</span>
+        <span class="ability-chip-cd">CD ${a.ability.cd}</span>
+      </div>
+    `).join('');
+  }
+
+  const eq = document.getElementById('equipment');
+  const slots = [
+    { key: 'weapon', label: SLOT_LABELS.weapon },
+    { key: 'armor', label: SLOT_LABELS.armor },
+    { key: 'helm', label: SLOT_LABELS.helm },
+    { key: 'boots', label: SLOT_LABELS.boots }
+  ];
+  eq.innerHTML = slots.map(s => {
+    const item = h.equipment[s.key];
+    return `<div class="slot" data-slot="${s.key}">
+      <div class="slot-label">${s.label}</div>
+      ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
+    </div>`;
+  }).join('');
+  eq.querySelectorAll('[data-slot]').forEach(el => {
+    el.addEventListener('click', () => {
+      const slot = el.dataset.slot;
+      if (h.equipment[slot]) {
+        h.inventory.push(h.equipment[slot]);
+        h.equipment[slot] = null;
+        recalculate(); renderAll();
+      }
+    });
+  });
+}
+
+function renderTalents() {
+  const h = state.hero;
+  const cls = CLASSES[h.class];
+  document.getElementById('talent-points').textContent = `${h.talentPoints} pts`;
+
+  const tree = document.getElementById('talent-tree');
+  const tiers = [1, 2, 3];
+  tree.innerHTML = tiers.map(tier => {
+    const tierTalents = cls.talents.filter(t => t.tier === tier);
+    const tierNodes = tierTalents.map(t => {
+      const unlocked = h.unlockedTalents.includes(t.key);
+      const reqMet = !t.req || h.unlockedTalents.includes(t.req);
+      const canAfford = h.talentPoints >= t.cost;
+      const available = !unlocked && reqMet && canAfford;
+      const locked = !unlocked && !reqMet;
+      const cls2 = unlocked ? 'unlocked' : (locked ? 'locked' : (available ? 'available' : ''));
+      return `
+        <div class="talent-node ${cls2}" data-talent="${t.key}">
+          <div class="talent-cost">${t.cost} pt${t.cost > 1 ? 's' : ''}</div>
+          <div class="talent-name ${t.type}">${t.name}</div>
+          <div class="talent-desc">${t.desc}</div>
+        </div>
+      `;
+    }).join('');
+    return `
+      <div class="talent-tier">
+        <div class="tier-label">— TIER ${tier} —</div>
+        ${tierNodes}
+      </div>
+    `;
+  }).join('');
+
+  tree.querySelectorAll('[data-talent]').forEach(el => {
+    el.addEventListener('click', () => {
+      const key = el.dataset.talent;
+      const talent = cls.talents.find(t => t.key === key);
+      if (!talent) return;
+      if (h.unlockedTalents.includes(key)) return;
+      if (talent.req && !h.unlockedTalents.includes(talent.req)) return;
+      if (h.talentPoints < talent.cost) return;
+      h.talentPoints -= talent.cost;
+      h.unlockedTalents.push(key);
+      recalculate();
+      renderAll();
+    });
+  });
+}
+
+function renderInventory() {
+  const list = document.getElementById('inv-list');
+  if (state.hero.inventory.length === 0) {
+    list.innerHTML = '<div style="text-align:center; color: var(--text-dim); font-style: italic; padding: 20px;">The bag is empty.</div>';
+    return;
+  }
+  list.innerHTML = state.hero.inventory.map((item, idx) => {
+    const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+    return `<div class="inv-item" data-idx="${idx}">
+      <div class="inv-item-header">
+        <span class="inv-item-name r-${item.rarity}">${item.name}</span>
+        <span class="inv-item-slot">${SLOT_LABELS[item.slot] || item.slot}</span>
+      </div>
+      <div class="inv-item-stats">${statStr}</div>
+      ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-idx]').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.idx);
+      const item = state.hero.inventory[idx];
+      const current = state.hero.equipment[item.slot];
+      state.hero.equipment[item.slot] = item;
+      state.hero.inventory.splice(idx, 1);
+      if (current) state.hero.inventory.push(current);
+      recalculate(); renderAll(); switchTab('hero');
+    });
+  });
+}
+
+function renderPve() {
+  const list = document.getElementById('pve-list');
+  list.innerHTML = MONSTERS.map((m, idx) => {
+    const power = m.atk + m.def + Math.floor(m.vit / 4) + m.agi;
+    return `<div class="enemy-card" data-monster="${idx}">
+      <div class="enemy-info">
+        <div class="enemy-name">${m.name}</div>
+        <div class="enemy-meta">Level ${m.level}</div>
+      </div>
+      <div class="enemy-power">⚔ ${power}</div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-monster]').forEach(el => {
+    el.addEventListener('click', () => {
+      startCombat({ ...MONSTERS[parseInt(el.dataset.monster)] }, 'pve');
+    });
+  });
+}
+
+function generatePvpOpponents() {
+  state.pvpOpponents = [];
+  const allClasses = Object.keys(CLASSES);
+  for (let i = 0; i < 4; i++) {
+    const clsKey = allClasses[Math.floor(Math.random() * allClasses.length)];
+    const cls = CLASSES[clsKey];
+    const raceKey = cls.race;
+    const r = RACES[raceKey];
+    const lvl = Math.max(1, state.hero.level + Math.floor(Math.random() * 3) - 1);
+    state.pvpOpponents.push({
+      name: PVP_NAMES[Math.floor(Math.random() * PVP_NAMES.length)],
+      race: raceKey, class: clsKey, level: lvl,
+      atk: cls.base.atk + r.mods.atk + lvl * 2,
+      def: cls.base.def + r.mods.def + lvl * 1,
+      vit: cls.base.vit + r.mods.vit + lvl * 2,
+      agi: cls.base.agi + r.mods.agi + lvl,
+      gold: [20 * lvl, 40 * lvl],
+      xp: lvl * 30,
+      isPlayer: true
+    });
+  }
+}
+
+function renderPvp() {
+  const list = document.getElementById('pvp-list');
+  list.innerHTML = state.pvpOpponents.map((o, idx) => {
+    const power = o.atk + o.def + Math.floor(o.vit / 4) + o.agi;
+    return `<div class="enemy-card" data-pvp="${idx}">
+      <div class="enemy-info">
+        <div class="enemy-name">${o.name}</div>
+        <div class="enemy-meta">${RACES[o.race].name} ${CLASSES[o.class].name} · Lv ${o.level}</div>
+      </div>
+      <div class="enemy-power">⚔ ${power}</div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-pvp]').forEach(el => {
+    el.addEventListener('click', () => {
+      startCombat({ ...state.pvpOpponents[parseInt(el.dataset.pvp)] }, 'pvp');
+    });
+  });
+}
+
+// ============ COMBAT ============
+// Pure idle: zero clicks during combat. The combat panel auto-closes
+// shortly after the fight ends and returns the player to the previous tab.
+const COMBAT_AUTO_CLOSE_MS = 2800;
+let _previousTab = 'hero';
+let _autoCloseTimer = null;
+
+function startCombat(enemy, mode) {
+  const h = state.hero;
+  if (h.hp <= 0) {
+    return; // can't fight while down; flow stays in tab
+  }
+  if (_autoCloseTimer) { clearTimeout(_autoCloseTimer); _autoCloseTimer = null; }
+  _previousTab = mode === 'pvp' ? 'pvp' : 'pve';
+  document.getElementById('combat').classList.remove('hidden');
+  document.querySelector('#game .tabs').classList.add('hidden');
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById('combat-autoclose').classList.add('hidden');
+  document.getElementById('combat-title').textContent = mode === 'pvp' ? 'ARENA DUEL' : 'HUNT';
+  document.getElementById('f1-name').textContent = h.name;
+  document.getElementById('f2-name').textContent = enemy.name;
+  const log = document.getElementById('combat-log');
+  log.innerHTML = '';
+  resolveCombat(enemy, mode, log);
+}
+
+function closeCombat() {
+  document.getElementById('combat').classList.add('hidden');
+  document.querySelector('#game .tabs').classList.remove('hidden');
+  switchTab(_previousTab || 'hero');
+  renderAll();
+}
+
+function scheduleAutoClose(delay) {
+  if (_autoCloseTimer) clearTimeout(_autoCloseTimer);
+  const note = document.getElementById('combat-autoclose');
+  note.classList.remove('hidden');
+  _autoCloseTimer = setTimeout(() => {
+    _autoCloseTimer = null;
+    closeCombat();
+  }, delay);
+}
+
+function buildFighter(source, isHero) {
+  const f = {
+    name: source.name,
+    isHero,
+    hp: 0, maxHp: 0,
+    atk: 0, def: 0, agi: 0,
+    race: source.race, class: source.class,
+    abilities: [], cooldowns: {},
+    statusBuffs: [], dots: [],
+    usedSavior: false, mutateStacks: { atk: 0, def: 0, vit: 0, agi: 0 },
+    flatDmgReduce: 0, critBonus: 0, lifestealBase: 0, regenBase: 0,
+    hasFirstStrike: false
+  };
+  if (isHero) {
+    f.atk = source.stats.atk;
+    f.def = source.stats.def;
+    f.agi = source.stats.agi;
+    f.maxHp = source.maxHp;
+    f.hp = source.hp;
+    f.abilities = getActiveAbilities();
+    const bonuses = getAllPassiveBonuses();
+    f.critBonus += bonuses.critBonus;
+    f.regenBase += bonuses.regen;
+    f.flatDmgReduce += bonuses.dmgReduce;
+    f.lifestealBase += bonuses.lifesteal;
+    f.savior = bonuses.savior;
+    f.doubleMutate = bonuses.doubleMutate;
+    f.passiveOverrides = bonuses.overrides;
+    // Equipment effects
+    Object.values(source.equipment).forEach(item => {
+      if (!item || !item.effect) return;
+      f.equipEffects = f.equipEffects || [];
+      f.equipEffects.push(item.effect);
+    });
+    if (f.equipEffects) {
+      f.equipEffects.forEach(e => {
+        if (e.type === 'firstStrike') f.hasFirstStrike = true;
+        if (e.type === 'crit') f.critBonus += e.val;
+        if (e.type === 'dodge') f.dodgeBase = (f.dodgeBase || 0) + e.val;
+        if (e.type === 'regen') f.regenBase += e.val;
+        if (e.type === 'lifesteal') f.lifestealBase += e.val;
+      });
+    }
+  } else {
+    f.atk = source.atk;
+    f.def = source.def;
+    f.agi = source.agi;
+    f.maxHp = source.vit * 4 + 25;
+    f.hp = f.maxHp;
+  }
+  return f;
+}
+
+function getRacePassive(fighter) {
+  if (!fighter.race) return null;
+  return RACES[fighter.race].passive;
+}
+function getClassPassive(fighter) {
+  if (!fighter.class) return null;
+  return CLASSES[fighter.class].passive;
+}
+
+function checkFirstStrike(f) {
+  if (f.hasFirstStrike) return true;
+  const cp = getClassPassive(f);
+  if (cp && cp.proc === 'firstStrike') return true;
+  return false;
+}
+
+function resolveCombat(enemy, mode, log) {
+  const hero = buildFighter(state.hero, true);
+  const foe = buildFighter(enemy, false);
+
+  updateCombatBars(hero, foe);
+
+  let heroFirst = hero.agi >= foe.agi;
+  if (checkFirstStrike(hero)) heroFirst = true;
+  if (checkFirstStrike(foe)) heroFirst = false;
+  if (checkFirstStrike(hero) && checkFirstStrike(foe)) heroFirst = hero.agi >= foe.agi;
+
+  let delay = 400;
+  let turn = 1;
+  const maxTurns = 25;
+  const result = { winner: null };
+
+  // Pre-combat: apply some passives
+  applyClassPassivesStart(hero, log, delay);
+
+  while (hero.hp > 0 && foe.hp > 0 && turn <= maxTurns) {
+    const turnNum = turn;
+    setTimeout(((t) => () => appendLog(log, `<div class="log-turn">— TURN ${t} —</div>`))(turnNum), delay);
+    delay += 300;
+
+    // Start-of-turn effects
+    delay = tickStartOfTurn(hero, log, delay);
+    delay = tickStartOfTurn(foe, log, delay);
+
+    if (hero.hp <= 0 || foe.hp <= 0) break;
+
+    const first = heroFirst ? hero : foe;
+    const second = heroFirst ? foe : hero;
+
+    delay = takeAction(first, second, log, delay, turn);
+    if (second.hp <= 0) break;
+    delay = takeAction(second, first, log, delay, turn);
+    if (first.hp <= 0) break;
+
+    // Mutate (shifter)
+    delay = tickMutate(hero, log, delay);
+    delay = tickMutate(foe, log, delay);
+
+    // Decay buffs/debuffs
+    decayStatuses(hero);
+    decayStatuses(foe);
+    decayCooldowns(hero);
+    decayCooldowns(foe);
+
+    turn++;
+  }
+
+  setTimeout(() => {
+    if (hero.hp > 0 && foe.hp <= 0) {
+      result.winner = 'hero';
+      finishVictory(enemy, mode, log, hero);
+    } else if (foe.hp > 0 && hero.hp <= 0) {
+      result.winner = 'foe';
+      finishDefeat(log);
+    } else {
+      finishDefeat(log, true);
+    }
+    updateCombatBars(hero, foe);
+    scheduleAutoClose(COMBAT_AUTO_CLOSE_MS);
+  }, delay + 300);
+}
+
+function applyClassPassivesStart(f, log, delay) {
+  // Most passives are "during combat" - nothing to do at start
+}
+
+function tickStartOfTurn(f, log, delay) {
+  if (f.hp <= 0) return delay;
+  // Regen
+  if (f.regenBase > 0 && f.hp < f.maxHp) {
+    const amt = f.regenBase;
+    setTimeout(() => {
+      if (f.hp <= 0) return;
+      f.hp = Math.min(f.maxHp, f.hp + amt);
+      appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP.</span>`);
+      updateCombatBars(stateFighter(true), stateFighter(false));
+    }, delay);
+    delay += 300;
+  }
+  // Class regen override (cleric aura, stone priest)
+  if (f.passiveOverrides && f.passiveOverrides.regen) {
+    const amt = f.passiveOverrides.regen.val;
+    setTimeout(() => {
+      if (f.hp <= 0) return;
+      f.hp = Math.min(f.maxHp, f.hp + amt);
+      appendLog(log, `<span class="log-effect">${f.name} is blessed: +${amt} HP.</span>`);
+      updateCombatBars(stateFighter(true), stateFighter(false));
+    }, delay);
+    delay += 300;
+  } else {
+    // Class passive regen (cleric, druid, stone priest)
+    const cp = getClassPassive(f);
+    if (cp && cp.proc === 'regen' && cp.val) {
+      const amt = cp.val;
+      setTimeout(() => {
+        if (f.hp <= 0) return;
+        f.hp = Math.min(f.maxHp, f.hp + amt);
+        appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP (${cp.name}).</span>`);
+        updateCombatBars(stateFighter(true), stateFighter(false));
+      }, delay);
+      delay += 300;
+    }
+  }
+  // DOTs (burn, curse, etc.)
+  if (f.dots && f.dots.length) {
+    f.dots = f.dots.filter(dot => dot.remaining > 0);
+    f.dots.forEach(dot => {
+      setTimeout(() => {
+        if (f.hp <= 0) return;
+        f.hp = Math.max(0, f.hp - dot.dmg);
+        appendLog(log, `<span class="log-effect">${f.name} suffers ${dot.dmg} (${dot.label}).</span>`);
+        updateCombatBars(stateFighter(true), stateFighter(false));
+      }, delay);
+      delay += 300;
+      dot.remaining--;
+    });
+    f.dots = f.dots.filter(dot => dot.remaining > 0);
+  }
+  // Turret (engineer)
+  const turret = f.statusBuffs.find(b => b.type === 'turret');
+  if (turret) {
+    const turretDmg = Math.floor(f.atk * turret.val);
+    setTimeout(() => {
+      const target = f.isHero ? stateFighter(false) : stateFighter(true);
+      if (!target || target.hp <= 0 || f.hp <= 0) return;
+      target.hp = Math.max(0, target.hp - turretDmg);
+      appendLog(log, `<span class="log-effect">${f.name}'s turret fires: ${turretDmg} damage.</span>`);
+      updateCombatBars(stateFighter(true), stateFighter(false));
+    }, delay);
+    delay += 300;
+  }
+  return delay;
+}
+
+// Helper to get current fighters - stored on a global
+let _currentFighters = { hero: null, foe: null };
+function stateFighter(isHero) {
+  return isHero ? _currentFighters.hero : _currentFighters.foe;
+}
+
+function tickMutate(f, log, delay) {
+  if (f.hp <= 0) return delay;
+  const cp = getClassPassive(f);
+  const rp = getRacePassive(f);
+  const isChaos = cp && cp.proc === 'mutate';
+  const isShifter = rp && rp.key === 'shifterAdapt';
+  if (!isChaos && !isShifter) return delay;
+
+  const val = (f.passiveOverrides && f.passiveOverrides.mutate ? f.passiveOverrides.mutate.val : (isChaos ? 2 : 1));
+  const stats = ['atk', 'def', 'vit', 'agi'];
+  const count = f.doubleMutate ? 2 : 1;
+  for (let i = 0; i < count; i++) {
+    const s = stats[Math.floor(Math.random() * stats.length)];
+    f.mutateStacks[s] = (f.mutateStacks[s] || 0) + val;
+    f[s] += val;
+    setTimeout(((sn, vn) => () => {
+      appendLog(log, `<span class="log-effect">${f.name} mutates: +${vn} ${sn.toUpperCase()}.</span>`);
+    })(s, val), delay);
+    delay += 250;
+  }
+  return delay;
+}
+
+function decayStatuses(f) {
+  f.statusBuffs = f.statusBuffs.filter(b => {
+    b.remaining--;
+    return b.remaining > 0;
+  });
+}
+
+function decayCooldowns(f) {
+  Object.keys(f.cooldowns).forEach(k => {
+    f.cooldowns[k]--;
+    if (f.cooldowns[k] <= 0) delete f.cooldowns[k];
+  });
+}
+
+function takeAction(attacker, defender, log, delay, turn) {
+  if (attacker.hp <= 0 || defender.hp <= 0) return delay;
+  _currentFighters.hero = attacker.isHero ? attacker : defender;
+  _currentFighters.foe = attacker.isHero ? defender : attacker;
+
+  // Stunned?
+  if (attacker.statusBuffs.find(b => b.type === 'stun')) {
+    setTimeout(() => {
+      appendLog(log, `<span class="log-effect">${attacker.name} is stunned.</span>`);
+    }, delay);
+    return delay + 300;
+  }
+
+  // Choose ability (for hero, prioritize abilities; for foe, basic attack mostly)
+  let abilityToUse = null;
+  if (attacker.isHero && attacker.abilities.length > 0) {
+    abilityToUse = chooseAbility(attacker, defender);
+  }
+
+  if (abilityToUse) {
+    return executeAbility(attacker, defender, abilityToUse, log, delay);
+  } else {
+    return executeBasicAttack(attacker, defender, log, delay);
+  }
+}
+
+function chooseAbility(attacker, defender) {
+  // Priority logic: heals if low HP, executes if enemy low HP, otherwise highest damage
+  const available = attacker.abilities.filter(a => !attacker.cooldowns[a.key]);
+  if (available.length === 0) return null;
+
+  const hpPct = attacker.hp / attacker.maxHp;
+  const defHpPct = defender.hp / defender.maxHp;
+
+  // Heal if low
+  if (hpPct < 0.5) {
+    const heal = available.find(a => a.ability.heal);
+    if (heal) return heal;
+  }
+  // Execute opportunity
+  const exec = available.find(a => a.ability.execThreshold && defHpPct < a.ability.execThreshold);
+  if (exec) return exec;
+
+  // Random damaging ability or buff
+  const damaging = available.filter(a => a.ability.dmgMult || a.ability.multiHit);
+  if (damaging.length > 0) {
+    return damaging[Math.floor(Math.random() * damaging.length)];
+  }
+  return available[Math.floor(Math.random() * available.length)];
+}
+
+function executeAbility(attacker, defender, talent, log, delay) {
+  const a = talent.ability;
+  attacker.cooldowns[talent.key] = a.cd + 1;
+  setTimeout(() => {
+    appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}!</span>`);
+  }, delay);
+  delay += 400;
+
+  // Heal
+  if (a.heal) {
+    const amt = Math.floor(attacker.maxHp * a.heal);
+    setTimeout(() => {
+      attacker.hp = Math.min(attacker.maxHp, attacker.hp + amt);
+      appendLog(log, `<span class="log-effect">${attacker.name} heals ${amt} HP.</span>`);
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    }, delay);
+    delay += 400;
+  }
+
+  // Damage abilities
+  if (a.dmgMult !== undefined || a.multiHit) {
+    const hits = a.multiHit || 1;
+    for (let i = 0; i < hits; i++) {
+      delay = doDamage(attacker, defender, log, delay, {
+        mult: Array.isArray(a.dmgMult) ? randRange(a.dmgMult[0], a.dmgMult[1]) : (a.dmgMult || 1),
+        armorPen: a.armorPen,
+        trueDmg: a.trueDmg,
+        guaranteedCrit: a.guaranteedCrit,
+        critBonus: a.critBonus || 0,
+        lifestealOnce: a.lifestealOnce,
+        execThreshold: a.execThreshold,
+        defAsDmg: a.defAsDmg,
+        missChance: a.missChance,
+        abilityLabel: talent.name
+      });
+      if (defender.hp <= 0) break;
+    }
+  }
+
+  // Buffs / Debuffs
+  if (a.buffAtk) {
+    attacker.statusBuffs.push({ type: 'buffAtk', val: a.buffAtk, remaining: a.dur + 1 });
+    attacker.atk = Math.floor(attacker.atk * (1 + a.buffAtk));
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.buffAtk*100)}% attack for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.buffDef) {
+    attacker.statusBuffs.push({ type: 'buffDef', val: a.buffDef, remaining: a.dur + 1 });
+    attacker.def = Math.floor(attacker.def * (1 + a.buffDef));
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.buffDef*100)}% defense for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.regenBuff) {
+    attacker.statusBuffs.push({ type: 'regenBuff', val: a.regenBuff, remaining: a.dur + 1 });
+    attacker.regenBase += a.regenBuff;
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: regenerates ${a.regenBuff} HP/turn for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.dodgeBuff) {
+    attacker.statusBuffs.push({ type: 'dodgeBuff', val: a.dodgeBuff, remaining: a.dur + 1 });
+    attacker.dodgeBase = (attacker.dodgeBase || 0) + a.dodgeBuff;
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.dodgeBuff*100)}% dodge for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.thornsBuff) {
+    attacker.statusBuffs.push({ type: 'thorns', val: a.thornsBuff, remaining: a.dur + 1 });
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: thorns ${Math.round(a.thornsBuff*100)}% for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.debuffAtk) {
+    defender.statusBuffs.push({ type: 'debuffAtk', val: a.debuffAtk, remaining: a.dur + 1 });
+    defender.atk = Math.floor(defender.atk * (1 - a.debuffAtk));
+    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name}: -${Math.round(a.debuffAtk*100)}% attack for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.debuffAgi) {
+    defender.statusBuffs.push({ type: 'debuffAgi', val: a.debuffAgi, remaining: a.dur + 1 });
+    defender.agi = Math.max(0, Math.floor(defender.agi * (1 - a.debuffAgi)));
+    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name}: -${Math.round(a.debuffAgi*100)}% agility for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.dot) {
+    defender.dots = defender.dots || [];
+    defender.dots.push({ dmg: a.dot, remaining: a.dur, label: talent.name });
+    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name} suffers ${a.dot}/turn for ${a.dur} turns.</span>`), delay);
+    delay += 300;
+  }
+  if (a.stun) {
+    defender.statusBuffs.push({ type: 'stun', remaining: a.stun + 1 });
+    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name} is stunned!</span>`), delay);
+    delay += 300;
+  }
+  if (a.turret) {
+    attacker.statusBuffs.push({ type: 'turret', val: a.turret, remaining: a.dur + 1 });
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name} raises an automatic turret!</span>`), delay);
+    delay += 300;
+  }
+  if (a.cleanse) {
+    attacker.statusBuffs = attacker.statusBuffs.filter(b => !['debuffAtk','debuffAgi','stun'].includes(b.type));
+    attacker.dots = [];
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name} purges all ailments.</span>`), delay);
+    delay += 300;
+  }
+  if (a.mimic) {
+    attacker.atk = Math.floor(attacker.atk + defender.atk * a.mimic);
+    attacker.def = Math.floor(attacker.def + defender.def * a.mimic);
+    attacker.statusBuffs.push({ type: 'mimic', remaining: a.dur + 1 });
+    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name} copies ${Math.round(a.mimic*100)}% of ${defender.name}'s stats.</span>`), delay);
+    delay += 300;
+  }
+
+  return delay;
+}
+
+function executeBasicAttack(attacker, defender, log, delay) {
+  return doDamage(attacker, defender, log, delay, {});
+}
+
+function doDamage(attacker, defender, log, delay, opts) {
+  setTimeout(() => {
+    if (attacker.hp <= 0 || defender.hp <= 0) return;
+    // Miss chance (unstable form)
+    if (opts.missChance && Math.random() < opts.missChance) {
+      appendLog(log, `<span class="log-effect">${attacker.name} misses!</span>`);
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+      return;
+    }
+    // Dodge
+    let dodgeChance = defender.dodgeBase || 0;
+    const cp = getClassPassive(defender);
+    if (cp && cp.proc === 'dodge' && !opts.guaranteedCrit) {
+      const dodgeVal = defender.passiveOverrides && defender.passiveOverrides.dodge
+        ? defender.passiveOverrides.dodge.val
+        : cp.val;
+      dodgeChance += dodgeVal;
+    }
+    if (Math.random() < dodgeChance) {
+      appendLog(log, `<span class="log-effect">${defender.name} dodges!</span>`);
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+      return;
+    }
+
+    // Base damage
+    let baseAtk = attacker.atk;
+    // Orc race passive: blood fury < 50% hp
+    const rp = getRacePassive(attacker);
+    if (rp && rp.key === 'orcFury' && attacker.hp / attacker.maxHp < 0.5) {
+      baseAtk = Math.floor(baseAtk * 1.3);
+    }
+    // Berserker bloodthirst
+    const ap = getClassPassive(attacker);
+    if (ap && ap.proc === 'bloodThirst') {
+      const missing = 1 - attacker.hp / attacker.maxHp;
+      baseAtk = Math.floor(baseAtk * (1 + missing * 0.5));
+    }
+    // Hunter mark
+    if (ap && ap.proc === 'markedShot' && defender.hp >= defender.maxHp * 0.99) {
+      baseAtk = Math.floor(baseAtk * 1.15);
+    }
+
+    let mult = opts.mult || 1;
+    let dmg = Math.max(1, baseAtk * mult);
+
+    // Defense
+    let defValue = defender.def;
+    if (opts.armorPen) defValue = Math.floor(defValue * (1 - opts.armorPen));
+    if (!opts.trueDmg) dmg = Math.max(1, dmg - defValue / 2);
+    dmg = Math.floor(dmg * (0.9 + Math.random() * 0.2));
+
+    // Critical
+    let critChance = 0.05 + (attacker.critBonus || 0) + (opts.critBonus || 0);
+    const racePassive = getRacePassive(attacker);
+    if (racePassive && racePassive.key === 'elfCrit') critChance += 0.05;
+    let isCrit = opts.guaranteedCrit || Math.random() < critChance;
+
+    // Stalker first-hit guaranteed crit
+    if (ap && ap.proc === 'guaranteedFirstCrit' && !attacker.firstHitDone) {
+      isCrit = true;
+      attacker.firstHitDone = true;
+    }
+
+    if (isCrit) dmg *= 2;
+
+    // Class proc: burst (engineer)
+    let burst = false;
+    if (ap && ap.proc === 'burst') {
+      const burstChance = (attacker.passiveOverrides && attacker.passiveOverrides.burst)
+        ? attacker.passiveOverrides.burst.val
+        : ap.val;
+      const burstMult = (attacker.passiveOverrides && attacker.passiveOverrides.burst && attacker.passiveOverrides.burst.mult)
+        ? attacker.passiveOverrides.burst.mult
+        : 0.5;
+      if (Math.random() < burstChance) {
+        dmg = Math.floor(dmg * (1 + burstMult));
+        burst = true;
+      }
+    }
+
+    // Execute
+    if (opts.execThreshold && defender.hp < defender.maxHp * opts.execThreshold) {
+      dmg = Math.max(dmg, defender.hp);
+    }
+
+    // Equipment execute effect
+    if (attacker.equipEffects) {
+      const exec = attacker.equipEffects.find(e => e.type === 'execute');
+      if (exec && defender.hp < defender.maxHp * exec.val) {
+        dmg = Math.max(dmg, defender.hp);
+      }
+    }
+
+    // Defense as damage (judgment)
+    if (opts.defAsDmg) dmg += Math.floor(attacker.def * opts.defAsDmg);
+
+    dmg = Math.floor(dmg);
+
+    // Block (knight / forge guardian)
+    let blocked = false;
+    const defenderClassPassive = getClassPassive(defender);
+    if (defenderClassPassive && defenderClassPassive.proc === 'block') {
+      const overrides = defender.passiveOverrides && defender.passiveOverrides.block;
+      const blockChance = overrides ? overrides.val : defenderClassPassive.val;
+      const blockMult = overrides && overrides.mult !== undefined ? overrides.mult : (defenderClassPassive.mult !== undefined ? defenderClassPassive.mult : 0.5);
+      if (Math.random() < blockChance) {
+        dmg = Math.floor(dmg * blockMult);
+        blocked = true;
+      }
+    }
+
+    // Flat damage reduction (dwarf race, bear form, guardian)
+    if (defender.flatDmgReduce) dmg = Math.max(1, dmg - defender.flatDmgReduce);
+    // Dwarf race passive
+    const defRace = getRacePassive(defender);
+    if (defRace && defRace.key === 'dwarfHide') dmg = Math.max(1, dmg - 2);
+    const defCls = getClassPassive(defender);
+    if (defCls && defCls.proc === 'dmgReduce') {
+      const reduceVal = defender.passiveOverrides && defender.passiveOverrides.dmgReduce
+        ? defender.passiveOverrides.dmgReduce.val
+        : defCls.val;
+      dmg = Math.max(1, dmg - reduceVal);
+    }
+
+    // Apply damage
+    defender.hp = Math.max(0, defender.hp - dmg);
+
+    // Savior (berserker)
+    if (defender.hp === 0 && defender.savior && !defender.usedSavior) {
+      defender.hp = 1;
+      defender.usedSavior = true;
+      appendLog(log, `<span class="log-crit">⚡ ${defender.name} REFUSES TO FALL!</span>`);
+    }
+
+    let msg = '';
+    if (opts.abilityLabel) msg += `<span class="log-ability">${opts.abilityLabel}: </span>`;
+    msg += `${attacker.name} strikes`;
+    if (isCrit) msg = `<span class="log-crit">⚡ CRITICAL!</span> ` + msg;
+    if (burst) msg += ` <span class="log-effect">(burst)</span>`;
+    if (blocked) msg += ` <span class="log-effect">(blocked)</span>`;
+    msg += ` for <span class="log-hit">${dmg} damage</span>.`;
+    appendLog(log, msg);
+
+    // Lifesteal
+    let lifesteal = attacker.lifestealBase || 0;
+    if (opts.lifestealOnce) lifesteal += opts.lifestealOnce;
+    // Class lifesteal passive (shaman)
+    const apCls = getClassPassive(attacker);
+    if (apCls && apCls.proc === 'lifesteal') {
+      const val = attacker.passiveOverrides && attacker.passiveOverrides.lifesteal
+        ? attacker.passiveOverrides.lifesteal.val
+        : apCls.val;
+      lifesteal += val;
+    }
+    if (lifesteal > 0 && dmg > 0) {
+      const heal = Math.floor(dmg * lifesteal);
+      if (heal > 0) {
+        attacker.hp = Math.min(attacker.maxHp, attacker.hp + heal);
+        appendLog(log, `<span class="log-effect">${attacker.name} drains ${heal} HP.</span>`);
+      }
+    }
+
+    // Druid healOnHit
+    if (apCls && apCls.proc === 'healOnHit' && dmg > 0) {
+      const heal = apCls.val;
+      attacker.hp = Math.min(attacker.maxHp, attacker.hp + heal);
+      appendLog(log, `<span class="log-effect">${attacker.name} renews: +${heal} HP.</span>`);
+    }
+
+    // Devourer (devour) - on kill
+    if (defender.hp <= 0 && apCls && apCls.proc === 'devour') {
+      const heal = Math.floor(attacker.maxHp * 0.3);
+      attacker.hp = Math.min(attacker.maxHp, attacker.hp + heal);
+      appendLog(log, `<span class="log-effect">${attacker.name} devours the soul: +${heal} HP.</span>`);
+    }
+
+    // Equipment burn
+    if (attacker.equipEffects) {
+      const burn = attacker.equipEffects.find(e => e.type === 'burn');
+      if (burn && defender.hp > 0) {
+        defender.dots = defender.dots || [];
+        if (!defender.dots.find(d => d.label === 'Burn')) {
+          defender.dots.push({ dmg: burn.val, remaining: 3, label: 'Burn' });
+          appendLog(log, `<span class="log-effect">${defender.name} bursts into flames!</span>`);
+        }
+      }
+    }
+
+    // Thorns (status buff and equipment)
+    const thornsBuff = defender.statusBuffs.find(b => b.type === 'thorns');
+    let totalThorns = 0;
+    if (thornsBuff && dmg > 0) totalThorns += Math.floor(dmg * thornsBuff.val);
+    if (defender.equipEffects) {
+      const eqThorns = defender.equipEffects.find(e => e.type === 'thorns');
+      if (eqThorns) totalThorns += eqThorns.val;
+    }
+    if (totalThorns > 0 && attacker.hp > 0) {
+      attacker.hp = Math.max(0, attacker.hp - totalThorns);
+      appendLog(log, `<span class="log-effect">Thorns: ${attacker.name} suffers ${totalThorns} damage.</span>`);
+    }
+
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+  }, delay);
+  return delay + 600;
+}
+
+function randRange(a, b) {
+  return a + Math.random() * (b - a);
+}
+
+function finishVictory(enemy, mode, log, heroFighter) {
+  let gold = randInt(enemy.gold[0], enemy.gold[1]);
+  let xp = enemy.xp;
+  // Human passive: +10% XP
+  if (state.hero.race === 'human') xp = Math.floor(xp * 1.1);
+  state.hero.gold += gold;
+  state.hero.xp += xp;
+  // Persist post-combat HP from the live fighter (more reliable than reading the DOM)
+  if (heroFighter) state.hero.hp = Math.max(1, Math.floor(heroFighter.hp));
+
+  let lootMsg = '';
+  if (Math.random() < 0.6) {
+    const loot = rollLootByLevel(enemy.level || state.hero.level);
+    state.hero.inventory.push(loot);
+    lootMsg = `<span class="reward-item r-${loot.rarity}">✦ ${loot.name}</span>`;
+  }
+  appendLog(log, `<div class="log-victory">⚔ VICTORY ⚔</div>`);
+  appendLog(log, `<div class="reward">+${gold} gold · +${xp} XP${lootMsg}</div>`);
+
+  while (state.hero.xp >= state.hero.xpNext) {
+    state.hero.xp -= state.hero.xpNext;
+    state.hero.level++;
+    state.hero.talentPoints++;
+    state.hero.xpNext = Math.floor(state.hero.xpNext * 1.5);
+    state.hero.base.atk += 2;
+    state.hero.base.def += 2;
+    state.hero.base.vit += 3;
+    state.hero.base.agi += 1;
+    appendLog(log, `<div class="log-victory">★ LEVEL ${state.hero.level} ★<br><span style="font-size:13px; color: var(--text);">+1 talent point</span></div>`);
+  }
+  recalculate();
+  if (mode === 'pvp') generatePvpOpponents();
+}
+
+function finishDefeat(log, draw) {
+  if (draw) {
+    appendLog(log, `<div class="log-defeat">— DRAW —</div>`);
+  } else {
+    appendLog(log, `<div class="log-defeat">— DEFEAT —</div>`);
+  }
+  state.hero.hp = Math.max(1, Math.floor(state.hero.maxHp * 0.15));
+  appendLog(log, `<div style="text-align:center; font-style:italic; color:var(--text-dim); padding:8px;">You wake wounded. You've recovered just enough to breathe.</div>`);
+}
+
+function appendLog(log, html) {
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = html;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function updateCombatBars(hero, foe) {
+  if (!hero || !foe) return;
+  const hPct = Math.max(0, (hero.hp / hero.maxHp) * 100);
+  const ePct = Math.max(0, (foe.hp / foe.maxHp) * 100);
+  document.getElementById('f1-hp').style.width = hPct + '%';
+  document.getElementById('f1-hp-text').textContent = Math.max(0, Math.floor(hero.hp));
+  document.getElementById('f2-hp').style.width = ePct + '%';
+  document.getElementById('f2-hp-text').textContent = Math.max(0, Math.floor(foe.hp));
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+renderCreation();
+</script>
+</body>
+</html>
