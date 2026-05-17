@@ -705,6 +705,17 @@
     color: var(--gold);
   }
   .btn-sell:hover { background: var(--gold); color: var(--bg); }
+  .btn-sell-all {
+    display: block; width: 100%;
+    padding: 10px 12px; margin-bottom: 10px;
+    background: var(--bg-deep);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 2px; cursor: pointer;
+    transition: all 0.18s;
+  }
+  .btn-sell-all:hover { background: var(--gold); color: var(--bg); }
   /* Combat summary panel — shown when a fight ends, no auto-close */
   .combat-summary {
     margin-top: 12px; padding-top: 12px;
@@ -826,6 +837,13 @@
     color: var(--epic); font-style: italic;
   }
   .passive-chip::before { content: '◈ '; }
+  .school-chip {
+    background: var(--bg-deep); border: 1px solid;
+    padding: 8px 10px; font-size: 12px; margin-bottom: 8px;
+    font-style: italic;
+  }
+  .school-chip.school-melee { border-color: var(--blood); color: var(--blood-bright); }
+  .school-chip.school-magic { border-color: var(--rare); color: var(--rare); }
 </style>
 </head>
 <body>
@@ -2420,7 +2438,13 @@ function renderHero() {
 
   // Class passive + abilities
   const cls = CLASSES[h.class];
+  // Damage school indicator — tells the player whether INT is useful
+  const isMagicClass = MAGICAL_CLASSES && MAGICAL_CLASSES.has(h.class);
+  const schoolChip = isMagicClass
+    ? `<div class="school-chip school-magic">⚡ Spell caster — scales with <strong>Magic</strong> (INT). Active abilities cost mana.</div>`
+    : `<div class="school-chip school-melee">⚔ Melee striker — scales with <strong>Melee</strong> (ATK). Some talents can still be magical.</div>`;
   document.getElementById('class-passive').innerHTML = `
+    ${schoolChip}
     <div class="passive-chip">${cls.passive.name}: ${cls.passive.desc}</div>
     <div class="passive-chip">${RACES[h.race].passive.name}: ${RACES[h.race].passive.desc}</div>
   `;
@@ -2557,7 +2581,10 @@ function renderInventory() {
     list.innerHTML = '<div style="text-align:center; color: var(--text-dim); font-style: italic; padding: 20px;">The bag is empty.</div>';
     return;
   }
-  list.innerHTML = state.hero.inventory.map((item, idx) => {
+  // Sell-all banner at the top — equipped gear is never touched
+  const totalSellValue = state.hero.inventory.reduce((s, it) => s + sellPrice(it), 0);
+  const sellAllHtml = `<button class="btn-sell-all" id="sell-all-btn">SELL ALL (${state.hero.inventory.length}) — ${totalSellValue} ◊</button>`;
+  list.innerHTML = sellAllHtml + state.hero.inventory.map((item, idx) => {
     const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
     const slotLabel = item.slot === 'ring' ? 'Ring' : (SLOT_LABELS[item.slot] || item.slot);
     return `<div class="inv-item rarity-${item.rarity}" data-idx="${idx}">
@@ -2575,6 +2602,8 @@ function renderInventory() {
       openCompareModal(idx);
     });
   });
+  const sellBtn = document.getElementById('sell-all-btn');
+  if (sellBtn) sellBtn.addEventListener('click', sellAllBag);
 }
 
 // ============ COMPARE & EQUIP MODAL ============
@@ -2639,6 +2668,19 @@ function renderDeltas(current, candidate) {
 const SELL_PRICE = { common: 5, uncommon: 15, rare: 40, epic: 120, legendary: 400 };
 function sellPrice(item) {
   return SELL_PRICE[item && item.rarity] || 0;
+}
+
+// Sell every item currently in the bag (equipped gear is safe — only the
+// inventory list is touched). Confirms with the player first.
+function sellAllBag() {
+  const h = state.hero;
+  if (!h || !h.inventory.length) return;
+  const total = h.inventory.reduce((sum, item) => sum + sellPrice(item), 0);
+  if (!confirm(`Sell all ${h.inventory.length} items in your bag for ${total} ◊?\n\nYour equipped gear is safe.`)) return;
+  h.gold += total;
+  h.inventory = [];
+  saveGame();
+  renderAll();
 }
 
 let _pendingEquip = null; // { invIdx, item, targets[] }

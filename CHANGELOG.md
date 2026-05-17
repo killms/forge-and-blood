@@ -6,6 +6,33 @@
 
 ---
 
+## Session 13 — 2026-05-18 — Sell-all + damage school indicator
+
+### Sell all (Bag)
+- New `SELL ALL (N) — X ◊` banner at the top of the inventory list.
+- Click → `window.confirm` with the count and total → if confirmed, all items in the bag are sold and the gold added at once.
+- Equipped gear is **never** touched (only `state.hero.inventory` is cleared).
+- Button hidden when bag is empty.
+
+### Damage school indicator (Hero tab)
+- New chip in the "Class Abilities" panel, just above the existing class/race passives:
+  - **Magic classes** (Cleric, Druid, Shaman, Stone Priest, Chaos Shifter): blue chip — *"Spell caster — scales with Magic (INT). Active abilities cost mana."*
+  - **Other classes**: red chip — *"Melee striker — scales with Melee (ATK). Some talents can still be magical."*
+- Driven by the existing `MAGICAL_CLASSES` set; no data changes.
+
+### Why this matters
+The Melee/Magic split is enforced in `doDamage`:
+- Magical abilities scale damage from **INT** instead of **ATK**.
+- Magical abilities cost mana from the INT-driven pool.
+- All other math (defense, AGI crits/dodge) is unchanged.
+
+For a pure-melee class (Knight, Berserker, Stalker, Bear, etc.) most active abilities are non-magical → INT does almost nothing. For magic classes, INT is the primary damage stat. The new chip makes that obvious at character creation.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 12 — 2026-05-18 — Melee/Magic split + Expeditions (dynamic Hunt)
 
 ### Part A — Melee / Magic damage split (presentation)
