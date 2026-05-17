@@ -6,6 +6,32 @@
 
 ---
 
+## Session 8 — 2026-05-18 — Animated emoji "bonecos" (Tier 3 lite)
+
+### What you'll see
+- **Idle bob** — both fighter portraits gently rise/fall continuously while alive.
+- **Hit flash** — defender's portrait background flashes red during the shake (much more readable on emoji than the previous hue-rotate).
+- **Slash overlay** — short diagonal gold streak appears across the defender on every hit, with random angle jitter so consecutive hits don't look identical. Variants: **gold** (normal), **white-gold** (crit), **blue** (magical).
+- **Cast glow** — magical abilities trigger a 0.7s scale-up + blue glow on the caster *before* damage resolves (windup feels like a real spell).
+- **Death animation** — when a fighter hits 0 HP, the portrait rotates left, slumps down, fades to grey. Fires on basic hits, ability hits, DoT ticks, thorns, and turret damage. Savior keeps the fighter alive at 1 HP so the animation correctly doesn't fire.
+- **Lunge upgraded** — attacker now also scales up by 6% during the dash (felt flat before).
+- **Hit / crit shake** — sharper, with rotation. Crits add gold drop-shadow glow.
+
+### Implementation
+- All pure CSS keyframes + tiny JS helpers. No external assets, no sprite sheets, no asset downloads.
+- New helpers: `spawnSlashFx(defender, kind)`, `playDeathAnimation(fighter)`, `playCastAnimation(attacker)`.
+- `startCombat` resets all per-combat animation classes (`dead`, `casting`, `shake`, etc.) so the next fight starts clean.
+
+### Why this approach
+- Sprite sheets (LPC pack we already have) would need an asset acquisition pass — base bodies for each race, classes-as-clothing layers, monster sheets, attack/death frame animations. Roughly 30-50 hours of asset work.
+- Animated emoji portraits give ~70% of the "juice" feeling for 1 session of CSS.
+- The combat code structure (async/await with sleep at every step) accepts proper sprite animations later with the same hook points — no refactor needed.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 7 — 2026-05-18 — Combat animations (Tier 1 + 2)
 
 ### Goal

@@ -328,29 +328,39 @@
     text-align: center; position: relative;
     transition: transform 0.18s ease;
   }
-  .fighter.lunge-l { transform: translateX(12px); }
-  .fighter.lunge-r { transform: translateX(-12px); }
-  .fighter.shake { animation: shake-hit 0.3s ease; }
-  .fighter.shake-crit { animation: shake-crit 0.45s ease; }
+  .fighter.lunge-l { transform: translateX(14px) scale(1.06); }
+  .fighter.lunge-r { transform: translateX(-14px) scale(1.06); }
+  .fighter.shake { animation: shake-hit 0.34s ease; }
+  .fighter.shake-crit { animation: shake-crit 0.5s ease; }
+  .fighter.shake .fighter-portrait,
+  .fighter.shake-crit .fighter-portrait {
+    animation: hit-flash 0.34s ease;
+  }
   .fighter.heal-flash .fighter-portrait { animation: heal-pulse 0.6s ease; }
   @keyframes shake-hit {
     0%   { transform: translateX(0); }
-    20%  { transform: translateX(-6px); filter: hue-rotate(-12deg) brightness(1.2); }
-    40%  { transform: translateX(5px); }
-    60%  { transform: translateX(-3px); }
+    18%  { transform: translateX(-9px) rotate(-3deg); }
+    36%  { transform: translateX(8px) rotate(3deg); }
+    54%  { transform: translateX(-5px) rotate(-2deg); }
+    72%  { transform: translateX(3px); }
     100% { transform: translateX(0); }
   }
   @keyframes shake-crit {
     0%, 100% { transform: translateX(0); }
-    15% { transform: translateX(-10px) scale(1.04); filter: brightness(1.4) drop-shadow(0 0 8px #e89530); }
-    30% { transform: translateX(9px) scale(1.04); }
-    45% { transform: translateX(-7px); }
-    60% { transform: translateX(5px); }
-    80% { transform: translateX(-2px); }
+    12% { transform: translateX(-13px) scale(1.06) rotate(-5deg); }
+    28% { transform: translateX(11px) scale(1.06) rotate(5deg); }
+    45% { transform: translateX(-8px) rotate(-3deg); }
+    62% { transform: translateX(6px) rotate(2deg); }
+    80% { transform: translateX(-3px); }
+  }
+  @keyframes hit-flash {
+    0%, 100% { background: var(--bg-deep); filter: none; }
+    35% { background: rgba(201, 48, 48, 0.55); filter: brightness(1.4); }
   }
   @keyframes heal-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(95,168,95,0.7); }
-    100% { box-shadow: 0 0 0 22px rgba(95,168,95,0); }
+    0%   { box-shadow: 0 0 0 0 rgba(95,168,95,0.7); transform: scale(1); }
+    50%  { transform: scale(1.12); }
+    100% { box-shadow: 0 0 0 22px rgba(95,168,95,0); transform: scale(1); }
   }
   .fighter-portrait {
     width: 80px; height: 80px;
@@ -363,6 +373,54 @@
     user-select: none;
     box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
     transition: box-shadow 0.2s, border-color 0.2s;
+    animation: idle-bob 2.6s ease-in-out infinite;
+  }
+  @keyframes idle-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+  /* Cast / spell glow before a magical ability resolves */
+  .fighter.casting .fighter-portrait {
+    animation: cast-glow 0.7s ease;
+  }
+  @keyframes cast-glow {
+    0%   { transform: scale(1); box-shadow: inset 0 0 12px rgba(0,0,0,0.6); }
+    50%  { transform: scale(1.22); box-shadow: inset 0 0 12px rgba(0,0,0,0.4), 0 0 36px rgba(74,143,214,0.95); filter: brightness(1.3); }
+    100% { transform: scale(1); box-shadow: inset 0 0 12px rgba(0,0,0,0.6); }
+  }
+  /* Death animation — when a fighter hits 0 HP */
+  .fighter.dead .fighter-portrait {
+    animation: death-fall 1s ease forwards;
+  }
+  @keyframes death-fall {
+    0%   { transform: rotate(0) scale(1); opacity: 1; }
+    35%  { transform: rotate(-15deg) translateY(-4px) scale(1.06); opacity: 1; }
+    100% { transform: rotate(-90deg) translateY(20px) scale(0.7); opacity: 0.25; filter: grayscale(1) brightness(0.5); }
+  }
+  /* Slash effect — short diagonal flash over the defender */
+  .slash-fx {
+    position: absolute; left: 50%; top: 50%;
+    width: 80px; height: 5px;
+    background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+    transform: translate(-50%, -50%) rotate(-25deg);
+    pointer-events: none;
+    box-shadow: 0 0 12px rgba(240,210,122,0.7);
+    animation: slash-anim 0.32s ease-out forwards;
+    border-radius: 4px;
+  }
+  .slash-fx.crit {
+    background: linear-gradient(90deg, transparent, #e89530 30%, #fff 50%, #e89530 70%, transparent);
+    height: 7px;
+    box-shadow: 0 0 18px rgba(232,149,48,0.9);
+  }
+  .slash-fx.magic {
+    background: linear-gradient(90deg, transparent, #4a8fd6 30%, #cfe0ff 50%, #4a8fd6 70%, transparent);
+    box-shadow: 0 0 14px rgba(74,143,214,0.85);
+  }
+  @keyframes slash-anim {
+    0%   { opacity: 0; width: 20px; }
+    25%  { opacity: 1; width: 130px; }
+    100% { opacity: 0; width: 160px; transform: translate(-50%, -50%) rotate(-25deg) translateX(20px); }
   }
   .fighter-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright); margin-bottom: 4px; }
   /* Floating combat numbers / text */
@@ -2634,9 +2692,11 @@ function startCombat(enemy, mode) {
   document.getElementById('f2-name').textContent = enemy.name;
   setPortrait('f1-portrait', h, true);
   setPortrait('f2-portrait', enemy, false);
-  // Clear any leftover floaters from a previous fight
+  // Clear any leftover floaters / death state from a previous fight
   document.getElementById('f1-floats').innerHTML = '';
   document.getElementById('f2-floats').innerHTML = '';
+  document.getElementById('f1').classList.remove('dead', 'shake', 'shake-crit', 'heal-flash', 'casting', 'lunge-l', 'lunge-r');
+  document.getElementById('f2').classList.remove('dead', 'shake', 'shake-crit', 'heal-flash', 'casting', 'lunge-l', 'lunge-r');
   const log = document.getElementById('combat-log');
   log.innerHTML = '';
   const token = ++_combatToken;
@@ -2921,6 +2981,7 @@ async function tickStartOfTurn(f, opponent, log) {
       appendLog(log, `<span class="log-effect">${f.name} suffers ${dot.dmg} (${dot.label}).</span>`);
       spawnFloater(f, '-' + dot.dmg, 'dot');
       shakeFighter(f, 'hit');
+      if (f.hp <= 0) playDeathAnimation(f);
       updateCombatBars(_currentFighters.hero, _currentFighters.foe);
       dot.remaining--;
       await sleep(280);
@@ -2939,6 +3000,8 @@ async function tickStartOfTurn(f, opponent, log) {
     appendLog(log, `<span class="log-effect">${f.name}'s turret fires: ${turretDmg} damage.</span>`);
     spawnFloater(opponent, '-' + turretDmg, 'damage');
     shakeFighter(opponent, 'hit');
+    spawnSlashFx(opponent, '');
+    if (opponent.hp <= 0) playDeathAnimation(opponent);
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(280);
   }
@@ -3076,6 +3139,8 @@ async function executeAbility(attacker, defender, talent, log) {
   }
   const tag = magical ? ' ✦' : '';
   appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}${tag}!</span>`);
+  // Magical abilities get a wind-up glow on the caster
+  if (magical) playCastAnimation(attacker);
   await sleep(380);
 
   // Heal
@@ -3409,11 +3474,15 @@ async function doDamage(attacker, defender, log, opts) {
   if (blocked) msg += ` <span class="log-effect">(blocked)</span>`;
   msg += ` for <span class="log-hit">${dmg} damage</span>.`;
   appendLog(log, msg);
-  // Floating number on the defender, shake, lunge from attacker
+  // Floating number on the defender, shake, lunge from attacker, slash overlay
   spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
   shakeFighter(defender, isCrit ? 'crit' : 'hit');
   lungeFighter(attacker);
+  const slashKind = isCrit ? 'crit' : (opts.magical ? 'magic' : '');
+  spawnSlashFx(defender, slashKind);
   if (blocked) spawnFloater(defender, 'BLOCK', 'block');
+  // If this hit killed the defender, play the death animation
+  if (defender.hp <= 0) playDeathAnimation(defender);
   if (lifestealHeal > 0) {
     appendLog(log, `<span class="log-effect">${attacker.name} drains ${lifestealHeal} HP.</span>`);
     spawnFloater(attacker, '+' + lifestealHeal, 'heal');
@@ -3432,6 +3501,8 @@ async function doDamage(attacker, defender, log, opts) {
     appendLog(log, `<span class="log-effect">Thorns: ${attacker.name} suffers ${totalThorns} damage.</span>`);
     spawnFloater(attacker, '-' + totalThorns, 'damage');
     shakeFighter(attacker, 'hit');
+    spawnSlashFx(attacker, '');
+    if (attacker.hp <= 0) playDeathAnimation(attacker);
   }
   updateCombatBars(_currentFighters.hero, _currentFighters.foe);
   await sleep(550);
@@ -3649,6 +3720,36 @@ function lungeFighter(fighter) {
   const cls = fighter.isHero ? 'lunge-l' : 'lunge-r';
   el.classList.add(cls);
   setTimeout(() => el.classList.remove(cls), 200);
+}
+
+// Slash overlay on a defender — fired on every hit. `kind` tints colour.
+function spawnSlashFx(defender, kind) {
+  const stage = floatStageEl(defender);
+  if (!stage) return;
+  const el = document.createElement('div');
+  el.className = 'slash-fx' + (kind ? ' ' + kind : '');
+  // Small angle randomisation so consecutive hits don't look identical
+  const angle = -25 + (Math.random() * 14 - 7);
+  el.style.transform = `translate(-50%, -50%) rotate(${angle.toFixed(1)}deg)`;
+  stage.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 360);
+}
+
+// Fighter falls over and fades when HP reaches 0.
+function playDeathAnimation(fighter) {
+  const el = fighterEl(fighter);
+  if (!el) return;
+  el.classList.add('dead');
+}
+
+// Quick wind-up glow when an attacker fires a magical ability.
+function playCastAnimation(attacker) {
+  const el = fighterEl(attacker);
+  if (!el) return;
+  el.classList.remove('casting');
+  void el.offsetWidth;
+  el.classList.add('casting');
+  setTimeout(() => el.classList.remove('casting'), 720);
 }
 
 // Set the portrait box (glyph + tinted border) for a fighter at fight start.
