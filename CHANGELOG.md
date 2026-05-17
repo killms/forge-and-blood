@@ -6,6 +6,50 @@
 
 ---
 
+## Session 11 — 2026-05-18 — Per-action sprite swapping (attack / hurt / dead)
+
+### What changed
+- The portrait data structure now supports **multiple animation states** per character. Each portrait can carry a `sprites` object:
+  ```js
+  'Goblin Raider': {
+    glyph: '👹', tint: '#5fa85f',
+    sprites: {
+      idle:   'assets/sprites/imp-sword-idle.gif',
+      attack: 'assets/sprites/imp-sword-attack.gif'
+      // hurt, dead optional — fall back to idle
+    }
+  }
+  ```
+- The old `sprite: 'X'` (single-string) format **still works** — treated as idle only. No data migration needed.
+- During combat, sprites swap based on what's happening:
+  - **Attacker → 'attack'** when they hit. Reverts to 'idle' ~480ms later.
+  - **Defender → 'hurt'** when they take damage. Reverts to 'idle' ~320ms later. (Falls back to idle if no hurt sprite exists.)
+  - **Defender → 'dead'** when killed. CSS death-fall takes over after.
+- Multi-hit abilities (Flurry, Volley, Storm of Arrows) keep the attack pose going across hits — each new hit pushes the revert-to-idle timer forward instead of triggering a flicker.
+- Each swap appends a cache-busting `?_=<timestamp>` so the GIF restarts from frame 0 cleanly.
+
+### Code
+- New `resolvePortrait(source, isHero)` extracted from `setPortrait` — reused by `buildFighter` to cache `portraitData` on the fighter object.
+- New `spriteFor(portrait, state)` — picks the right URL with a fallback chain (state → idle → null).
+- New `setFighterAnim(fighter, state)` — low-level swap.
+- New `playAttackAnim(fighter, ms)` / `playHurtAnim(fighter, ms)` — high-level wrappers that schedule the revert and cancel previous reverts on consecutive calls.
+
+### Wired to Goblin Raider (LPC imp)
+- `imp-sword-idle.gif` for idle (already in repo from session 10).
+- `imp-sword-attack.gif` now also wired — fires on each hit the goblin deals.
+- LPC walk + attack packs don't include hurt or die frames, so those states fall back to idle. CSS death-fall handles dying visually.
+
+### How to add more
+For any monster (or race) you want per-action animation:
+1. Drop the sprite files in `assets/sprites/`.
+2. Edit the entry in `MONSTER_PORTRAITS` or `RACES.*.portrait`, replace `sprite: 'X'` with `sprites: { idle, attack, hurt?, dead? }`.
+3. `git push` — live in ~1 min.
+
+### Files touched
+- `index.html`.
+
+---
+
 ## Session 10 — 2026-05-18 — LPC imp sprite wired to Goblin Raider
 
 ### What happened

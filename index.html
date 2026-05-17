@@ -989,7 +989,14 @@ const RACES = {
 // Optional `sprite` field overrides the glyph with an animated GIF/PNG.
 const MONSTER_PORTRAITS = {
   'Giant Rat':        { glyph: '🐀', tint: '#7a6a55' },
-  'Goblin Raider':    { glyph: '👹', tint: '#5fa85f', sprite: 'assets/sprites/imp-sword-idle.gif' },
+  'Goblin Raider':    { glyph: '👹', tint: '#5fa85f',
+    sprites: {
+      idle:   'assets/sprites/imp-sword-idle.gif',
+      attack: 'assets/sprites/imp-sword-attack.gif',
+      // No hurt frames in LPC walk/attack packs — falls back to idle.
+      // 'dead' could point to a death frame if we add one later.
+    }
+  },
   'Ash Wolf':         { glyph: '🐺', tint: '#9a9a9a' },
   'Skeleton Warrior': { glyph: '💀', tint: '#cfc7a8' },
   'Cave Ogre':        { glyph: '👺', tint: '#8b6a3e' },
@@ -2743,7 +2750,8 @@ function buildFighter(source, isHero) {
     statusBuffs: [], dots: [],
     usedSavior: false, mutateStacks: { atk: 0, def: 0, vit: 0, agi: 0 },
     flatDmgReduce: 0, critBonus: 0, lifestealBase: 0, regenBase: 0,
-    hasFirstStrike: false
+    hasFirstStrike: false,
+    portraitData: resolvePortrait(source, isHero)
   };
   if (isHero) {
     f.atk = source.stats.atk;
@@ -3486,11 +3494,18 @@ async function doDamage(attacker, defender, log, opts) {
   spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
   shakeFighter(defender, isCrit ? 'crit' : 'hit');
   lungeFighter(attacker);
+  // Sprite swaps: attacker → attack pose, defender → hurt pose (per-fighter,
+  // only if the sprite data has those states; falls back to idle silently)
+  playAttackAnim(attacker);
+  playHurtAnim(defender);
   const slashKind = isCrit ? 'crit' : (opts.magical ? 'magic' : '');
   spawnSlashFx(defender, slashKind);
   if (blocked) spawnFloater(defender, 'BLOCK', 'block');
   // If this hit killed the defender, play the death animation
-  if (defender.hp <= 0) playDeathAnimation(defender);
+  if (defender.hp <= 0) {
+    setFighterAnim(defender, 'dead');
+    playDeathAnimation(defender);
+  }
   if (lifestealHeal > 0) {
     appendLog(log, `<span class="log-effect">${attacker.name} drains ${lifestealHeal} HP.</span>`);
     spawnFloater(attacker, '+' + lifestealHeal, 'heal');
@@ -3760,29 +3775,86 @@ function playCastAnimation(attacker) {
   setTimeout(() => el.classList.remove('casting'), 720);
 }
 
-// Set the portrait box (sprite GIF/PNG + tinted border) for a fighter at
-// fight start. If the portrait data carries a `sprite` path, the box renders
-// an <img> from that path; otherwise it falls back to the glyph emoji.
+// Look up the portrait data for any combat source (hero, PvP opponent,
+// monster). Returns { glyph, tint, sprite?, sprites? }.
+//   - `sprite`: string path (legacy, equivalent to sprites.idle)
+//   - `sprites`: { idle, attack, hurt, dead } — any subset; missing states
+//     fall back to idle.
+function resolvePortrait(source, isHero) {
+  if (isHero) {
+    return (RACES[source.race] && RACES[source.race].portrait) || { glyph: '⚔', tint: '#c9a557' };
+  }
+  if (source.isPlayer) {
+    return (RACES[source.race] && RACES[source.race].portrait) || { glyph: '⚔', tint: '#8b1e1e' };
+  }
+  return MONSTER_PORTRAITS[source.name] || { glyph: '👹', tint: '#8b1e1e' };
+}
+
+// Resolve which sprite URL to use for a given animation state. Returns null
+// if the portrait has no sprite art at all (caller falls back to the emoji).
+function spriteFor(portrait, state) {
+  if (!portrait) return null;
+  // New format: sprites object with named states
+  if (portrait.sprites) {
+    return portrait.sprites[state] || portrait.sprites.idle || null;
+  }
+  // Legacy format: single sprite string = idle only
+  if (portrait.sprite) {
+    return portrait.sprite;
+  }
+  return null;
+}
+
+// Set the portrait box at fight start. Picks the idle sprite if available,
+// otherwise renders the emoji glyph.
 function setPortrait(slotId, source, isHero) {
   const el = document.getElementById(slotId);
   if (!el) return;
-  let portrait;
-  if (isHero) {
-    portrait = (RACES[source.race] && RACES[source.race].portrait) || { glyph: '⚔', tint: '#c9a557' };
-  } else if (source.isPlayer) {
-    portrait = (RACES[source.race] && RACES[source.race].portrait) || { glyph: '⚔', tint: '#8b1e1e' };
-  } else {
-    portrait = MONSTER_PORTRAITS[source.name] || { glyph: '👹', tint: '#8b1e1e' };
-  }
-  // Sprite path takes priority over the emoji glyph
-  if (portrait.sprite) {
-    el.innerHTML = `<img src="${portrait.sprite}" alt="${source.name || ''}">`;
+  const portrait = resolvePortrait(source, isHero);
+  const idleSrc = spriteFor(portrait, 'idle');
+  if (idleSrc) {
+    el.innerHTML = `<img src="${idleSrc}" alt="${source.name || ''}">`;
   } else {
     el.textContent = portrait.glyph;
   }
   el.style.borderColor = portrait.tint;
   el.style.color = portrait.tint;
   el.style.boxShadow = `inset 0 0 12px rgba(0,0,0,0.6), 0 0 14px ${portrait.tint}44`;
+}
+
+// Swap the running sprite to a different state (idle/attack/hurt/dead).
+// Cache-busts the src so the GIF restarts from frame 0 on every swap.
+function setFighterAnim(fighter, state) {
+  if (!fighter || !fighter.portraitData) return;
+  const url = spriteFor(fighter.portraitData, state);
+  if (!url) return;
+  const slotId = fighter.isHero ? 'f1-portrait' : 'f2-portrait';
+  const el = document.getElementById(slotId);
+  if (!el) return;
+  const img = el.querySelector('img');
+  if (!img) return; // emoji-only fighter, nothing to swap
+  img.src = url + '?_=' + Date.now();
+}
+
+// Play attack pose for ms, then revert to idle (if still alive). Consecutive
+// calls (multi-hit abilities) cancel the previous revert so the attack pose
+// keeps playing instead of flickering back to idle between hits.
+function playAttackAnim(fighter, ms = 480) {
+  setFighterAnim(fighter, 'attack');
+  if (fighter._attackTimer) clearTimeout(fighter._attackTimer);
+  fighter._attackTimer = setTimeout(() => {
+    if (fighter && fighter.hp > 0) setFighterAnim(fighter, 'idle');
+    fighter._attackTimer = null;
+  }, ms);
+}
+
+function playHurtAnim(fighter, ms = 320) {
+  setFighterAnim(fighter, 'hurt');
+  if (fighter._hurtTimer) clearTimeout(fighter._hurtTimer);
+  fighter._hurtTimer = setTimeout(() => {
+    if (fighter && fighter.hp > 0) setFighterAnim(fighter, 'idle');
+    fighter._hurtTimer = null;
+  }, ms);
 }
 
 function switchTab(name) {
