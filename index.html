@@ -43,6 +43,117 @@
   }
   .tab.active { background: var(--border); color: var(--gold-bright); }
 
+  /* Hunt — expeditions */
+  .hunt-intro {
+    font-style: italic; color: var(--text-dim); font-size: 13px;
+    margin-bottom: 14px; padding: 8px 10px;
+    background: rgba(201,165,87,0.06); border-left: 3px solid var(--gold);
+  }
+  .expedition-card {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; margin-bottom: 10px;
+    display: flex; gap: 14px; align-items: flex-start;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .expedition-card:hover { background: rgba(201,165,87,0.05); transform: translateX(2px); }
+  .expedition-card.locked {
+    cursor: not-allowed; opacity: 0.4;
+  }
+  .expedition-card.locked:hover { transform: none; background: var(--bg-deep); }
+  .exp-card-icon {
+    font-size: 36px; line-height: 1; flex-shrink: 0;
+    width: 48px; text-align: center;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  .exp-card-name {
+    font-family: 'Cinzel', serif; font-size: 15px;
+    color: var(--gold-bright); margin-bottom: 4px;
+  }
+  .exp-card-desc { font-size: 13px; color: var(--text-dim); font-style: italic; margin-bottom: 6px; }
+  .exp-card-meta { font-size: 11px; color: var(--gold); letter-spacing: 0.5px; }
+  .hunt-quick {
+    margin-top: 16px; padding-top: 12px;
+    border-top: 1px dashed rgba(74,56,38,0.5);
+  }
+  .hunt-quick summary {
+    cursor: pointer; font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 2px; color: var(--text-dim);
+    padding: 6px 0;
+  }
+  .hunt-quick summary:hover { color: var(--gold); }
+  .hunt-quick-list { margin-top: 8px; }
+
+  /* Active expedition card */
+  .exp-active {
+    background: var(--bg-deep); border: 1px solid var(--gold);
+    padding: 14px;
+    box-shadow: 0 0 18px rgba(201,165,87,0.15);
+  }
+  .exp-active-header {
+    display: flex; gap: 12px; align-items: center;
+    margin-bottom: 10px;
+  }
+  .exp-active-icon {
+    font-size: 32px; line-height: 1;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  .exp-active-name {
+    font-family: 'Cinzel', serif; font-size: 15px;
+    color: var(--gold-bright);
+  }
+  .exp-active-progress {
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 1.5px;
+  }
+  .exp-progress-bar {
+    height: 6px; background: var(--bg); border: 1px solid var(--border);
+    margin-bottom: 14px; overflow: hidden;
+  }
+  .exp-progress-fill { height: 100%; transition: width 0.3s; }
+  .exp-encounter {
+    background: var(--bg-panel); border: 1px solid var(--border);
+    padding: 14px; margin-bottom: 12px;
+  }
+  .exp-encounter.boss {
+    border-color: var(--blood-bright);
+    box-shadow: inset 0 0 18px rgba(201,48,48,0.18);
+  }
+  .exp-encounter.resolved {
+    border-color: var(--uncommon);
+    background: rgba(95,168,95,0.06);
+  }
+  .exp-encounter-title {
+    font-family: 'Cinzel', serif; font-size: 14px;
+    color: var(--gold-bright); margin-bottom: 6px;
+  }
+  .exp-encounter-text {
+    font-style: italic; color: var(--text);
+    font-size: 13px; margin-bottom: 12px;
+  }
+  .exp-result {
+    background: var(--bg-deep); border: 1px solid var(--gold);
+    padding: 10px; margin-bottom: 12px;
+    font-family: 'Cinzel', serif; text-align: center;
+    color: var(--gold-bright);
+  }
+  .exp-result.r-uncommon  { border-color: var(--uncommon); color: var(--uncommon); }
+  .exp-result.r-rare      { border-color: var(--rare); color: var(--rare); }
+  .exp-result.r-epic      { border-color: var(--epic); color: var(--epic); }
+  .exp-result.r-legendary { border-color: var(--legendary); color: var(--legendary); box-shadow: 0 0 12px rgba(232,149,48,0.55); }
+  .exp-verdict-win {
+    font-family: 'Cinzel', serif; font-size: 18px;
+    letter-spacing: 4px; text-align: center;
+    color: var(--gold-bright); text-shadow: 0 0 12px rgba(201,165,87,0.45);
+    padding: 6px 0; margin-bottom: 10px;
+  }
+  .exp-summary {
+    display: flex; justify-content: space-around;
+    padding: 10px; margin-top: 12px;
+    background: var(--bg); border: 1px solid var(--border);
+    font-family: 'Cinzel', serif; font-size: 12px;
+    color: var(--gold); letter-spacing: 1px;
+  }
+
   /* Shop tab */
   .shop-intro {
     font-style: italic; color: var(--text-dim); font-size: 13px;
@@ -915,6 +1026,20 @@
 </div>
 
 <script>
+// ============ STAT LABELS ============
+// User-facing names for the 5 stats. Internal keys (atk / int / def / vit / agi)
+// don't change for compat. ATK is melee damage; INT is magical damage.
+const STAT_LABELS = {
+  atk: 'Melee',
+  int: 'Magic',
+  def: 'Defense',
+  vit: 'Life',
+  agi: 'Agility'
+};
+function statLabel(key) {
+  return STAT_LABELS[key] || key.toUpperCase();
+}
+
 // ============ SLOT LABELS ============
 // Internal slot keys stay short; labels render in the UI.
 const SLOT_LABELS = {
@@ -1615,6 +1740,128 @@ function scaleMonster(template, heroLevel) {
 
 const PVP_NAMES = ['Aldric the Black', 'Sylvana Silverleaf', 'Grosh Skullbreaker', 'Mira the Whisper', 'Kael Ironhand', 'Lirien of the Vales', 'Drogath the Cruel', 'Vendra Catseye', 'Borin Deepforge', 'Skarn Faceless'];
 
+// ============ EXPEDITIONS ============
+// A hunt is a multi-node expedition. Each node is a randomly typed
+// encounter (combat / treasure / event) drawn from the expedition's pool.
+// The last node is always the boss. Player can leave anytime; losing a
+// combat ends the expedition.
+const EXPEDITIONS = [
+  {
+    key: 'whispering-woods',
+    name: 'The Whispering Woods',
+    desc: 'Goblins and worse skitter between moss-covered oaks.',
+    glyph: '🌲',
+    tint: '#5fa85f',
+    minLevel: 1,
+    nodes: 5,
+    monsters: ['Giant Rat', 'Goblin Raider', 'Ash Wolf'],
+    boss: 'Cave Ogre',
+    treasureChance: 0.30,
+    eventChance: 0.15
+  },
+  {
+    key: 'cursed-crypt',
+    name: 'The Cursed Crypt',
+    desc: 'Bones rattle in the dark. Old magic lingers in the stone.',
+    glyph: '⚰️',
+    tint: '#7b5fd6',
+    minLevel: 5,
+    nodes: 6,
+    monsters: ['Skeleton Warrior', 'Ash Wolf', 'Awakened Lich'],
+    boss: 'Awakened Lich',
+    treasureChance: 0.25,
+    eventChance: 0.15
+  },
+  {
+    key: 'dragons-lair',
+    name: "The Dragon's Lair",
+    desc: 'Smoke, gold, and the long shadow of leathery wings.',
+    glyph: '🔥',
+    tint: '#e89530',
+    minLevel: 15,
+    nodes: 7,
+    monsters: ['Skeleton Warrior', 'Cave Ogre', 'Awakened Lich'],
+    boss: 'Young Dragon',
+    treasureChance: 0.20,
+    eventChance: 0.10
+  }
+];
+
+// Pool of "event" cards — text choices with outcomes. Picked at random when a
+// node lands on an event. `outcomes` map button key → handler called with
+// (state.hero) returning a string summary.
+const EXPEDITION_EVENTS = [
+  {
+    key: 'hooded-stranger',
+    title: 'A hooded stranger',
+    text: 'A figure in dark robes offers to bless your weapon — for a price.',
+    choices: [
+      { key: 'pay',    label: 'Pay 30 ◊',
+        cost: 30,
+        effect: (h) => { h.gold = Math.max(0, h.gold - 30); return 'Your weapon hums faintly. (+30 XP)'; },
+        xp: 30 },
+      { key: 'refuse', label: 'Walk on',
+        effect: () => 'You walk on, the stranger laughs softly.' }
+    ]
+  },
+  {
+    key: 'wounded-stranger',
+    title: 'A wounded traveller',
+    text: 'A bloodied stranger begs for help. They have a small pouch of coins.',
+    choices: [
+      { key: 'help',  label: 'Help them',
+        effect: (h) => { const g = randInt(15, 35); h.gold += g; return `They thank you and press ${g} ◊ into your hand.`; } },
+      { key: 'rob',   label: 'Take the pouch',
+        effect: (h) => { const g = randInt(40, 80); h.gold += g; return `You take ${g} ◊. Their eyes follow you as you leave.`; } },
+      { key: 'leave', label: 'Walk past',
+        effect: () => 'You walk past. Nothing of note.' }
+    ]
+  },
+  {
+    key: 'glittering-pool',
+    title: 'A glittering pool',
+    text: 'Cold water glints with what looks like coin at the bottom. The surface ripples on its own.',
+    choices: [
+      { key: 'dive',   label: 'Dive in',
+        effect: (h) => {
+          if (Math.random() < 0.6) {
+            const g = randInt(50, 120); h.gold += g;
+            return `Cold and worth it. You surface with ${g} ◊.`;
+          } else {
+            const dmg = Math.floor(h.maxHp * 0.15);
+            h.hp = Math.max(1, h.hp - dmg);
+            return `Something below grabs at you. You stagger out, -${dmg} HP.`;
+          }
+        } },
+      { key: 'pass',   label: 'Leave it alone',
+        effect: () => 'You leave the pool alone. Sometimes that\'s the lesson.' }
+    ]
+  },
+  {
+    key: 'old-shrine',
+    title: 'An old shrine',
+    text: 'A weathered stone shrine. Offerings have lain here for centuries.',
+    choices: [
+      { key: 'pray',  label: 'Pray (heal to full)',
+        effect: (h) => { h.hp = h.maxHp; if (h.maxMp) h.mp = h.maxMp; return 'A warm wind. You feel restored.'; } },
+      { key: 'loot',  label: 'Loot the offerings',
+        effect: (h) => {
+          const g = randInt(40, 100); h.gold += g;
+          if (Math.random() < 0.3) {
+            const dmg = Math.floor(h.maxHp * 0.25);
+            h.hp = Math.max(1, h.hp - dmg);
+            return `You pocket ${g} ◊. The stone watches. -${dmg} HP.`;
+          }
+          return `You pocket ${g} ◊ and slip away.`;
+        } }
+    ]
+  }
+];
+
+function rollEvent() {
+  return EXPEDITION_EVENTS[Math.floor(Math.random() * EXPEDITION_EVENTS.length)];
+}
+
 // ============ AUTH & PERSISTENCE ============
 // Client-side only. Accounts live in localStorage; passwords are SHA-256
 // hashed (no salt — basic, not real security). Per-device only.
@@ -1684,6 +1931,7 @@ function logout() {
   saveGame(); // persist any pending change
   clearActiveUser();
   state.hero = null;
+  state.expedition = null;
   state.step = 0;
   state.pendingHero = { race: null, class: null, name: '' };
   showAuthScreen();
@@ -1696,6 +1944,7 @@ function saveGame() {
   const accounts = getAccounts();
   if (!accounts[user]) return;
   accounts[user].hero = state.hero;
+  accounts[user].expedition = state.expedition || null;
   accounts[user].lastSavedAt = Date.now();
   setAccounts(accounts);
 }
@@ -1706,6 +1955,8 @@ function loadGame() {
   const accounts = getAccounts();
   const acc = accounts[user];
   if (!acc) return null;
+  // Restore the active expedition (if any) alongside the hero
+  state.expedition = acc.expedition || null;
   return acc.hero || null;
 }
 
@@ -1780,7 +2031,8 @@ let state = {
   step: 0,
   pendingHero: { race: null, class: null, name: '' },
   hero: null,
-  pvpOpponents: []
+  pvpOpponents: [],
+  expedition: null // active expedition object, see EXPEDITIONS / startExpedition
 };
 
 // ============ CHARACTER CREATION ============
@@ -2135,11 +2387,11 @@ function renderHero() {
   const grid = document.getElementById('stats-grid');
   const canSpend = (h.statPoints || 0) > 0;
   const rows = [
-    { key: 'atk', label: 'Strength', val: h.stats.atk },
-    { key: 'agi', label: 'Agility', val: h.stats.agi },
-    { key: 'int', label: 'Intellect', val: h.stats.int || 0 },
-    { key: 'vit', label: 'Life', val: h.stats.vit },
-    { key: 'def', label: 'Defense', val: h.stats.def }
+    { key: 'atk', label: 'Melee dmg', val: h.stats.atk },
+    { key: 'int', label: 'Magic dmg', val: h.stats.int || 0 },
+    { key: 'def', label: 'Defense',  val: h.stats.def },
+    { key: 'vit', label: 'Life',     val: h.stats.vit },
+    { key: 'agi', label: 'Agility',  val: h.stats.agi }
   ];
   grid.innerHTML = rows.map(r => `
     <div class="stat-row">
@@ -2306,7 +2558,7 @@ function renderInventory() {
     return;
   }
   list.innerHTML = state.hero.inventory.map((item, idx) => {
-    const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+    const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
     const slotLabel = item.slot === 'ring' ? 'Ring' : (SLOT_LABELS[item.slot] || item.slot);
     return `<div class="inv-item rarity-${item.rarity}" data-idx="${idx}">
       <div class="inv-item-header">
@@ -2348,7 +2600,7 @@ function renderItemCell(item, labelText, isNew) {
       <div class="compare-cell-empty">— empty —</div>
     </div>`;
   }
-  const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+  const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
   return `<div class="${cls}">
     <div class="compare-cell-label">${labelText}</div>
     <div class="compare-cell-name r-${item.rarity}">${item.name}</div>
@@ -2358,7 +2610,7 @@ function renderItemCell(item, labelText, isNew) {
 }
 
 function renderDeltas(current, candidate) {
-  const stats = ['atk', 'def', 'vit', 'agi'];
+  const stats = ['atk', 'int', 'def', 'vit', 'agi'];
   const cur = current ? current.stats : {};
   const cand = candidate.stats || {};
   const rows = [];
@@ -2371,7 +2623,7 @@ function renderDeltas(current, candidate) {
     let sign = '';
     if (diff > 0) { cls = 'delta-positive'; sign = '+'; }
     else if (diff < 0) { cls = 'delta-negative'; sign = ''; }
-    rows.push(`<div class="delta-row"><span>${s.toUpperCase()}</span><span class="${cls}">${a} → ${b} (${sign}${diff})</span></div>`);
+    rows.push(`<div class="delta-row"><span>${statLabel(s)}</span><span class="${cls}">${a} → ${b} (${sign}${diff})</span></div>`);
   }
   if (rows.length === 0) {
     rows.push('<div class="delta-row"><span class="delta-neutral">No stat changes.</span></div>');
@@ -2517,7 +2769,7 @@ function openSlotPicker(slotKey) {
     list.innerHTML = `<div class="slot-picker-empty-note">Bag has no gear for this slot.</div>`;
   } else {
     list.innerHTML = compatible.map(({ item, idx }) => {
-      const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+      const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
       return `<div class="inv-item rarity-${item.rarity}" data-picker-idx="${idx}">
         <div class="inv-item-header">
           <span class="inv-item-name r-${item.rarity}">${item.name}</span>
@@ -2599,25 +2851,371 @@ function handleCompareAction(action) {
   closeCompareModal();
 }
 
+// ============ EXPEDITION LOGIC ============
+function startExpedition(key) {
+  const def = EXPEDITIONS.find(e => e.key === key);
+  if (!def) return;
+  state.expedition = {
+    key: def.key,
+    name: def.name,
+    glyph: def.glyph,
+    tint: def.tint,
+    nodeIdx: 0,
+    totalNodes: def.nodes + 1, // +1 boss
+    gold: 0, xp: 0,
+    monstersSlain: 0,
+    loot: [],
+    pending: null,
+    finished: false,
+    _awaitingCombat: false
+  };
+  generateNextEncounter();
+  saveGame();
+  renderPve();
+}
+
+// Returns the expedition's full definition (so we can roll monster pools etc.)
+function _expDef() {
+  if (!state.expedition) return null;
+  return EXPEDITIONS.find(e => e.key === state.expedition.key) || null;
+}
+
+function generateNextEncounter() {
+  const exp = state.expedition;
+  if (!exp) return;
+  const def = _expDef();
+  if (!def) return;
+  // Last node = boss
+  if (exp.nodeIdx >= def.nodes) {
+    exp.pending = {
+      type: 'boss',
+      title: 'The end of the path',
+      text: `${def.boss} stands between you and the way out.`,
+      monsterName: def.boss
+    };
+    return;
+  }
+  // Otherwise roll a node type. Default: combat
+  const r = Math.random();
+  let kind = 'combat';
+  if (r < def.eventChance) kind = 'event';
+  else if (r < def.eventChance + def.treasureChance) kind = 'treasure';
+
+  if (kind === 'combat') {
+    const monsterName = def.monsters[Math.floor(Math.random() * def.monsters.length)];
+    exp.pending = {
+      type: 'combat',
+      title: 'An encounter',
+      text: `${monsterName} blocks your path.`,
+      monsterName
+    };
+  } else if (kind === 'treasure') {
+    exp.pending = {
+      type: 'treasure',
+      title: 'A treasure',
+      text: 'An old chest, half-buried.'
+    };
+  } else {
+    const ev = rollEvent();
+    exp.pending = {
+      type: 'event',
+      eventKey: ev.key,
+      title: ev.title,
+      text: ev.text,
+      choices: ev.choices
+    };
+  }
+}
+
+function expeditionAdvance() {
+  const exp = state.expedition;
+  if (!exp) return;
+  exp.nodeIdx++;
+  generateNextEncounter();
+  saveGame();
+  renderPve();
+}
+
+function expeditionAcceptCombat() {
+  const exp = state.expedition;
+  if (!exp || !exp.pending) return;
+  if (exp.pending.type !== 'combat' && exp.pending.type !== 'boss') return;
+  exp._awaitingCombat = true;
+  const tpl = MONSTERS.find(m => m.name === exp.pending.monsterName);
+  if (!tpl) {
+    // Defensive: monster name typo — just skip the node
+    exp._awaitingCombat = false;
+    expeditionAdvance();
+    return;
+  }
+  const heroLevel = state.hero.level;
+  const isBoss = exp.pending.type === 'boss';
+  const scaled = scaleMonster(tpl, heroLevel);
+  if (isBoss) {
+    // Boss = +25% stats and named "Boss · Monster"
+    scaled.atk = Math.floor(scaled.atk * 1.25);
+    scaled.def = Math.floor(scaled.def * 1.25);
+    scaled.vit = Math.floor(scaled.vit * 1.5);
+    scaled.gold = [scaled.gold[0] * 2, scaled.gold[1] * 2];
+    scaled.xp = Math.floor(scaled.xp * 2);
+    scaled.name = `Boss · ${scaled.name}`;
+  }
+  startCombat(scaled, 'pve');
+}
+
+function expeditionOpenTreasure() {
+  const exp = state.expedition;
+  if (!exp || !exp.pending || exp.pending.type !== 'treasure') return;
+  const h = state.hero;
+  const gold = randInt(20, 60) + h.level * 4;
+  h.gold += gold;
+  exp.gold += gold;
+  let lootName = '';
+  if (Math.random() < 0.7) {
+    const loot = rollLootByLevel(h.level);
+    h.inventory.push(loot);
+    exp.loot.push(loot);
+    lootName = loot.name;
+  }
+  exp.pending.resolved = true;
+  exp.pending.result = lootName
+    ? `+${gold} ◊  ·  ✦ ${lootName}`
+    : `+${gold} ◊`;
+  exp.pending.lootRarity = lootName && exp.loot.length ? exp.loot[exp.loot.length - 1].rarity : null;
+  saveGame();
+  renderPve();
+}
+
+function expeditionResolveEvent(choiceKey) {
+  const exp = state.expedition;
+  if (!exp || !exp.pending || exp.pending.type !== 'event') return;
+  const choice = exp.pending.choices.find(c => c.key === choiceKey);
+  if (!choice) return;
+  let resultText = '';
+  if (typeof choice.effect === 'function') {
+    resultText = choice.effect(state.hero) || '';
+  }
+  if (choice.xp) {
+    if (state.hero.level < MAX_LEVEL) {
+      state.hero.xp += choice.xp;
+      exp.xp += choice.xp;
+      // Apply level-ups
+      while (state.hero.level < MAX_LEVEL && state.hero.xp >= state.hero.xpNext) {
+        state.hero.xp -= state.hero.xpNext;
+        state.hero.level++;
+        state.hero.statPoints++;
+        state.hero.xpNext = xpForLevel(state.hero.level);
+      }
+      recalculate();
+    }
+  }
+  exp.pending.resolved = true;
+  exp.pending.result = resultText;
+  saveGame();
+  renderPve();
+}
+
+function leaveExpedition() {
+  // Just clear — rewards earned along the way are already on the hero
+  state.expedition = null;
+  saveGame();
+  renderPve();
+}
+
+function finishExpedition() {
+  // Called when the boss has been beaten (or you decide to stop after final)
+  if (!state.expedition) return;
+  state.expedition.finished = true;
+  saveGame();
+  renderPve();
+}
+
 function renderPve() {
   const list = document.getElementById('pve-list');
+  if (!list) return;
   const heroLevel = state.hero ? state.hero.level : 1;
-  list.innerHTML = MONSTERS.map((tpl, idx) => {
-    const m = scaleMonster(tpl, heroLevel);
-    const power = m.atk + m.def + Math.floor(m.vit / 4) + m.agi + Math.floor((m.int || 0) / 2);
-    return `<div class="enemy-card" data-monster="${idx}">
-      <div class="enemy-info">
-        <div class="enemy-name">${m.name}</div>
-        <div class="enemy-meta">Level ${m.level}</div>
-      </div>
-      <div class="enemy-power">⚔ ${power}</div>
-    </div>`;
-  }).join('');
-  list.querySelectorAll('[data-monster]').forEach(el => {
-    el.addEventListener('click', () => {
-      const tpl = MONSTERS[parseInt(el.dataset.monster)];
-      startCombat(scaleMonster(tpl, heroLevel), 'pve');
+  const exp = state.expedition;
+
+  // ===== EXPEDITION LIST VIEW =====
+  if (!exp) {
+    const cards = EXPEDITIONS.map(def => {
+      const locked = heroLevel < def.minLevel;
+      return `<div class="expedition-card${locked ? ' locked' : ''}" data-exp="${def.key}" style="border-color: ${def.tint};">
+        <div class="exp-card-icon" style="color: ${def.tint};">${def.glyph}</div>
+        <div class="exp-card-body">
+          <div class="exp-card-name">${def.name}</div>
+          <div class="exp-card-desc">${def.desc}</div>
+          <div class="exp-card-meta">
+            ${def.nodes + 1} encounters · boss: ${def.boss}
+            ${locked ? ` · <span style="color: var(--blood-bright);">requires Lv ${def.minLevel}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    list.innerHTML = `
+      <div class="hunt-intro">Choose a path. Each expedition is a sequence of encounters — combat, treasure, choices, and a boss at the end.</div>
+      ${cards}
+      <details class="hunt-quick">
+        <summary>Or — direct hunt (one-off fights)</summary>
+        <div class="hunt-quick-list">${MONSTERS.map((tpl, idx) => {
+          const m = scaleMonster(tpl, heroLevel);
+          const power = m.atk + m.def + Math.floor(m.vit / 4) + m.agi + Math.floor((m.int || 0) / 2);
+          return `<div class="enemy-card" data-monster="${idx}">
+            <div class="enemy-info">
+              <div class="enemy-name">${m.name}</div>
+              <div class="enemy-meta">Level ${m.level}</div>
+            </div>
+            <div class="enemy-power">⚔ ${power}</div>
+          </div>`;
+        }).join('')}</div>
+      </details>
+    `;
+    list.querySelectorAll('[data-exp]').forEach(el => {
+      el.addEventListener('click', () => {
+        if (el.classList.contains('locked')) return;
+        startExpedition(el.dataset.exp);
+      });
     });
+    list.querySelectorAll('[data-monster]').forEach(el => {
+      el.addEventListener('click', () => {
+        const tpl = MONSTERS[parseInt(el.dataset.monster)];
+        startCombat(scaleMonster(tpl, heroLevel), 'pve');
+      });
+    });
+    return;
+  }
+
+  // ===== ACTIVE EXPEDITION VIEW =====
+  const def = _expDef();
+  const progressPct = Math.min(100, ((exp.nodeIdx) / exp.totalNodes) * 100);
+
+  // Summary footer (always shown)
+  const summary = `
+    <div class="exp-summary">
+      <span>+${exp.gold} ◊</span>
+      <span>+${exp.xp} XP</span>
+      <span>${exp.monstersSlain} slain</span>
+      <span>${exp.loot.length} loot</span>
+    </div>
+  `;
+
+  // If finished, show complete screen
+  if (exp.finished) {
+    list.innerHTML = `
+      <div class="exp-active" style="border-color: ${exp.tint};">
+        <div class="exp-active-header">
+          <div class="exp-active-icon" style="color: ${exp.tint};">${exp.glyph}</div>
+          <div>
+            <div class="exp-active-name">${exp.name}</div>
+            <div class="exp-active-progress">Expedition complete!</div>
+          </div>
+        </div>
+        <div class="exp-encounter">
+          <div class="exp-verdict-win">⚔ EXPEDITION COMPLETE ⚔</div>
+          <div class="exp-encounter-text">You return with everything you found.</div>
+          ${summary}
+          <div class="modal-actions">
+            <button class="btn" id="exp-finish">RETURN HOME</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('exp-finish').addEventListener('click', leaveExpedition);
+    return;
+  }
+
+  // Active node
+  const p = exp.pending;
+  let nodeHtml = '';
+  if (p) {
+    if (p.type === 'combat' || p.type === 'boss') {
+      const isBoss = p.type === 'boss';
+      nodeHtml = `
+        <div class="exp-encounter ${isBoss ? 'boss' : ''}">
+          <div class="exp-encounter-title">${isBoss ? '🔥 ' : '⚔ '}${p.title}</div>
+          <div class="exp-encounter-text">${p.text}</div>
+          <div class="modal-actions">
+            <button class="btn" id="exp-fight">${isBoss ? 'FACE THE BOSS' : 'FIGHT'}</button>
+            <button class="btn btn-cancel" id="exp-leave">LEAVE EXPEDITION</button>
+          </div>
+        </div>
+      `;
+    } else if (p.type === 'treasure') {
+      if (p.resolved) {
+        nodeHtml = `
+          <div class="exp-encounter resolved">
+            <div class="exp-encounter-title">💰 ${p.title}</div>
+            <div class="exp-encounter-text">You crack the chest open.</div>
+            <div class="exp-result ${p.lootRarity ? 'r-' + p.lootRarity : ''}">${p.result}</div>
+            <div class="modal-actions">
+              <button class="btn" id="exp-continue">CONTINUE</button>
+              <button class="btn btn-cancel" id="exp-leave">LEAVE</button>
+            </div>
+          </div>
+        `;
+      } else {
+        nodeHtml = `
+          <div class="exp-encounter">
+            <div class="exp-encounter-title">💰 ${p.title}</div>
+            <div class="exp-encounter-text">${p.text}</div>
+            <div class="modal-actions">
+              <button class="btn" id="exp-treasure">OPEN</button>
+              <button class="btn btn-cancel" id="exp-skip">SKIP IT</button>
+            </div>
+          </div>
+        `;
+      }
+    } else if (p.type === 'event') {
+      if (p.resolved) {
+        nodeHtml = `
+          <div class="exp-encounter resolved">
+            <div class="exp-encounter-title">✦ ${p.title}</div>
+            <div class="exp-result">${p.result}</div>
+            <div class="modal-actions">
+              <button class="btn" id="exp-continue">CONTINUE</button>
+              <button class="btn btn-cancel" id="exp-leave">LEAVE</button>
+            </div>
+          </div>
+        `;
+      } else {
+        const buttons = p.choices.map(c =>
+          `<button class="btn" data-event-choice="${c.key}" ${c.cost && state.hero.gold < c.cost ? 'disabled' : ''}>${c.label}</button>`
+        ).join('');
+        nodeHtml = `
+          <div class="exp-encounter">
+            <div class="exp-encounter-title">✦ ${p.title}</div>
+            <div class="exp-encounter-text">${p.text}</div>
+            <div class="modal-actions">${buttons}</div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  list.innerHTML = `
+    <div class="exp-active" style="border-color: ${exp.tint};">
+      <div class="exp-active-header">
+        <div class="exp-active-icon" style="color: ${exp.tint};">${exp.glyph}</div>
+        <div>
+          <div class="exp-active-name">${exp.name}</div>
+          <div class="exp-active-progress">Node ${exp.nodeIdx + 1} of ${exp.totalNodes}</div>
+        </div>
+      </div>
+      <div class="exp-progress-bar"><div class="exp-progress-fill" style="width: ${progressPct}%; background: ${exp.tint};"></div></div>
+      ${nodeHtml}
+      ${summary}
+    </div>
+  `;
+
+  // Wire buttons
+  const wire = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  wire('exp-fight', expeditionAcceptCombat);
+  wire('exp-leave', leaveExpedition);
+  wire('exp-treasure', expeditionOpenTreasure);
+  wire('exp-skip', expeditionAdvance);
+  wire('exp-continue', expeditionAdvance);
+  list.querySelectorAll('[data-event-choice]').forEach(el => {
+    el.addEventListener('click', () => expeditionResolveEvent(el.dataset.eventChoice));
   });
 }
 
@@ -2722,6 +3320,25 @@ function closeCombat() {
   document.getElementById('combat').classList.add('hidden');
   document.querySelector('#game .tabs').classList.remove('hidden');
   switchTab(_previousTab || 'hero');
+  // If a combat was part of an active expedition, advance the expedition.
+  if (state.expedition && state.expedition._awaitingCombat) {
+    const exp = state.expedition;
+    exp._awaitingCombat = false;
+    if (_combatResult === 'victory') {
+      exp.monstersSlain++;
+      // The boss node ends the expedition victoriously.
+      if (exp.pending && exp.pending.type === 'boss') {
+        finishExpedition();
+      } else {
+        expeditionAdvance();
+      }
+    } else {
+      // Defeat or draw: expedition fails, but loot already on hero
+      exp.finished = true;
+      exp.pending = { type: 'defeat', title: 'Defeat', text: 'You return wounded. The expedition ends here.' };
+      saveGame();
+    }
+  }
   renderAll();
 }
 
@@ -3042,7 +3659,7 @@ async function tickMutate(f, log) {
     const s = stats[Math.floor(Math.random() * stats.length)];
     f.mutateStacks[s] = (f.mutateStacks[s] || 0) + val;
     f[s] += val;
-    appendLog(log, `<span class="log-effect">${f.name} mutates: +${val} ${s.toUpperCase()}.</span>`);
+    appendLog(log, `<span class="log-effect">${f.name} mutates: +${val} ${statLabel(s)}.</span>`);
     await sleep(220);
   }
 }
@@ -3909,6 +4526,7 @@ async function handleAuthSubmit() {
     // Logged in — route based on whether this account has a hero
     if (result.account.hero) {
       state.hero = migrateHero(result.account.hero);
+      state.expedition = result.account.expedition || null;
       recalculate();
       generatePvpOpponents();
       showGameScreen();
@@ -3951,6 +4569,7 @@ function init() {
   }
   if (acc.hero) {
     state.hero = migrateHero(acc.hero);
+    state.expedition = acc.expedition || null;
     recalculate();
     generatePvpOpponents();
     showGameScreen();

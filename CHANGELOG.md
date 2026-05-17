@@ -6,6 +6,52 @@
 
 ---
 
+## Session 12 — 2026-05-18 — Melee/Magic split + Expeditions (dynamic Hunt)
+
+### Part A — Melee / Magic damage split (presentation)
+- New `STAT_LABELS` map: `atk → Melee · int → Magic · def → Defense · vit → Life · agi → Agility`.
+- `statLabel(key)` helper used in:
+  - Hero **Attributes** grid: now reads `Melee dmg · Magic dmg · Defense · Life · Agility`.
+  - Inventory item stat lines: `+5 Melee` / `+3 Magic` instead of `+5 ATK` / `+3 INT`.
+  - Equipment slot picker + compare modal.
+  - Compare deltas table — also now includes INT row.
+  - Shifter mutate log entry (`Caos mutates: +2 Melee`).
+- Combat math unchanged. INT keeps driving magical ability damage and the mana pool; ATK keeps driving melee damage.
+
+### Part B — Expeditions (dynamic Hunt)
+The Hunt tab is no longer a flat list of monsters. It now offers **expeditions** — multi-encounter runs with branching outcomes.
+
+#### Three starter expeditions
+- **The Whispering Woods** — Lv 1+, 5 nodes, boss: Cave Ogre. Pool: Giant Rat / Goblin Raider / Ash Wolf.
+- **The Cursed Crypt** — Lv 5+, 6 nodes, boss: Awakened Lich. Pool: Skeleton Warrior / Ash Wolf / Awakened Lich.
+- **The Dragon's Lair** — Lv 15+, 7 nodes, boss: Young Dragon. Pool: Skeleton Warrior / Cave Ogre / Awakened Lich.
+
+#### Encounter types per node
+- **Combat** (default) — random monster from the expedition's pool, scaled to hero level.
+- **Treasure** — chance to open a chest for gold + (70%) a random item rolled with `rollLootByLevel`. Chance configurable per expedition (15-30%).
+- **Event** — text-based choice with branching outcomes. Four event cards in the pool (Hooded Stranger, Wounded Traveller, Glittering Pool, Old Shrine), drawn at random. Choices have effects: gold cost / gain / heal / damage / XP, plus narrative text.
+- **Boss** — always the last node. +25% atk/def, +50% vit, 2× gold, 2× XP. Defeating it completes the expedition.
+
+#### UI
+- Hunt tab opens with three **expedition cards** + a collapsible "direct hunt" `<details>` for one-off fights (original behaviour preserved).
+- Active expedition shows: icon, name, "Node X of Y" progress, animated progress bar, current encounter card, and a running summary footer (gold / XP / slain / loot).
+- Encounter cards have themed colours (boss = blood-red border, resolved = green tint).
+- Result panels for treasures get a rarity-coloured border.
+
+#### State + flow
+- `state.expedition` holds the active run; persists in localStorage so refreshing keeps you in the run.
+- `closeCombat` checks `expedition._awaitingCombat` and either advances the node (victory) or ends the expedition (defeat). Rewards earned along the way stay on the hero either way.
+- Boss victory triggers a "EXPEDITION COMPLETE" screen with a single RETURN HOME button.
+- "LEAVE EXPEDITION" button on any encounter lets the player exit voluntarily and keep all earned rewards.
+
+### Migration
+- `state.expedition` defaults to `null`. Loaded from `accounts[user].expedition`. Saved on every save. Cleared on logout.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 11 — 2026-05-18 — Per-action sprite swapping (attack / hurt / dead)
 
 ### What changed
