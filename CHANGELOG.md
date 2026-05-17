@@ -6,6 +6,59 @@
 
 ---
 
+## 🔖 RESUME HERE — 2026-05-17 evening — pickup for tomorrow
+
+### Current state (HEAD = `b4972e2`)
+- All Phase A (combat fix + XP bar) ✅
+- All Phase B (stat points 1→100, new XP curve, level cap) ✅
+- Login + localStorage persistence ✅
+- Repo prepped for GitHub Pages (renamed to `index.html`, README added) ✅
+
+### One action blocking the rest: **GitHub Pages deploy**
+The user wants to play on their phone via a public URL. Everything is ready; we just need a one-off auth.
+
+**User action (1 minute):**
+```bash
+gh auth login
+```
+Pick: GitHub.com → HTTPS → Login with web browser → paste code.
+
+**Then Claude runs (from `F:\Jogo`):**
+```bash
+gh repo create killms/forge-and-blood --public --source=. --remote=origin --push
+gh api -X POST /repos/killms/forge-and-blood/pages -f source[branch]=main -f source[path]=/
+```
+
+Final URL: **https://killms.github.io/forge-and-blood/** (Updates ~30-60s after each `git push`.)
+
+### Temp URL (catbox) — last known working
+- `https://files.catbox.moe/w6x1pt.html` — uploaded 2026-05-17, content-addressed (hash of current `index.html`). Verified serving 99,475 bytes with `Content-Type: text/html`. User reported "nao deu" on mobile — likely their ISP blocks `catbox.moe`. **Re-upload only if `index.html` changes:** `curl -sS -F "reqtype=fileupload" -F "fileToUpload=@index.html" https://catbox.moe/user/api.php` (same content = same URL).
+- Other tried hosts that **don't work** for HTML: 0x0.st (uploads disabled), tmpfiles.org, uguu.se, qu.ax, pomf.lain.la (all reject `.html`). transfer.sh down. file.io requires auth. paste.rs wraps in viewer (no script exec).
+
+### Known limitations / open issues
+1. **Per-device accounts only.** Login on PC and on phone are separate localStorage. For cross-device sync we need a backend. **Supabase is the obvious next step** (the user is already using it for Between Lunges — same project structure could apply).
+2. **Stat balance:** removed the old auto `+8 stats per level`. Players now allocate 1 point per level — 87% reduction in raw growth. Tune by changing `+1` in `finishVictory` if combat feels too weak. Suggested test: get to level ~10 and see if hunting feels under-tuned.
+3. **Monster scaling:** monsters cap at level 10 (Young Dragon). At hero L20+ they're trivial. **Next progression task** = scale monsters or add new biome tiers.
+4. **Talent overflow:** still +1 talent point per level, but the tree only takes 8. Levels 9+ waste talent points. Either expand the tree or give talent points only every 5-10 levels.
+5. **Enemy AI:** PvE monsters and PvP opponents still only use basic attack. Original roadmap Session 3.
+
+### Roadmap — what's next, in suggested order
+1. **Deploy to GitHub Pages** (blocked on user `gh auth login`).
+2. **Enemy AI** — let monsters and PvP use their class abilities. Game becomes much more interesting.
+3. **Monster scaling** — match enemy levels to hero, or add tiers (lv 10-20 bestiary, lv 20-30, etc.).
+4. **Shop + potions** — sink for the gold that's piling up.
+5. **Talent tree expansion** so talent points stay valuable past level 8.
+6. **Phase C if still wanted** — STR/AGI/INT/LIFE split + magical vs melee damage + mana system. This is a real rework (1-2 sessions of focused work), would touch races, classes, items, formulas.
+7. **Modularization** — split `index.html` into the structure proposed at the bottom of `PROJECT-SUMMARY.md`. Worth doing before backend integration.
+8. **Backend / cross-device sync** — Supabase. Account migration from localStorage. Cloud save.
+9. **App packaging** — React Native + Expo, or Capacitor (like Between Lunges).
+
+### How to continue tomorrow
+In a fresh chat, paste this CHANGELOG and say:
+> "Lê este CHANGELOG.md (`F:\Jogo\CHANGELOG.md`) e depois o `F:\Jogo\index.html`. Continuamos do que está na secção RESUME HERE."
+
+---
+
 ## Session 2 (continued) — 2026-05-17 — Auth + localStorage persistence
 
 ### Goal
