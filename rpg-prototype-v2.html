@@ -91,6 +91,37 @@
   .hero-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .hero-name { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-bright); }
   .hero-meta { font-size: 12px; color: var(--text-dim); font-style: italic; }
+  .xp-panel {
+    background: linear-gradient(180deg, rgba(74,143,214,0.08), rgba(0,0,0,0)),
+                var(--bg-panel);
+    border-color: rgba(74,143,214,0.45);
+  }
+  .xp-panel::before {
+    background: linear-gradient(90deg, transparent, var(--rare), transparent);
+  }
+  .xp-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+  }
+  .xp-level-badge {
+    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900;
+    color: var(--gold-bright);
+    background: var(--bg-deep);
+    border: 1px solid var(--gold);
+    padding: 6px 12px; letter-spacing: 1px;
+    box-shadow: 0 0 12px rgba(201,165,87,0.2);
+    min-width: 60px; text-align: center;
+  }
+  .xp-next-label { flex: 1; }
+  .xp-next-title {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+  }
+  .xp-next-value {
+    font-family: 'Cinzel', serif; font-size: 14px; color: var(--rare);
+    margin-top: 2px;
+  }
+  .xp-bar-big { height: 22px; }
+  .xp-bar-big .bar-text { line-height: 22px; font-size: 13px; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
   .stat-row {
     display: flex; justify-content: space-between;
@@ -312,7 +343,17 @@
           <div class="bar-fill hp" id="hp-bar"></div>
           <div class="bar-text" id="hp-text"></div>
         </div>
-        <div class="bar">
+      </div>
+
+      <div class="panel xp-panel">
+        <div class="xp-header">
+          <div class="xp-level-badge" id="xp-level-badge">Lv 1</div>
+          <div class="xp-next-label">
+            <div class="xp-next-title">Next level</div>
+            <div class="xp-next-value" id="xp-next-value">0 / 100</div>
+          </div>
+        </div>
+        <div class="bar xp-bar-big">
           <div class="bar-fill xp" id="xp-bar"></div>
           <div class="bar-text" id="xp-text"></div>
         </div>
@@ -955,6 +996,8 @@ function renderHero() {
   const xpPct = (h.xp / h.xpNext) * 100;
   document.getElementById('xp-bar').style.width = xpPct + '%';
   document.getElementById('xp-text').textContent = `${h.xp} / ${h.xpNext} XP`;
+  document.getElementById('xp-level-badge').textContent = `Lv ${h.level}`;
+  document.getElementById('xp-next-value').textContent = `${h.xp} / ${h.xpNext}`;
 
   const grid = document.getElementById('stats-grid');
   grid.innerHTML = `
@@ -1151,9 +1194,19 @@ function renderPvp() {
 // ============ COMBAT ============
 // Pure idle: zero clicks during combat. The combat panel auto-closes
 // shortly after the fight ends and returns the player to the previous tab.
+//
+// Combat resolves with an async/await loop. Each tick applies state changes
+// synchronously, paints the log, then awaits a short sleep for pacing. This
+// guarantees the loop's `if (fighter.hp <= 0) break` checks always see the
+// latest HP, so rounds never continue past a death.
 const COMBAT_AUTO_CLOSE_MS = 2800;
 let _previousTab = 'hero';
 let _autoCloseTimer = null;
+let _combatToken = 0; // bumped on every new combat; lets stale awaits bail
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function startCombat(enemy, mode) {
   const h = state.hero;
@@ -1171,7 +1224,8 @@ function startCombat(enemy, mode) {
   document.getElementById('f2-name').textContent = enemy.name;
   const log = document.getElementById('combat-log');
   log.innerHTML = '';
-  resolveCombat(enemy, mode, log);
+  const token = ++_combatToken;
+  resolveCombat(enemy, mode, log, token);
 }
 
 function closeCombat() {
@@ -1260,9 +1314,11 @@ function checkFirstStrike(f) {
   return false;
 }
 
-function resolveCombat(enemy, mode, log) {
+async function resolveCombat(enemy, mode, log, token) {
   const hero = buildFighter(state.hero, true);
   const foe = buildFighter(enemy, false);
+  _currentFighters.hero = hero;
+  _currentFighters.foe = foe;
 
   updateCombatBars(hero, foe);
 
@@ -1271,38 +1327,48 @@ function resolveCombat(enemy, mode, log) {
   if (checkFirstStrike(foe)) heroFirst = false;
   if (checkFirstStrike(hero) && checkFirstStrike(foe)) heroFirst = hero.agi >= foe.agi;
 
-  let delay = 400;
   let turn = 1;
   const maxTurns = 25;
-  const result = { winner: null };
 
-  // Pre-combat: apply some passives
-  applyClassPassivesStart(hero, log, delay);
+  await sleep(400);
+  if (token !== _combatToken) return;
 
-  while (hero.hp > 0 && foe.hp > 0 && turn <= maxTurns) {
-    const turnNum = turn;
-    setTimeout(((t) => () => appendLog(log, `<div class="log-turn">— TURN ${t} —</div>`))(turnNum), delay);
-    delay += 300;
+  // Helper: true if the current combat has been superseded (player started another fight)
+  const stale = () => token !== _combatToken;
+  // Helper: true if the fight is decided
+  const ended = () => hero.hp <= 0 || foe.hp <= 0;
 
-    // Start-of-turn effects
-    delay = tickStartOfTurn(hero, log, delay);
-    delay = tickStartOfTurn(foe, log, delay);
+  while (!ended() && turn <= maxTurns) {
+    appendLog(log, `<div class="log-turn">— TURN ${turn} —</div>`);
+    await sleep(300);
+    if (stale()) return;
 
-    if (hero.hp <= 0 || foe.hp <= 0) break;
+    await tickStartOfTurn(hero, foe, log);
+    if (stale()) return;
+    if (ended()) break;
+
+    await tickStartOfTurn(foe, hero, log);
+    if (stale()) return;
+    if (ended()) break;
 
     const first = heroFirst ? hero : foe;
     const second = heroFirst ? foe : hero;
 
-    delay = takeAction(first, second, log, delay, turn);
-    if (second.hp <= 0) break;
-    delay = takeAction(second, first, log, delay, turn);
-    if (first.hp <= 0) break;
+    await takeAction(first, second, log);
+    if (stale()) return;
+    if (ended()) break;
 
-    // Mutate (shifter)
-    delay = tickMutate(hero, log, delay);
-    delay = tickMutate(foe, log, delay);
+    await takeAction(second, first, log);
+    if (stale()) return;
+    if (ended()) break;
 
-    // Decay buffs/debuffs
+    // Mutate (shifter / chaos)
+    await tickMutate(hero, log);
+    if (stale()) return;
+    await tickMutate(foe, log);
+    if (stale()) return;
+
+    // Decay buffs/cooldowns
     decayStatuses(hero);
     decayStatuses(foe);
     decayCooldowns(hero);
@@ -1311,106 +1377,89 @@ function resolveCombat(enemy, mode, log) {
     turn++;
   }
 
-  setTimeout(() => {
-    if (hero.hp > 0 && foe.hp <= 0) {
-      result.winner = 'hero';
-      finishVictory(enemy, mode, log, hero);
-    } else if (foe.hp > 0 && hero.hp <= 0) {
-      result.winner = 'foe';
-      finishDefeat(log);
-    } else {
-      finishDefeat(log, true);
-    }
-    updateCombatBars(hero, foe);
-    scheduleAutoClose(COMBAT_AUTO_CLOSE_MS);
-  }, delay + 300);
+  await sleep(300);
+  if (stale()) return;
+
+  if (hero.hp > 0 && foe.hp <= 0) {
+    finishVictory(enemy, mode, log, hero);
+  } else if (foe.hp > 0 && hero.hp <= 0) {
+    finishDefeat(log);
+  } else if (hero.hp <= 0 && foe.hp <= 0) {
+    finishDefeat(log, true); // mutual KO
+  } else {
+    finishDefeat(log, true); // turn limit reached
+  }
+  updateCombatBars(hero, foe);
+  scheduleAutoClose(COMBAT_AUTO_CLOSE_MS);
 }
 
-function applyClassPassivesStart(f, log, delay) {
-  // Most passives are "during combat" - nothing to do at start
-}
+async function tickStartOfTurn(f, opponent, log) {
+  if (f.hp <= 0) return;
 
-function tickStartOfTurn(f, log, delay) {
-  if (f.hp <= 0) return delay;
   // Regen
   if (f.regenBase > 0 && f.hp < f.maxHp) {
     const amt = f.regenBase;
-    setTimeout(() => {
-      if (f.hp <= 0) return;
-      f.hp = Math.min(f.maxHp, f.hp + amt);
-      appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP.</span>`);
-      updateCombatBars(stateFighter(true), stateFighter(false));
-    }, delay);
-    delay += 300;
+    f.hp = Math.min(f.maxHp, f.hp + amt);
+    appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP.</span>`);
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(280);
   }
+
   // Class regen override (cleric aura, stone priest)
   if (f.passiveOverrides && f.passiveOverrides.regen) {
     const amt = f.passiveOverrides.regen.val;
-    setTimeout(() => {
-      if (f.hp <= 0) return;
-      f.hp = Math.min(f.maxHp, f.hp + amt);
-      appendLog(log, `<span class="log-effect">${f.name} is blessed: +${amt} HP.</span>`);
-      updateCombatBars(stateFighter(true), stateFighter(false));
-    }, delay);
-    delay += 300;
+    f.hp = Math.min(f.maxHp, f.hp + amt);
+    appendLog(log, `<span class="log-effect">${f.name} is blessed: +${amt} HP.</span>`);
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(280);
   } else {
-    // Class passive regen (cleric, druid, stone priest)
     const cp = getClassPassive(f);
     if (cp && cp.proc === 'regen' && cp.val) {
       const amt = cp.val;
-      setTimeout(() => {
-        if (f.hp <= 0) return;
-        f.hp = Math.min(f.maxHp, f.hp + amt);
-        appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP (${cp.name}).</span>`);
-        updateCombatBars(stateFighter(true), stateFighter(false));
-      }, delay);
-      delay += 300;
+      f.hp = Math.min(f.maxHp, f.hp + amt);
+      appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP (${cp.name}).</span>`);
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+      await sleep(280);
     }
   }
+
   // DOTs (burn, curse, etc.)
   if (f.dots && f.dots.length) {
     f.dots = f.dots.filter(dot => dot.remaining > 0);
-    f.dots.forEach(dot => {
-      setTimeout(() => {
-        if (f.hp <= 0) return;
-        f.hp = Math.max(0, f.hp - dot.dmg);
-        appendLog(log, `<span class="log-effect">${f.name} suffers ${dot.dmg} (${dot.label}).</span>`);
-        updateCombatBars(stateFighter(true), stateFighter(false));
-      }, delay);
-      delay += 300;
+    for (const dot of f.dots) {
+      if (f.hp <= 0) break;
+      f.hp = Math.max(0, f.hp - dot.dmg);
+      appendLog(log, `<span class="log-effect">${f.name} suffers ${dot.dmg} (${dot.label}).</span>`);
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
       dot.remaining--;
-    });
+      await sleep(280);
+    }
     f.dots = f.dots.filter(dot => dot.remaining > 0);
   }
+  if (f.hp <= 0) return;
+
   // Turret (engineer)
   const turret = f.statusBuffs.find(b => b.type === 'turret');
-  if (turret) {
+  if (turret && opponent && opponent.hp > 0) {
     const turretDmg = Math.floor(f.atk * turret.val);
-    setTimeout(() => {
-      const target = f.isHero ? stateFighter(false) : stateFighter(true);
-      if (!target || target.hp <= 0 || f.hp <= 0) return;
-      target.hp = Math.max(0, target.hp - turretDmg);
-      appendLog(log, `<span class="log-effect">${f.name}'s turret fires: ${turretDmg} damage.</span>`);
-      updateCombatBars(stateFighter(true), stateFighter(false));
-    }, delay);
-    delay += 300;
+    opponent.hp = Math.max(0, opponent.hp - turretDmg);
+    appendLog(log, `<span class="log-effect">${f.name}'s turret fires: ${turretDmg} damage.</span>`);
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(280);
   }
-  return delay;
 }
 
-// Helper to get current fighters - stored on a global
+// Shared reference to the active combat fighters — set once in resolveCombat,
+// read by visual helpers (updateCombatBars) so they always see the current pair.
 let _currentFighters = { hero: null, foe: null };
-function stateFighter(isHero) {
-  return isHero ? _currentFighters.hero : _currentFighters.foe;
-}
 
-function tickMutate(f, log, delay) {
-  if (f.hp <= 0) return delay;
+async function tickMutate(f, log) {
+  if (f.hp <= 0) return;
   const cp = getClassPassive(f);
   const rp = getRacePassive(f);
   const isChaos = cp && cp.proc === 'mutate';
   const isShifter = rp && rp.key === 'shifterAdapt';
-  if (!isChaos && !isShifter) return delay;
+  if (!isChaos && !isShifter) return;
 
   const val = (f.passiveOverrides && f.passiveOverrides.mutate ? f.passiveOverrides.mutate.val : (isChaos ? 2 : 1));
   const stats = ['atk', 'def', 'vit', 'agi'];
@@ -1419,12 +1468,9 @@ function tickMutate(f, log, delay) {
     const s = stats[Math.floor(Math.random() * stats.length)];
     f.mutateStacks[s] = (f.mutateStacks[s] || 0) + val;
     f[s] += val;
-    setTimeout(((sn, vn) => () => {
-      appendLog(log, `<span class="log-effect">${f.name} mutates: +${vn} ${sn.toUpperCase()}.</span>`);
-    })(s, val), delay);
-    delay += 250;
+    appendLog(log, `<span class="log-effect">${f.name} mutates: +${val} ${s.toUpperCase()}.</span>`);
+    await sleep(220);
   }
-  return delay;
 }
 
 function decayStatuses(f) {
@@ -1441,29 +1487,26 @@ function decayCooldowns(f) {
   });
 }
 
-function takeAction(attacker, defender, log, delay, turn) {
-  if (attacker.hp <= 0 || defender.hp <= 0) return delay;
-  _currentFighters.hero = attacker.isHero ? attacker : defender;
-  _currentFighters.foe = attacker.isHero ? defender : attacker;
+async function takeAction(attacker, defender, log) {
+  if (attacker.hp <= 0 || defender.hp <= 0) return;
 
   // Stunned?
   if (attacker.statusBuffs.find(b => b.type === 'stun')) {
-    setTimeout(() => {
-      appendLog(log, `<span class="log-effect">${attacker.name} is stunned.</span>`);
-    }, delay);
-    return delay + 300;
+    appendLog(log, `<span class="log-effect">${attacker.name} is stunned.</span>`);
+    await sleep(300);
+    return;
   }
 
-  // Choose ability (for hero, prioritize abilities; for foe, basic attack mostly)
+  // Choose ability (heroes prioritise abilities; foes fall back to basic attack)
   let abilityToUse = null;
   if (attacker.isHero && attacker.abilities.length > 0) {
     abilityToUse = chooseAbility(attacker, defender);
   }
 
   if (abilityToUse) {
-    return executeAbility(attacker, defender, abilityToUse, log, delay);
+    await executeAbility(attacker, defender, abilityToUse, log);
   } else {
-    return executeBasicAttack(attacker, defender, log, delay);
+    await executeBasicAttack(attacker, defender, log);
   }
 }
 
@@ -1492,30 +1535,26 @@ function chooseAbility(attacker, defender) {
   return available[Math.floor(Math.random() * available.length)];
 }
 
-function executeAbility(attacker, defender, talent, log, delay) {
+async function executeAbility(attacker, defender, talent, log) {
   const a = talent.ability;
   attacker.cooldowns[talent.key] = a.cd + 1;
-  setTimeout(() => {
-    appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}!</span>`);
-  }, delay);
-  delay += 400;
+  appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}!</span>`);
+  await sleep(380);
 
   // Heal
   if (a.heal) {
     const amt = Math.floor(attacker.maxHp * a.heal);
-    setTimeout(() => {
-      attacker.hp = Math.min(attacker.maxHp, attacker.hp + amt);
-      appendLog(log, `<span class="log-effect">${attacker.name} heals ${amt} HP.</span>`);
-      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
-    }, delay);
-    delay += 400;
+    attacker.hp = Math.min(attacker.maxHp, attacker.hp + amt);
+    appendLog(log, `<span class="log-effect">${attacker.name} heals ${amt} HP.</span>`);
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(380);
   }
 
-  // Damage abilities
+  // Damage hits
   if (a.dmgMult !== undefined || a.multiHit) {
     const hits = a.multiHit || 1;
     for (let i = 0; i < hits; i++) {
-      delay = doDamage(attacker, defender, log, delay, {
+      await doDamage(attacker, defender, log, {
         mult: Array.isArray(a.dmgMult) ? randRange(a.dmgMult[0], a.dmgMult[1]) : (a.dmgMult || 1),
         armorPen: a.armorPen,
         trueDmg: a.trueDmg,
@@ -1527,293 +1566,287 @@ function executeAbility(attacker, defender, talent, log, delay) {
         missChance: a.missChance,
         abilityLabel: talent.name
       });
-      if (defender.hp <= 0) break;
+      if (defender.hp <= 0 || attacker.hp <= 0) break;
     }
   }
 
-  // Buffs / Debuffs
+  // Buffs / Debuffs (only if both still alive)
+  if (attacker.hp <= 0 || defender.hp <= 0) return;
+
   if (a.buffAtk) {
     attacker.statusBuffs.push({ type: 'buffAtk', val: a.buffAtk, remaining: a.dur + 1 });
     attacker.atk = Math.floor(attacker.atk * (1 + a.buffAtk));
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.buffAtk*100)}% attack for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.buffAtk*100)}% attack for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.buffDef) {
     attacker.statusBuffs.push({ type: 'buffDef', val: a.buffDef, remaining: a.dur + 1 });
     attacker.def = Math.floor(attacker.def * (1 + a.buffDef));
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.buffDef*100)}% defense for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.buffDef*100)}% defense for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.regenBuff) {
     attacker.statusBuffs.push({ type: 'regenBuff', val: a.regenBuff, remaining: a.dur + 1 });
     attacker.regenBase += a.regenBuff;
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: regenerates ${a.regenBuff} HP/turn for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name}: regenerates ${a.regenBuff} HP/turn for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.dodgeBuff) {
     attacker.statusBuffs.push({ type: 'dodgeBuff', val: a.dodgeBuff, remaining: a.dur + 1 });
     attacker.dodgeBase = (attacker.dodgeBase || 0) + a.dodgeBuff;
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.dodgeBuff*100)}% dodge for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name}: +${Math.round(a.dodgeBuff*100)}% dodge for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.thornsBuff) {
     attacker.statusBuffs.push({ type: 'thorns', val: a.thornsBuff, remaining: a.dur + 1 });
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name}: thorns ${Math.round(a.thornsBuff*100)}% for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name}: thorns ${Math.round(a.thornsBuff*100)}% for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.debuffAtk) {
     defender.statusBuffs.push({ type: 'debuffAtk', val: a.debuffAtk, remaining: a.dur + 1 });
     defender.atk = Math.floor(defender.atk * (1 - a.debuffAtk));
-    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name}: -${Math.round(a.debuffAtk*100)}% attack for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${defender.name}: -${Math.round(a.debuffAtk*100)}% attack for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.debuffAgi) {
     defender.statusBuffs.push({ type: 'debuffAgi', val: a.debuffAgi, remaining: a.dur + 1 });
     defender.agi = Math.max(0, Math.floor(defender.agi * (1 - a.debuffAgi)));
-    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name}: -${Math.round(a.debuffAgi*100)}% agility for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${defender.name}: -${Math.round(a.debuffAgi*100)}% agility for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.dot) {
     defender.dots = defender.dots || [];
     defender.dots.push({ dmg: a.dot, remaining: a.dur, label: talent.name });
-    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name} suffers ${a.dot}/turn for ${a.dur} turns.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${defender.name} suffers ${a.dot}/turn for ${a.dur} turns.</span>`);
+    await sleep(280);
   }
   if (a.stun) {
     defender.statusBuffs.push({ type: 'stun', remaining: a.stun + 1 });
-    setTimeout(() => appendLog(log, `<span class="log-effect">${defender.name} is stunned!</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${defender.name} is stunned!</span>`);
+    await sleep(280);
   }
   if (a.turret) {
     attacker.statusBuffs.push({ type: 'turret', val: a.turret, remaining: a.dur + 1 });
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name} raises an automatic turret!</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name} raises an automatic turret!</span>`);
+    await sleep(280);
   }
   if (a.cleanse) {
     attacker.statusBuffs = attacker.statusBuffs.filter(b => !['debuffAtk','debuffAgi','stun'].includes(b.type));
     attacker.dots = [];
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name} purges all ailments.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name} purges all ailments.</span>`);
+    await sleep(280);
   }
   if (a.mimic) {
     attacker.atk = Math.floor(attacker.atk + defender.atk * a.mimic);
     attacker.def = Math.floor(attacker.def + defender.def * a.mimic);
     attacker.statusBuffs.push({ type: 'mimic', remaining: a.dur + 1 });
-    setTimeout(() => appendLog(log, `<span class="log-effect">${attacker.name} copies ${Math.round(a.mimic*100)}% of ${defender.name}'s stats.</span>`), delay);
-    delay += 300;
+    appendLog(log, `<span class="log-effect">${attacker.name} copies ${Math.round(a.mimic*100)}% of ${defender.name}'s stats.</span>`);
+    await sleep(280);
+  }
+}
+
+async function executeBasicAttack(attacker, defender, log) {
+  await doDamage(attacker, defender, log, {});
+}
+
+async function doDamage(attacker, defender, log, opts) {
+  if (attacker.hp <= 0 || defender.hp <= 0) return;
+
+  // Miss
+  if (opts.missChance && Math.random() < opts.missChance) {
+    appendLog(log, `<span class="log-effect">${attacker.name} misses!</span>`);
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(550);
+    return;
   }
 
-  return delay;
-}
+  // Dodge
+  let dodgeChance = defender.dodgeBase || 0;
+  const cp = getClassPassive(defender);
+  if (cp && cp.proc === 'dodge' && !opts.guaranteedCrit) {
+    const dodgeVal = defender.passiveOverrides && defender.passiveOverrides.dodge
+      ? defender.passiveOverrides.dodge.val
+      : cp.val;
+    dodgeChance += dodgeVal;
+  }
+  if (Math.random() < dodgeChance) {
+    appendLog(log, `<span class="log-effect">${defender.name} dodges!</span>`);
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(550);
+    return;
+  }
 
-function executeBasicAttack(attacker, defender, log, delay) {
-  return doDamage(attacker, defender, log, delay, {});
-}
+  // Base damage
+  let baseAtk = attacker.atk;
+  const rp = getRacePassive(attacker);
+  if (rp && rp.key === 'orcFury' && attacker.hp / attacker.maxHp < 0.5) {
+    baseAtk = Math.floor(baseAtk * 1.3);
+  }
+  const ap = getClassPassive(attacker);
+  if (ap && ap.proc === 'bloodThirst') {
+    const missing = 1 - attacker.hp / attacker.maxHp;
+    baseAtk = Math.floor(baseAtk * (1 + missing * 0.5));
+  }
+  if (ap && ap.proc === 'markedShot' && defender.hp >= defender.maxHp * 0.99) {
+    baseAtk = Math.floor(baseAtk * 1.15);
+  }
 
-function doDamage(attacker, defender, log, delay, opts) {
-  setTimeout(() => {
-    if (attacker.hp <= 0 || defender.hp <= 0) return;
-    // Miss chance (unstable form)
-    if (opts.missChance && Math.random() < opts.missChance) {
-      appendLog(log, `<span class="log-effect">${attacker.name} misses!</span>`);
-      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
-      return;
+  let mult = opts.mult || 1;
+  let dmg = Math.max(1, baseAtk * mult);
+
+  let defValue = defender.def;
+  if (opts.armorPen) defValue = Math.floor(defValue * (1 - opts.armorPen));
+  if (!opts.trueDmg) dmg = Math.max(1, dmg - defValue / 2);
+  dmg = Math.floor(dmg * (0.9 + Math.random() * 0.2));
+
+  let critChance = 0.05 + (attacker.critBonus || 0) + (opts.critBonus || 0);
+  const racePassive = getRacePassive(attacker);
+  if (racePassive && racePassive.key === 'elfCrit') critChance += 0.05;
+  let isCrit = opts.guaranteedCrit || Math.random() < critChance;
+
+  if (ap && ap.proc === 'guaranteedFirstCrit' && !attacker.firstHitDone) {
+    isCrit = true;
+    attacker.firstHitDone = true;
+  }
+
+  if (isCrit) dmg *= 2;
+
+  let burst = false;
+  if (ap && ap.proc === 'burst') {
+    const burstChance = (attacker.passiveOverrides && attacker.passiveOverrides.burst)
+      ? attacker.passiveOverrides.burst.val
+      : ap.val;
+    const burstMult = (attacker.passiveOverrides && attacker.passiveOverrides.burst && attacker.passiveOverrides.burst.mult)
+      ? attacker.passiveOverrides.burst.mult
+      : 0.5;
+    if (Math.random() < burstChance) {
+      dmg = Math.floor(dmg * (1 + burstMult));
+      burst = true;
     }
-    // Dodge
-    let dodgeChance = defender.dodgeBase || 0;
-    const cp = getClassPassive(defender);
-    if (cp && cp.proc === 'dodge' && !opts.guaranteedCrit) {
-      const dodgeVal = defender.passiveOverrides && defender.passiveOverrides.dodge
-        ? defender.passiveOverrides.dodge.val
-        : cp.val;
-      dodgeChance += dodgeVal;
-    }
-    if (Math.random() < dodgeChance) {
-      appendLog(log, `<span class="log-effect">${defender.name} dodges!</span>`);
-      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
-      return;
-    }
+  }
 
-    // Base damage
-    let baseAtk = attacker.atk;
-    // Orc race passive: blood fury < 50% hp
-    const rp = getRacePassive(attacker);
-    if (rp && rp.key === 'orcFury' && attacker.hp / attacker.maxHp < 0.5) {
-      baseAtk = Math.floor(baseAtk * 1.3);
-    }
-    // Berserker bloodthirst
-    const ap = getClassPassive(attacker);
-    if (ap && ap.proc === 'bloodThirst') {
-      const missing = 1 - attacker.hp / attacker.maxHp;
-      baseAtk = Math.floor(baseAtk * (1 + missing * 0.5));
-    }
-    // Hunter mark
-    if (ap && ap.proc === 'markedShot' && defender.hp >= defender.maxHp * 0.99) {
-      baseAtk = Math.floor(baseAtk * 1.15);
-    }
-
-    let mult = opts.mult || 1;
-    let dmg = Math.max(1, baseAtk * mult);
-
-    // Defense
-    let defValue = defender.def;
-    if (opts.armorPen) defValue = Math.floor(defValue * (1 - opts.armorPen));
-    if (!opts.trueDmg) dmg = Math.max(1, dmg - defValue / 2);
-    dmg = Math.floor(dmg * (0.9 + Math.random() * 0.2));
-
-    // Critical
-    let critChance = 0.05 + (attacker.critBonus || 0) + (opts.critBonus || 0);
-    const racePassive = getRacePassive(attacker);
-    if (racePassive && racePassive.key === 'elfCrit') critChance += 0.05;
-    let isCrit = opts.guaranteedCrit || Math.random() < critChance;
-
-    // Stalker first-hit guaranteed crit
-    if (ap && ap.proc === 'guaranteedFirstCrit' && !attacker.firstHitDone) {
-      isCrit = true;
-      attacker.firstHitDone = true;
-    }
-
-    if (isCrit) dmg *= 2;
-
-    // Class proc: burst (engineer)
-    let burst = false;
-    if (ap && ap.proc === 'burst') {
-      const burstChance = (attacker.passiveOverrides && attacker.passiveOverrides.burst)
-        ? attacker.passiveOverrides.burst.val
-        : ap.val;
-      const burstMult = (attacker.passiveOverrides && attacker.passiveOverrides.burst && attacker.passiveOverrides.burst.mult)
-        ? attacker.passiveOverrides.burst.mult
-        : 0.5;
-      if (Math.random() < burstChance) {
-        dmg = Math.floor(dmg * (1 + burstMult));
-        burst = true;
-      }
-    }
-
-    // Execute
-    if (opts.execThreshold && defender.hp < defender.maxHp * opts.execThreshold) {
+  if (opts.execThreshold && defender.hp < defender.maxHp * opts.execThreshold) {
+    dmg = Math.max(dmg, defender.hp);
+  }
+  if (attacker.equipEffects) {
+    const exec = attacker.equipEffects.find(e => e.type === 'execute');
+    if (exec && defender.hp < defender.maxHp * exec.val) {
       dmg = Math.max(dmg, defender.hp);
     }
+  }
 
-    // Equipment execute effect
-    if (attacker.equipEffects) {
-      const exec = attacker.equipEffects.find(e => e.type === 'execute');
-      if (exec && defender.hp < defender.maxHp * exec.val) {
-        dmg = Math.max(dmg, defender.hp);
+  if (opts.defAsDmg) dmg += Math.floor(attacker.def * opts.defAsDmg);
+
+  dmg = Math.floor(dmg);
+
+  let blocked = false;
+  const defenderClassPassive = getClassPassive(defender);
+  if (defenderClassPassive && defenderClassPassive.proc === 'block') {
+    const overrides = defender.passiveOverrides && defender.passiveOverrides.block;
+    const blockChance = overrides ? overrides.val : defenderClassPassive.val;
+    const blockMult = overrides && overrides.mult !== undefined ? overrides.mult : (defenderClassPassive.mult !== undefined ? defenderClassPassive.mult : 0.5);
+    if (Math.random() < blockChance) {
+      dmg = Math.floor(dmg * blockMult);
+      blocked = true;
+    }
+  }
+
+  if (defender.flatDmgReduce) dmg = Math.max(1, dmg - defender.flatDmgReduce);
+  const defRace = getRacePassive(defender);
+  if (defRace && defRace.key === 'dwarfHide') dmg = Math.max(1, dmg - 2);
+  const defCls = getClassPassive(defender);
+  if (defCls && defCls.proc === 'dmgReduce') {
+    const reduceVal = defender.passiveOverrides && defender.passiveOverrides.dmgReduce
+      ? defender.passiveOverrides.dmgReduce.val
+      : defCls.val;
+    dmg = Math.max(1, dmg - reduceVal);
+  }
+
+  // APPLY DAMAGE
+  defender.hp = Math.max(0, defender.hp - dmg);
+
+  // Savior (berserker)
+  let savior = false;
+  if (defender.hp === 0 && defender.savior && !defender.usedSavior) {
+    defender.hp = 1;
+    defender.usedSavior = true;
+    savior = true;
+  }
+
+  // Lifesteal
+  let lifesteal = attacker.lifestealBase || 0;
+  if (opts.lifestealOnce) lifesteal += opts.lifestealOnce;
+  const apCls = getClassPassive(attacker);
+  if (apCls && apCls.proc === 'lifesteal') {
+    const val = attacker.passiveOverrides && attacker.passiveOverrides.lifesteal
+      ? attacker.passiveOverrides.lifesteal.val
+      : apCls.val;
+    lifesteal += val;
+  }
+  let lifestealHeal = 0;
+  if (lifesteal > 0 && dmg > 0) {
+    lifestealHeal = Math.floor(dmg * lifesteal);
+    if (lifestealHeal > 0) attacker.hp = Math.min(attacker.maxHp, attacker.hp + lifestealHeal);
+  }
+
+  // Druid healOnHit
+  let druidHeal = 0;
+  if (apCls && apCls.proc === 'healOnHit' && dmg > 0) {
+    druidHeal = apCls.val;
+    attacker.hp = Math.min(attacker.maxHp, attacker.hp + druidHeal);
+  }
+
+  // Devour on kill
+  let devourHeal = 0;
+  if (defender.hp <= 0 && apCls && apCls.proc === 'devour') {
+    devourHeal = Math.floor(attacker.maxHp * 0.3);
+    attacker.hp = Math.min(attacker.maxHp, attacker.hp + devourHeal);
+  }
+
+  // Equipment burn
+  let burnApplied = false;
+  if (attacker.equipEffects) {
+    const burn = attacker.equipEffects.find(e => e.type === 'burn');
+    if (burn && defender.hp > 0) {
+      defender.dots = defender.dots || [];
+      if (!defender.dots.find(d => d.label === 'Burn')) {
+        defender.dots.push({ dmg: burn.val, remaining: 3, label: 'Burn' });
+        burnApplied = true;
       }
     }
+  }
 
-    // Defense as damage (judgment)
-    if (opts.defAsDmg) dmg += Math.floor(attacker.def * opts.defAsDmg);
+  // Thorns
+  const thornsBuff = defender.statusBuffs.find(b => b.type === 'thorns');
+  let totalThorns = 0;
+  if (thornsBuff && dmg > 0) totalThorns += Math.floor(dmg * thornsBuff.val);
+  if (defender.equipEffects) {
+    const eqThorns = defender.equipEffects.find(e => e.type === 'thorns');
+    if (eqThorns) totalThorns += eqThorns.val;
+  }
+  if (totalThorns > 0 && attacker.hp > 0) {
+    attacker.hp = Math.max(0, attacker.hp - totalThorns);
+  }
 
-    dmg = Math.floor(dmg);
-
-    // Block (knight / forge guardian)
-    let blocked = false;
-    const defenderClassPassive = getClassPassive(defender);
-    if (defenderClassPassive && defenderClassPassive.proc === 'block') {
-      const overrides = defender.passiveOverrides && defender.passiveOverrides.block;
-      const blockChance = overrides ? overrides.val : defenderClassPassive.val;
-      const blockMult = overrides && overrides.mult !== undefined ? overrides.mult : (defenderClassPassive.mult !== undefined ? defenderClassPassive.mult : 0.5);
-      if (Math.random() < blockChance) {
-        dmg = Math.floor(dmg * blockMult);
-        blocked = true;
-      }
-    }
-
-    // Flat damage reduction (dwarf race, bear form, guardian)
-    if (defender.flatDmgReduce) dmg = Math.max(1, dmg - defender.flatDmgReduce);
-    // Dwarf race passive
-    const defRace = getRacePassive(defender);
-    if (defRace && defRace.key === 'dwarfHide') dmg = Math.max(1, dmg - 2);
-    const defCls = getClassPassive(defender);
-    if (defCls && defCls.proc === 'dmgReduce') {
-      const reduceVal = defender.passiveOverrides && defender.passiveOverrides.dmgReduce
-        ? defender.passiveOverrides.dmgReduce.val
-        : defCls.val;
-      dmg = Math.max(1, dmg - reduceVal);
-    }
-
-    // Apply damage
-    defender.hp = Math.max(0, defender.hp - dmg);
-
-    // Savior (berserker)
-    if (defender.hp === 0 && defender.savior && !defender.usedSavior) {
-      defender.hp = 1;
-      defender.usedSavior = true;
-      appendLog(log, `<span class="log-crit">⚡ ${defender.name} REFUSES TO FALL!</span>`);
-    }
-
-    let msg = '';
-    if (opts.abilityLabel) msg += `<span class="log-ability">${opts.abilityLabel}: </span>`;
-    msg += `${attacker.name} strikes`;
-    if (isCrit) msg = `<span class="log-crit">⚡ CRITICAL!</span> ` + msg;
-    if (burst) msg += ` <span class="log-effect">(burst)</span>`;
-    if (blocked) msg += ` <span class="log-effect">(blocked)</span>`;
-    msg += ` for <span class="log-hit">${dmg} damage</span>.`;
-    appendLog(log, msg);
-
-    // Lifesteal
-    let lifesteal = attacker.lifestealBase || 0;
-    if (opts.lifestealOnce) lifesteal += opts.lifestealOnce;
-    // Class lifesteal passive (shaman)
-    const apCls = getClassPassive(attacker);
-    if (apCls && apCls.proc === 'lifesteal') {
-      const val = attacker.passiveOverrides && attacker.passiveOverrides.lifesteal
-        ? attacker.passiveOverrides.lifesteal.val
-        : apCls.val;
-      lifesteal += val;
-    }
-    if (lifesteal > 0 && dmg > 0) {
-      const heal = Math.floor(dmg * lifesteal);
-      if (heal > 0) {
-        attacker.hp = Math.min(attacker.maxHp, attacker.hp + heal);
-        appendLog(log, `<span class="log-effect">${attacker.name} drains ${heal} HP.</span>`);
-      }
-    }
-
-    // Druid healOnHit
-    if (apCls && apCls.proc === 'healOnHit' && dmg > 0) {
-      const heal = apCls.val;
-      attacker.hp = Math.min(attacker.maxHp, attacker.hp + heal);
-      appendLog(log, `<span class="log-effect">${attacker.name} renews: +${heal} HP.</span>`);
-    }
-
-    // Devourer (devour) - on kill
-    if (defender.hp <= 0 && apCls && apCls.proc === 'devour') {
-      const heal = Math.floor(attacker.maxHp * 0.3);
-      attacker.hp = Math.min(attacker.maxHp, attacker.hp + heal);
-      appendLog(log, `<span class="log-effect">${attacker.name} devours the soul: +${heal} HP.</span>`);
-    }
-
-    // Equipment burn
-    if (attacker.equipEffects) {
-      const burn = attacker.equipEffects.find(e => e.type === 'burn');
-      if (burn && defender.hp > 0) {
-        defender.dots = defender.dots || [];
-        if (!defender.dots.find(d => d.label === 'Burn')) {
-          defender.dots.push({ dmg: burn.val, remaining: 3, label: 'Burn' });
-          appendLog(log, `<span class="log-effect">${defender.name} bursts into flames!</span>`);
-        }
-      }
-    }
-
-    // Thorns (status buff and equipment)
-    const thornsBuff = defender.statusBuffs.find(b => b.type === 'thorns');
-    let totalThorns = 0;
-    if (thornsBuff && dmg > 0) totalThorns += Math.floor(dmg * thornsBuff.val);
-    if (defender.equipEffects) {
-      const eqThorns = defender.equipEffects.find(e => e.type === 'thorns');
-      if (eqThorns) totalThorns += eqThorns.val;
-    }
-    if (totalThorns > 0 && attacker.hp > 0) {
-      attacker.hp = Math.max(0, attacker.hp - totalThorns);
-      appendLog(log, `<span class="log-effect">Thorns: ${attacker.name} suffers ${totalThorns} damage.</span>`);
-    }
-
-    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
-  }, delay);
-  return delay + 600;
+  // Visuals — log everything together, paced
+  if (savior) {
+    appendLog(log, `<span class="log-crit">⚡ ${defender.name} REFUSES TO FALL!</span>`);
+  }
+  let msg = '';
+  if (opts.abilityLabel) msg += `<span class="log-ability">${opts.abilityLabel}: </span>`;
+  msg += `${attacker.name} strikes`;
+  if (isCrit) msg = `<span class="log-crit">⚡ CRITICAL!</span> ` + msg;
+  if (burst) msg += ` <span class="log-effect">(burst)</span>`;
+  if (blocked) msg += ` <span class="log-effect">(blocked)</span>`;
+  msg += ` for <span class="log-hit">${dmg} damage</span>.`;
+  appendLog(log, msg);
+  if (lifestealHeal > 0) appendLog(log, `<span class="log-effect">${attacker.name} drains ${lifestealHeal} HP.</span>`);
+  if (druidHeal > 0) appendLog(log, `<span class="log-effect">${attacker.name} renews: +${druidHeal} HP.</span>`);
+  if (devourHeal > 0) appendLog(log, `<span class="log-effect">${attacker.name} devours the soul: +${devourHeal} HP.</span>`);
+  if (burnApplied) appendLog(log, `<span class="log-effect">${defender.name} bursts into flames!</span>`);
+  if (totalThorns > 0) appendLog(log, `<span class="log-effect">Thorns: ${attacker.name} suffers ${totalThorns} damage.</span>`);
+  updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+  await sleep(550);
 }
 
 function randRange(a, b) {
