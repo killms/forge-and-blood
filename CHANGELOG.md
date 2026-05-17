@@ -6,33 +6,32 @@
 
 ---
 
-## 🔖 RESUME HERE — 2026-05-17 evening — pickup for tomorrow
+## 🔖 RESUME HERE — 2026-05-17 — current state
 
-### Current state (HEAD = `b4972e2`)
+### LIVE on the internet ✅
+- **Play it:** https://killms.github.io/forge-and-blood/
+- **Repo:** https://github.com/killms/forge-and-blood (public)
+- **GitHub Pages** serves from `master` branch root. Each `git push` triggers a rebuild that's live in ~30-60s.
+- Verified: HTTP 200, Content-Type `text/html`, 99,475 bytes.
+
+### Current state (HEAD = `def022f`)
 - All Phase A (combat fix + XP bar) ✅
 - All Phase B (stat points 1→100, new XP curve, level cap) ✅
 - Login + localStorage persistence ✅
-- Repo prepped for GitHub Pages (renamed to `index.html`, README added) ✅
+- Deployed to GitHub Pages ✅
 
-### One action blocking the rest: **GitHub Pages deploy**
-The user wants to play on their phone via a public URL. Everything is ready; we just need a one-off auth.
-
-**User action (1 minute):**
+### Re-deploy workflow (already automatic)
 ```bash
-gh auth login
-```
-Pick: GitHub.com → HTTPS → Login with web browser → paste code.
-
-**Then Claude runs (from `F:\Jogo`):**
-```bash
-gh repo create killms/forge-and-blood --public --source=. --remote=origin --push
-gh api -X POST /repos/killms/forge-and-blood/pages -f source[branch]=main -f source[path]=/
+# Make edits to index.html (or anything else)
+git add -A
+git commit -m "your message"
+git push
+# ~1 min later, https://killms.github.io/forge-and-blood/ shows the new version
 ```
 
-Final URL: **https://killms.github.io/forge-and-blood/** (Updates ~30-60s after each `git push`.)
-
-### Temp URL (catbox) — last known working
-- `https://files.catbox.moe/w6x1pt.html` — uploaded 2026-05-17, content-addressed (hash of current `index.html`). Verified serving 99,475 bytes with `Content-Type: text/html`. User reported "nao deu" on mobile — likely their ISP blocks `catbox.moe`. **Re-upload only if `index.html` changes:** `curl -sS -F "reqtype=fileupload" -F "fileToUpload=@index.html" https://catbox.moe/user/api.php` (same content = same URL).
+### Hosting notes (for reference)
+- **GitHub Pages** is the permanent answer. Free, auto-deploys on push, no rate limits worth worrying about for this use case.
+- **Catbox** (`https://files.catbox.moe/w6x1pt.html`) was the temp URL during the previous session. It serves with `Content-Type: text/plain` now (Catbox security policy), so the browser shows source instead of rendering. **Don't use Catbox for HTML.**
 - Other tried hosts that **don't work** for HTML: 0x0.st (uploads disabled), tmpfiles.org, uguu.se, qu.ax, pomf.lain.la (all reject `.html`). transfer.sh down. file.io requires auth. paste.rs wraps in viewer (no script exec).
 
 ### Known limitations / open issues
