@@ -986,9 +986,10 @@ const RACES = {
 };
 
 // Portrait glyphs / tints for monsters. Same shape as race portraits.
+// Optional `sprite` field overrides the glyph with an animated GIF/PNG.
 const MONSTER_PORTRAITS = {
   'Giant Rat':        { glyph: '🐀', tint: '#7a6a55' },
-  'Goblin Raider':    { glyph: '👹', tint: '#5fa85f' },
+  'Goblin Raider':    { glyph: '👹', tint: '#5fa85f', sprite: 'assets/sprites/imp-sword-idle.gif' },
   'Ash Wolf':         { glyph: '🐺', tint: '#9a9a9a' },
   'Skeleton Warrior': { glyph: '💀', tint: '#cfc7a8' },
   'Cave Ogre':        { glyph: '👺', tint: '#8b6a3e' },

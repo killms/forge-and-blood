@@ -6,6 +6,30 @@
 
 ---
 
+## Session 10 — 2026-05-18 — LPC imp sprite wired to Goblin Raider
+
+### What happened
+- User shared the LPC imp ZIP from OpenGameArt (`LPC%20imp_0.zip`). The pack contains 10 PNG sprite sheets (256×256, 4 directions × 4 frames each, 64×64 per frame) covering walk + attack with vanilla / pitchfork / sword / sword+shield variants.
+- LPC sheets aren't animated GIFs — they're static PNGs with frames laid out in a grid. So I ran a small Python/Pillow script to extract the "facing down" row (row 2 in LPC convention: up/left/down/right) and stitch the frames into proper animated GIFs.
+- Output dropped into `assets/sprites/`:
+  - `imp-idle.gif` (4 frames @ 200ms — walking-down loop reused as idle for the vanilla imp)
+  - `imp-sword-idle.gif` (same but holding sword + shield)
+  - `imp-sword-attack.gif` (4 attack frames @ 120ms)
+- **Wired** `imp-sword-idle.gif` to `MONSTER_PORTRAITS['Goblin Raider']` — small adversary slot fits the imp's vibe. Goblin keeps the same name; only the visual changed.
+- Credit added in the main `README.md` pointing back to OpenGameArt's LPC imp page (CC-BY-SA 3.0 / GPL 3.0 — typical LPC licence).
+
+### Notes
+- If the "facing down" row turns out to be the wrong direction visually (some LPC packs differ), it's a one-line tweak: change `row=2` to `0/1/3` in the Python script and re-run.
+- Same conversion pattern works for any LPC pack the user wants to add. Steps: drop the ZIP path on Claude, pick which monster slot, done.
+- For per-class hero sprites we'd need much more art (15 classes × idle/attack/die). The infrastructure already supports it — just needs the source files.
+
+### Files touched
+- `index.html` — single line in `MONSTER_PORTRAITS`.
+- `README.md` — credit line.
+- `assets/sprites/` — 3 new GIFs.
+
+---
+
 ## Session 9 — 2026-05-18 — Sprite GIF support (optional, falls back to emoji)
 
 ### Goal

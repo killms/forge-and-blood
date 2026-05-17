@@ -29,3 +29,4 @@ Active prototype. Built iteratively with Claude Code.
 ## Credits
 
 - Sprite assets in `expansion_pack-0.04/` from the Liberated Pixel Cup expansion by Johannes Sjölund ("wulax"), via [OpenGameArt](https://opengameart.org/).
+- "LPC imp" pack in `assets/sprites/imp-*.gif` (derived from the original PNG sprite sheets) — original via [OpenGameArt — LPC imp](https://opengameart.org/content/lpc-imp). LPC assets are typically CC-BY-SA 3.0 / GPL 3.0 — check the upload page for the exact licence.
