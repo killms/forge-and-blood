@@ -6,6 +6,38 @@
 
 ---
 
+## Session 9 — 2026-05-18 — Sprite GIF support (optional, falls back to emoji)
+
+### Goal
+- Make it trivial to swap the emoji portraits for real animated GIFs (OpenGameArt, itch.io, etc.) without touching combat code.
+
+### Implementation
+- `portrait` data (in `RACES` and `MONSTER_PORTRAITS`) now accepts an optional `sprite` path alongside the existing `glyph` + `tint`. Example:
+  ```js
+  'Goblin Raider': { glyph: '👹', tint: '#5fa85f', sprite: 'assets/sprites/goblin.gif' }
+  ```
+- `setPortrait()` checks for `sprite` first — if present, renders `<img src="...">`; otherwise renders the emoji glyph as before.
+- The portrait box grew from 80×80 → 96×96 with `overflow: hidden` and inner `img { object-fit: contain; image-rendering: pixelated; }` so any sprite size shows up crisp.
+- All existing animations (idle-bob, shake, lunge, slash, cast glow, death-fall, hit-flash) **still apply** because they target the parent `.fighter` / `.fighter-portrait` — they don't care whether the content is text or an `<img>`.
+
+### New folder
+- `assets/sprites/` with a `README.md` that explains:
+  - How to drop a file and wire the data
+  - Where to source free assets (OpenGameArt, itch.io, Kenney.nl)
+  - Suggested filenames matching the data keys
+  - The OpenGameArt URL gotcha: `/styles/medium/public/<file>` is a thumbnail; the real download is at `/files/<file>`
+  - How to upgrade to per-class portraits later if 5 race sprites isn't enough
+
+### What this DOESN'T do
+- No sprites bundled — the user supplies them. Until that happens, every fighter keeps its emoji portrait.
+- No sprite-sheet animation (LPC-style frame switching by action). GIFs animate themselves on loop; the per-action effects are still CSS on top. Sprite-sheet support would be a separate session.
+
+### Files touched
+- `index.html` (CSS + `setPortrait` rewrite)
+- `assets/sprites/README.md` (new)
+
+---
+
 ## Session 8 — 2026-05-18 — Animated emoji "bonecos" (Tier 3 lite)
 
 ### What you'll see
