@@ -324,8 +324,83 @@
     display: grid; grid-template-columns: 1fr auto 1fr;
     gap: 8px; align-items: center; margin-bottom: 12px;
   }
-  .fighter { text-align: center; }
+  .fighter {
+    text-align: center; position: relative;
+    transition: transform 0.18s ease;
+  }
+  .fighter.lunge-l { transform: translateX(12px); }
+  .fighter.lunge-r { transform: translateX(-12px); }
+  .fighter.shake { animation: shake-hit 0.3s ease; }
+  .fighter.shake-crit { animation: shake-crit 0.45s ease; }
+  .fighter.heal-flash .fighter-portrait { animation: heal-pulse 0.6s ease; }
+  @keyframes shake-hit {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-6px); filter: hue-rotate(-12deg) brightness(1.2); }
+    40%  { transform: translateX(5px); }
+    60%  { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes shake-crit {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-10px) scale(1.04); filter: brightness(1.4) drop-shadow(0 0 8px #e89530); }
+    30% { transform: translateX(9px) scale(1.04); }
+    45% { transform: translateX(-7px); }
+    60% { transform: translateX(5px); }
+    80% { transform: translateX(-2px); }
+  }
+  @keyframes heal-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(95,168,95,0.7); }
+    100% { box-shadow: 0 0 0 22px rgba(95,168,95,0); }
+  }
+  .fighter-portrait {
+    width: 80px; height: 80px;
+    margin: 0 auto 6px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px; line-height: 1;
+    user-select: none;
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
   .fighter-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright); margin-bottom: 4px; }
+  /* Floating combat numbers / text */
+  .float-stage {
+    position: absolute; left: 0; right: 0;
+    top: 0; height: 100%;
+    pointer-events: none; overflow: visible;
+  }
+  .floater {
+    position: absolute; left: 50%;
+    top: 30px;
+    transform: translate(-50%, 0);
+    font-family: 'Cinzel', serif; font-weight: 900;
+    text-shadow: 1px 1px 0 #000, 0 0 6px rgba(0,0,0,0.8);
+    animation: floater-rise 1.2s ease-out forwards;
+    white-space: nowrap;
+  }
+  .floater.damage   { color: var(--blood-bright); font-size: 22px; }
+  .floater.crit     { color: var(--legendary); font-size: 30px; text-shadow: 1px 1px 0 #000, 0 0 12px rgba(232,149,48,0.9); }
+  .floater.heal     { color: var(--uncommon); font-size: 20px; }
+  .floater.miss     { color: var(--text-dim); font-size: 16px; font-style: italic; }
+  .floater.dodge    { color: var(--rare); font-size: 18px; font-style: italic; }
+  .floater.block    { color: var(--rare); font-size: 16px; }
+  .floater.dot      { color: #e89530; font-size: 16px; }
+  .floater.mana     { color: #5fa8d6; font-size: 14px; }
+  @keyframes floater-rise {
+    0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.7); }
+    15%  { opacity: 1; transform: translate(-50%, -8px) scale(1.15); }
+    100% { opacity: 0; transform: translate(-50%, -80px) scale(1); }
+  }
+  /* HP bar pulse when low */
+  .bar-fill.hp.hp-low {
+    animation: hp-low-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes hp-low-pulse {
+    0%, 100% { filter: brightness(0.85); }
+    50%      { filter: brightness(1.6) drop-shadow(0 0 6px var(--blood-bright)); }
+  }
   .vs { font-family: 'Cinzel', serif; color: var(--blood-bright); font-size: 14px; font-weight: 900; }
   .combat-log {
     background: var(--bg-deep); border: 1px solid var(--border);
@@ -747,20 +822,24 @@
       <div class="panel">
         <div class="section-title" id="combat-title">Combat</div>
         <div class="combat-arena">
-          <div class="fighter">
+          <div class="fighter" id="f1">
+            <div class="fighter-portrait" id="f1-portrait"></div>
             <div class="fighter-name" id="f1-name"></div>
             <div class="bar">
               <div class="bar-fill hp" id="f1-hp"></div>
               <div class="bar-text" id="f1-hp-text"></div>
             </div>
+            <div class="float-stage" id="f1-floats"></div>
           </div>
           <div class="vs">VS</div>
-          <div class="fighter">
+          <div class="fighter" id="f2">
+            <div class="fighter-portrait" id="f2-portrait"></div>
             <div class="fighter-name" id="f2-name"></div>
             <div class="bar">
               <div class="bar-fill hp" id="f2-hp"></div>
               <div class="bar-text" id="f2-hp-text"></div>
             </div>
+            <div class="float-stage" id="f2-floats"></div>
           </div>
         </div>
         <div class="combat-log" id="combat-log"></div>
@@ -800,6 +879,7 @@ const RACES = {
     mods: { atk: 2, def: 2, vit: 2, agi: 2 },
     summary: '+2 to all attributes',
     passive: { key: 'humanXp', name: 'Resilience', desc: '+10% XP from each victory.' },
+    portrait: { glyph: '⚔', tint: '#c9a557' },
     classes: ['knight', 'cleric', 'bountyHunter']
   },
   elf: {
@@ -808,6 +888,7 @@ const RACES = {
     mods: { atk: 1, def: 0, vit: 0, agi: 6 },
     summary: '+6 Agility, +1 Attack',
     passive: { key: 'elfCrit', name: 'Ancient Gaze', desc: '+5% critical chance on all attacks.' },
+    portrait: { glyph: '🏹', tint: '#5fa85f' },
     classes: ['archer', 'druid', 'bladeDancer']
   },
   orc: {
@@ -816,6 +897,7 @@ const RACES = {
     mods: { atk: 5, def: 3, vit: 2, agi: -3 },
     summary: '+5 ATK, +3 DEF, +2 VIT, -3 AGI',
     passive: { key: 'orcFury', name: 'Blood Fury', desc: 'When below 50% HP, +30% attack.' },
+    portrait: { glyph: '🪓', tint: '#8b1e1e' },
     classes: ['berserker', 'shaman', 'devourer']
   },
   dwarf: {
@@ -824,6 +906,7 @@ const RACES = {
     mods: { atk: 2, def: 6, vit: 5, agi: -2 },
     summary: '+6 DEF, +5 VIT, +2 ATK, -2 AGI',
     passive: { key: 'dwarfHide', name: 'Granite Skin', desc: 'Reduces all damage taken by 2.' },
+    portrait: { glyph: '⛏', tint: '#a89875' },
     classes: ['guardian', 'priest', 'engineer']
   },
   shifter: {
@@ -832,8 +915,20 @@ const RACES = {
     mods: { atk: 3, def: 1, vit: 3, agi: 3 },
     summary: '+3 ATK, +3 VIT, +3 AGI, +1 DEF',
     passive: { key: 'shifterAdapt', name: 'Adaptation', desc: 'Each turn, +1 to a random stat (combat only).' },
+    portrait: { glyph: '🐾', tint: '#a85fd6' },
     classes: ['stalker', 'bearForm', 'chaos']
   }
+};
+
+// Portrait glyphs / tints for monsters. Same shape as race portraits.
+const MONSTER_PORTRAITS = {
+  'Giant Rat':        { glyph: '🐀', tint: '#7a6a55' },
+  'Goblin Raider':    { glyph: '👹', tint: '#5fa85f' },
+  'Ash Wolf':         { glyph: '🐺', tint: '#9a9a9a' },
+  'Skeleton Warrior': { glyph: '💀', tint: '#cfc7a8' },
+  'Cave Ogre':        { glyph: '👺', tint: '#8b6a3e' },
+  'Awakened Lich':    { glyph: '☠',  tint: '#7b5fd6' },
+  'Young Dragon':     { glyph: '🐉', tint: '#e89530' }
 };
 
 // ============ CLASSES ============
@@ -2537,6 +2632,11 @@ function startCombat(enemy, mode) {
   document.getElementById('combat-title').textContent = mode === 'pvp' ? 'ARENA DUEL' : 'HUNT';
   document.getElementById('f1-name').textContent = h.name;
   document.getElementById('f2-name').textContent = enemy.name;
+  setPortrait('f1-portrait', h, true);
+  setPortrait('f2-portrait', enemy, false);
+  // Clear any leftover floaters from a previous fight
+  document.getElementById('f1-floats').innerHTML = '';
+  document.getElementById('f2-floats').innerHTML = '';
   const log = document.getElementById('combat-log');
   log.innerHTML = '';
   const token = ++_combatToken;
@@ -2779,6 +2879,7 @@ async function tickStartOfTurn(f, opponent, log) {
     f.hp += amt;
     if (sb) sb.healed += amt;
     appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP.</span>`);
+    spawnFloater(f, '+' + amt, 'heal');
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(280);
   }
@@ -2790,6 +2891,7 @@ async function tickStartOfTurn(f, opponent, log) {
       f.hp += amt;
       if (sb) sb.healed += amt;
       appendLog(log, `<span class="log-effect">${f.name} is blessed: +${amt} HP.</span>`);
+      spawnFloater(f, '+' + amt, 'heal');
       updateCombatBars(_currentFighters.hero, _currentFighters.foe);
       await sleep(280);
     }
@@ -2801,6 +2903,7 @@ async function tickStartOfTurn(f, opponent, log) {
         f.hp += amt;
         if (sb) sb.healed += amt;
         appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP (${cp.name}).</span>`);
+        spawnFloater(f, '+' + amt, 'heal');
         updateCombatBars(_currentFighters.hero, _currentFighters.foe);
         await sleep(280);
       }
@@ -2813,7 +2916,11 @@ async function tickStartOfTurn(f, opponent, log) {
     for (const dot of f.dots) {
       if (f.hp <= 0) break;
       f.hp = Math.max(0, f.hp - dot.dmg);
+      const ds = statsBucket(f);
+      if (ds) ds.dmgTaken += dot.dmg;
       appendLog(log, `<span class="log-effect">${f.name} suffers ${dot.dmg} (${dot.label}).</span>`);
+      spawnFloater(f, '-' + dot.dmg, 'dot');
+      shakeFighter(f, 'hit');
       updateCombatBars(_currentFighters.hero, _currentFighters.foe);
       dot.remaining--;
       await sleep(280);
@@ -2827,7 +2934,11 @@ async function tickStartOfTurn(f, opponent, log) {
   if (turret && opponent && opponent.hp > 0) {
     const turretDmg = Math.floor(f.atk * turret.val);
     opponent.hp = Math.max(0, opponent.hp - turretDmg);
+    const ts = statsBucket(opponent);
+    if (ts) ts.dmgTaken += turretDmg;
     appendLog(log, `<span class="log-effect">${f.name}'s turret fires: ${turretDmg} damage.</span>`);
+    spawnFloater(opponent, '-' + turretDmg, 'damage');
+    shakeFighter(opponent, 'hit');
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(280);
   }
@@ -2973,6 +3084,8 @@ async function executeAbility(attacker, defender, talent, log) {
     attacker.hp = Math.min(attacker.maxHp, attacker.hp + amt);
     if (sb) sb.healed += amt;
     appendLog(log, `<span class="log-effect">${attacker.name} heals ${amt} HP.</span>`);
+    spawnFloater(attacker, '+' + amt, 'heal');
+    shakeFighter(attacker, 'heal');
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(380);
   }
@@ -3084,6 +3197,8 @@ async function doDamage(attacker, defender, log, opts) {
   // Miss
   if (opts.missChance && Math.random() < opts.missChance) {
     appendLog(log, `<span class="log-effect">${attacker.name} misses!</span>`);
+    spawnFloater(attacker, 'MISS', 'miss');
+    lungeFighter(attacker);
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(550);
     return;
@@ -3100,6 +3215,8 @@ async function doDamage(attacker, defender, log, opts) {
   }
   if (Math.random() < dodgeChance) {
     appendLog(log, `<span class="log-effect">${defender.name} dodges!</span>`);
+    spawnFloater(defender, 'DODGE!', 'dodge');
+    lungeFighter(attacker);
     const dStats = statsBucket(defender);
     if (dStats) dStats.dodges++;
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
@@ -3279,9 +3396,10 @@ async function doDamage(attacker, defender, log, opts) {
     attacker.hp = Math.max(0, attacker.hp - totalThorns);
   }
 
-  // Visuals — log everything together, paced
+  // Visuals — log + floaters + shake/lunge
   if (savior) {
     appendLog(log, `<span class="log-crit">⚡ ${defender.name} REFUSES TO FALL!</span>`);
+    spawnFloater(defender, 'SAVED!', 'crit');
   }
   let msg = '';
   if (opts.abilityLabel) msg += `<span class="log-ability">${opts.abilityLabel}: </span>`;
@@ -3291,11 +3409,30 @@ async function doDamage(attacker, defender, log, opts) {
   if (blocked) msg += ` <span class="log-effect">(blocked)</span>`;
   msg += ` for <span class="log-hit">${dmg} damage</span>.`;
   appendLog(log, msg);
-  if (lifestealHeal > 0) appendLog(log, `<span class="log-effect">${attacker.name} drains ${lifestealHeal} HP.</span>`);
-  if (druidHeal > 0) appendLog(log, `<span class="log-effect">${attacker.name} renews: +${druidHeal} HP.</span>`);
-  if (devourHeal > 0) appendLog(log, `<span class="log-effect">${attacker.name} devours the soul: +${devourHeal} HP.</span>`);
+  // Floating number on the defender, shake, lunge from attacker
+  spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
+  shakeFighter(defender, isCrit ? 'crit' : 'hit');
+  lungeFighter(attacker);
+  if (blocked) spawnFloater(defender, 'BLOCK', 'block');
+  if (lifestealHeal > 0) {
+    appendLog(log, `<span class="log-effect">${attacker.name} drains ${lifestealHeal} HP.</span>`);
+    spawnFloater(attacker, '+' + lifestealHeal, 'heal');
+  }
+  if (druidHeal > 0) {
+    appendLog(log, `<span class="log-effect">${attacker.name} renews: +${druidHeal} HP.</span>`);
+    spawnFloater(attacker, '+' + druidHeal, 'heal');
+  }
+  if (devourHeal > 0) {
+    appendLog(log, `<span class="log-effect">${attacker.name} devours the soul: +${devourHeal} HP.</span>`);
+    spawnFloater(attacker, '+' + devourHeal, 'heal');
+    shakeFighter(attacker, 'heal');
+  }
   if (burnApplied) appendLog(log, `<span class="log-effect">${defender.name} bursts into flames!</span>`);
-  if (totalThorns > 0) appendLog(log, `<span class="log-effect">Thorns: ${attacker.name} suffers ${totalThorns} damage.</span>`);
+  if (totalThorns > 0) {
+    appendLog(log, `<span class="log-effect">Thorns: ${attacker.name} suffers ${totalThorns} damage.</span>`);
+    spawnFloater(attacker, '-' + totalThorns, 'damage');
+    shakeFighter(attacker, 'hit');
+  }
   updateCombatBars(_currentFighters.hero, _currentFighters.foe);
   await sleep(550);
 }
@@ -3457,10 +3594,79 @@ function updateCombatBars(hero, foe) {
   if (!hero || !foe) return;
   const hPct = Math.max(0, (hero.hp / hero.maxHp) * 100);
   const ePct = Math.max(0, (foe.hp / foe.maxHp) * 100);
-  document.getElementById('f1-hp').style.width = hPct + '%';
+  const hpHero = document.getElementById('f1-hp');
+  const hpFoe  = document.getElementById('f2-hp');
+  hpHero.style.width = hPct + '%';
+  hpFoe.style.width  = ePct + '%';
   document.getElementById('f1-hp-text').textContent = Math.max(0, Math.floor(hero.hp));
-  document.getElementById('f2-hp').style.width = ePct + '%';
   document.getElementById('f2-hp-text').textContent = Math.max(0, Math.floor(foe.hp));
+  hpHero.classList.toggle('hp-low', hPct > 0 && hPct < 25);
+  hpFoe.classList.toggle('hp-low',  ePct > 0 && ePct < 25);
+}
+
+// ============ COMBAT ANIMATIONS ============
+// Map a fighter -> the DOM container element. Hero is always slot 1 (left).
+function fighterEl(fighter) {
+  if (!fighter) return null;
+  return document.getElementById(fighter.isHero ? 'f1' : 'f2');
+}
+function floatStageEl(fighter) {
+  if (!fighter) return null;
+  return document.getElementById(fighter.isHero ? 'f1-floats' : 'f2-floats');
+}
+
+// Drop a floating number / label above the fighter. type drives colour and
+// size (damage/crit/heal/miss/dodge/block/dot/mana).
+function spawnFloater(fighter, text, type) {
+  const stage = floatStageEl(fighter);
+  if (!stage) return;
+  const el = document.createElement('div');
+  el.className = `floater ${type || 'damage'}`;
+  el.textContent = text;
+  // Small horizontal jitter so stacked hits don't perfectly overlap
+  const jitter = (Math.random() - 0.5) * 30;
+  el.style.marginLeft = jitter.toFixed(0) + 'px';
+  stage.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 1300);
+}
+
+// Apply a short hit / crit shake on the fighter.
+function shakeFighter(fighter, kind) {
+  const el = fighterEl(fighter);
+  if (!el) return;
+  const cls = kind === 'crit' ? 'shake-crit' : (kind === 'heal' ? 'heal-flash' : 'shake');
+  el.classList.remove('shake', 'shake-crit', 'heal-flash');
+  // Reflow to restart animation if it's still running
+  void el.offsetWidth;
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), kind === 'crit' ? 460 : (kind === 'heal' ? 620 : 320));
+}
+
+// Brief lunge toward the opponent. Hero (left) moves right; foe (right) moves left.
+function lungeFighter(fighter) {
+  const el = fighterEl(fighter);
+  if (!el) return;
+  const cls = fighter.isHero ? 'lunge-l' : 'lunge-r';
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), 200);
+}
+
+// Set the portrait box (glyph + tinted border) for a fighter at fight start.
+function setPortrait(slotId, source, isHero) {
+  const el = document.getElementById(slotId);
+  if (!el) return;
+  let portrait;
+  if (isHero) {
+    portrait = (RACES[source.race] && RACES[source.race].portrait) || { glyph: '⚔', tint: '#c9a557' };
+  } else if (source.isPlayer) {
+    portrait = (RACES[source.race] && RACES[source.race].portrait) || { glyph: '⚔', tint: '#8b1e1e' };
+  } else {
+    portrait = MONSTER_PORTRAITS[source.name] || { glyph: '👹', tint: '#8b1e1e' };
+  }
+  el.textContent = portrait.glyph;
+  el.style.borderColor = portrait.tint;
+  el.style.color = portrait.tint;
+  el.style.boxShadow = `inset 0 0 12px rgba(0,0,0,0.6), 0 0 14px ${portrait.tint}44`;
 }
 
 function switchTab(name) {

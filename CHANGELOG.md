@@ -6,6 +6,47 @@
 
 ---
 
+## Session 7 — 2026-05-18 — Combat animations (Tier 1 + 2)
+
+### Goal
+- Make combat feel alive without needing external assets. CSS-only animations + emoji-based portraits keyed to race/monster.
+
+### Portraits
+- Each `RACES[*]` now has a `portrait: { glyph, tint }`. Tints used: human gold, elf green, orc red, dwarf stone, shifter purple.
+- New `MONSTER_PORTRAITS` map: rat 🐀, goblin 👹, ash wolf 🐺, skeleton 💀, ogre 👺, lich ☠, dragon 🐉.
+- `setPortrait()` paints the fighter's 80×80 box with the glyph, tinted border, and inner shadow.
+- PvP opponents use their race's portrait too.
+
+### Floating combat numbers (`spawnFloater`)
+- Rises above the fighter, scales up, then fades. Coloured by type:
+  - **damage** (red, large)
+  - **crit** (gold, extra-large with glow)
+  - **heal** (green)
+  - **miss** / **dodge** (grey/blue, italic)
+  - **block** (blue)
+  - **dot** (orange)
+- Small horizontal jitter so stacked hits don't perfectly overlap.
+
+### Fighter shake / lunge
+- `shakeFighter(fighter, kind)` — `hit` (short red shake), `crit` (longer, gold-glow shake), `heal` (green pulse on portrait).
+- `lungeFighter(fighter)` — attacker briefly translates toward the opponent on every hit / miss / dodge.
+
+### HP bar pulse
+- HP fill gains `.hp-low` class when below 25% (animated pulse + drop-shadow).
+
+### Hooks
+- `doDamage`: floater + shake on defender, lunge attacker. Lifesteal / druid heal / devour heal → heal floater on attacker. Thorns → damage floater on attacker. Miss / dodge / block → their own floaters.
+- `executeAbility` heal → heal floater + portrait pulse.
+- `tickStartOfTurn` regen / class regen → heal floater. DoT ticks → orange damage floater + shake. Turret hits → red floater on opponent.
+
+### Architecture note
+The async/await combat loop already paced everything with `await sleep(N)`. Adding animation hooks at each step was a single line per event, no refactor needed. Tier 3+ (per-ability VFX, sprite sheets) plugs in the same way later.
+
+### Files touched
+- `index.html` only. (Still 100% CSS — no external assets required.)
+
+---
+
 ## Session 6 — 2026-05-18 — Combat summary + slot picker + shop + sell
 
 ### Combat ends with a summary, not auto-close
