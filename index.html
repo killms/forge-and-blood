@@ -219,6 +219,7 @@
   .bar-fill { height: 100%; transition: width 0.4s; }
   .bar-fill.hp { background: linear-gradient(90deg, #6b1010, var(--blood-bright)); }
   .bar-fill.xp { background: linear-gradient(90deg, #3d6b9a, #5fa8d6); }
+  .bar-fill.mp { background: linear-gradient(90deg, #1f3a78, #4a7bce); }
   .bar-text {
     position: absolute; inset: 0; text-align: center;
     font-size: 12px; line-height: 18px; color: var(--text);
@@ -527,6 +528,10 @@
           <div class="bar-fill hp" id="hp-bar"></div>
           <div class="bar-text" id="hp-text"></div>
         </div>
+        <div class="bar bar-mp hidden" id="mp-bar-wrap">
+          <div class="bar-fill mp" id="mp-bar"></div>
+          <div class="bar-text" id="mp-text"></div>
+        </div>
       </div>
 
       <div class="panel xp-panel">
@@ -712,7 +717,7 @@ const CLASSES = {
     name: 'Knight',
     race: 'human',
     desc: 'Honoured defender, shield and faith.',
-    base: { atk: 11, def: 12, vit: 13, agi: 5 },
+    base: { atk: 11, def: 12, vit: 13, agi: 5, int: 3 },
     passive: { name: 'Oath', desc: '15% chance to block half the damage.', proc: 'block', val: 0.15 },
     talentTree: [
       [ { key: 'k1a', name: 'Defensive Training', type: 'passive', desc: '+5 Defense.', effect: { def: 5 } },
@@ -741,7 +746,7 @@ const CLASSES = {
     name: 'Cleric',
     race: 'human',
     desc: 'Devoted to the light. Heals and punishes.',
-    base: { atk: 10, def: 8, vit: 11, agi: 7 },
+    base: { atk: 10, def: 8, vit: 11, agi: 7, int: 12 },
     passive: { name: 'Blessing', desc: 'Regenerates 4 HP per turn in combat.', proc: 'regen', val: 4 },
     talentTree: [
       [ { key: 'c1a', name: 'Devotion', type: 'passive', desc: '+6 Vitality.', effect: { vit: 6 } },
@@ -770,7 +775,7 @@ const CLASSES = {
     name: 'Bounty Hunter',
     race: 'human',
     desc: 'Cold hunter. Always knows where to strike.',
-    base: { atk: 13, def: 7, vit: 10, agi: 10 },
+    base: { atk: 13, def: 7, vit: 10, agi: 10, int: 3 },
     passive: { name: "Hunter's Mark", desc: '+15% damage against enemies at full HP.', proc: 'markedShot' },
     talentTree: [
       [ { key: 'b1a', name: 'Aim', type: 'passive', desc: '+5 Attack.', effect: { atk: 5 } },
@@ -800,7 +805,7 @@ const CLASSES = {
     name: 'Wild Archer',
     race: 'elf',
     desc: "Hawk's eye, silken hand.",
-    base: { atk: 14, def: 5, vit: 9, agi: 12 },
+    base: { atk: 14, def: 5, vit: 9, agi: 12, int: 4 },
     passive: { name: 'First Arrow', desc: 'Always attacks first in combat.', proc: 'firstStrike' },
     talentTree: [
       [ { key: 'a1a', name: 'Bowstring Tension', type: 'passive', desc: '+6 Attack.', effect: { atk: 6 } },
@@ -829,7 +834,7 @@ const CLASSES = {
     name: 'Druid',
     race: 'elf',
     desc: 'Voice of the forests. Natural magic.',
-    base: { atk: 12, def: 7, vit: 12, agi: 8 },
+    base: { atk: 12, def: 7, vit: 12, agi: 8, int: 10 },
     passive: { name: 'Renewal', desc: 'Heals 5 HP on each damaging attack.', proc: 'healOnHit', val: 5 },
     talentTree: [
       [ { key: 'd1a', name: 'Deep Roots', type: 'passive', desc: '+8 Vitality.', effect: { vit: 8 } },
@@ -858,7 +863,7 @@ const CLASSES = {
     name: 'Blade Dancer',
     race: 'elf',
     desc: 'Steel in motion. Lethal beauty.',
-    base: { atk: 12, def: 6, vit: 9, agi: 13 },
+    base: { atk: 12, def: 6, vit: 9, agi: 13, int: 4 },
     passive: { name: 'Dance of Blades', desc: '15% chance to dodge attacks.', proc: 'dodge', val: 0.15 },
     talentTree: [
       [ { key: 'l1a', name: 'Wind Step', type: 'passive', desc: '+7 Agility.', effect: { agi: 7 } },
@@ -888,7 +893,7 @@ const CLASSES = {
     name: 'Berserker',
     race: 'orc',
     desc: 'Bloody madness. Fearless.',
-    base: { atk: 16, def: 5, vit: 14, agi: 6 },
+    base: { atk: 16, def: 5, vit: 14, agi: 6, int: 2 },
     passive: { name: 'Bloodlust', desc: 'The lower the HP, the higher the attack (up to +50%).', proc: 'bloodThirst' },
     talentTree: [
       [ { key: 'br1a', name: 'Raw Fury', type: 'passive', desc: '+7 Attack.', effect: { atk: 7 } },
@@ -917,7 +922,7 @@ const CLASSES = {
     name: 'Blood Shaman',
     race: 'orc',
     desc: 'Primal magic through blood.',
-    base: { atk: 13, def: 7, vit: 13, agi: 7 },
+    base: { atk: 13, def: 7, vit: 13, agi: 7, int: 11 },
     passive: { name: 'Blood Pact', desc: 'Each attack drains 10% of damage as HP.', proc: 'lifesteal', val: 0.1 },
     talentTree: [
       [ { key: 's1a', name: 'Hot Blood', type: 'passive', desc: '+5 Attack.', effect: { atk: 5 } },
@@ -946,7 +951,7 @@ const CLASSES = {
     name: 'Soul Devourer',
     race: 'orc',
     desc: 'Consumes the essence of the fallen.',
-    base: { atk: 14, def: 6, vit: 12, agi: 6 },
+    base: { atk: 14, def: 6, vit: 12, agi: 6, int: 6 },
     passive: { name: 'Devour', desc: 'After killing an enemy, recovers 30% HP.', proc: 'devour' },
     talentTree: [
       [ { key: 'v1a', name: 'Maw', type: 'passive', desc: '+6 Attack.', effect: { atk: 6 } },
@@ -976,7 +981,7 @@ const CLASSES = {
     name: 'Forge Guardian',
     race: 'dwarf',
     desc: 'Living wall. Unshakeable.',
-    base: { atk: 11, def: 14, vit: 15, agi: 4 },
+    base: { atk: 11, def: 14, vit: 15, agi: 4, int: 3 },
     passive: { name: 'Stone Stance', desc: '20% chance to block 80% of damage.', proc: 'block', val: 0.2, mult: 0.2 },
     talentTree: [
       [ { key: 'g1a', name: 'Forged Armour', type: 'passive', desc: '+8 Defense.', effect: { def: 8 } },
@@ -1005,7 +1010,7 @@ const CLASSES = {
     name: 'Stone Priest',
     race: 'dwarf',
     desc: 'Voice of ancestors. Stone and faith.',
-    base: { atk: 12, def: 10, vit: 13, agi: 5 },
+    base: { atk: 12, def: 10, vit: 13, agi: 5, int: 10 },
     passive: { name: 'Ancestral Blessing', desc: 'Regenerates 6 HP per turn.', proc: 'regen', val: 6 },
     talentTree: [
       [ { key: 'p1a', name: 'Granite Heart', type: 'passive', desc: '+8 Vitality.', effect: { vit: 8 } },
@@ -1034,7 +1039,7 @@ const CLASSES = {
     name: 'War Engineer',
     race: 'dwarf',
     desc: 'Gunpowder, gears, and death.',
-    base: { atk: 14, def: 9, vit: 11, agi: 6 },
+    base: { atk: 14, def: 9, vit: 11, agi: 6, int: 6 },
     passive: { name: 'Gunpowder', desc: '20% chance to deal +50% damage (burst).', proc: 'burst', val: 0.2 },
     talentTree: [
       [ { key: 'e1a', name: 'Calibration', type: 'passive', desc: '+6 Attack.', effect: { atk: 6 } },
@@ -1064,7 +1069,7 @@ const CLASSES = {
     name: 'Stalker',
     race: 'shifter',
     desc: 'Faceless flesh. Assassin between forms.',
-    base: { atk: 14, def: 6, vit: 10, agi: 11 },
+    base: { atk: 14, def: 6, vit: 10, agi: 11, int: 4 },
     passive: { name: 'Mimic Form', desc: 'First attack has +100% crit (always critical).', proc: 'guaranteedFirstCrit' },
     talentTree: [
       [ { key: 'st1a', name: 'Fluid Form', type: 'passive', desc: '+6 Agility.', effect: { agi: 6 } },
@@ -1093,7 +1098,7 @@ const CLASSES = {
     name: 'Bear Form',
     race: 'shifter',
     desc: 'Embodies the primal beast.',
-    base: { atk: 13, def: 10, vit: 14, agi: 5 },
+    base: { atk: 13, def: 10, vit: 14, agi: 5, int: 4 },
     passive: { name: 'Thick Fur', desc: 'Reduces damage taken by 3.', proc: 'dmgReduce', val: 3 },
     talentTree: [
       [ { key: 'u1a', name: 'Brutal Mass', type: 'passive', desc: '+9 Vitality.', effect: { vit: 9 } },
@@ -1122,7 +1127,7 @@ const CLASSES = {
     name: 'Chaos Shifter',
     race: 'shifter',
     desc: 'Their very flesh is unstable magic.',
-    base: { atk: 12, def: 8, vit: 11, agi: 9 },
+    base: { atk: 12, def: 8, vit: 11, agi: 9, int: 10 },
     passive: { name: 'Mutation', desc: 'Each turn, +2 to a random stat (stackable).', proc: 'mutate' },
     talentTree: [
       [ { key: 'h1a', name: 'Plastic Flesh', type: 'passive', desc: '+3 to all stats.', effect: { atk: 3, def: 3, vit: 3, agi: 3 } },
@@ -1211,15 +1216,65 @@ const ITEM_POOL = [
   { slot: 'pants', name: 'Legs of the Titan', rarity: 'legendary', stats: { def: 9, vit: 8 }, effect: { type: 'thorns', val: 6, desc: 'Thorns: returns 6 damage' } }
 ];
 
+// Monsters define a "tier" (relative difficulty) and base stats at tier level.
+// Their actual stats scale with the hero's level so they remain a challenge
+// all the way to level 100. See scaleMonster(template, heroLevel).
 const MONSTERS = [
-  { name: 'Giant Rat', level: 1, atk: 6, def: 2, vit: 8, agi: 4, gold: [5, 12], xp: 15 },
-  { name: 'Goblin Raider', level: 2, atk: 9, def: 4, vit: 14, agi: 7, gold: [10, 20], xp: 25 },
-  { name: 'Ash Wolf', level: 3, atk: 14, def: 5, vit: 18, agi: 12, gold: [18, 30], xp: 40 },
-  { name: 'Skeleton Warrior', level: 4, atk: 16, def: 10, vit: 24, agi: 6, gold: [30, 50], xp: 60 },
-  { name: 'Cave Ogre', level: 5, atk: 22, def: 12, vit: 38, agi: 4, gold: [50, 80], xp: 90 },
-  { name: 'Awakened Lich', level: 7, atk: 30, def: 14, vit: 50, agi: 10, gold: [80, 140], xp: 150 },
-  { name: 'Young Dragon', level: 10, atk: 42, def: 22, vit: 80, agi: 12, gold: [150, 250], xp: 300 }
+  { name: 'Giant Rat', tier: 1, baseAtk: 6, baseDef: 2, baseVit: 8, baseAgi: 4, baseInt: 0, abilities: [] },
+  { name: 'Goblin Raider', tier: 2, baseAtk: 9, baseDef: 4, baseVit: 14, baseAgi: 7, baseInt: 0, abilities: ['quick_jab'] },
+  { name: 'Ash Wolf', tier: 3, baseAtk: 14, baseDef: 5, baseVit: 18, baseAgi: 12, baseInt: 0, abilities: ['rend'] },
+  { name: 'Skeleton Warrior', tier: 4, baseAtk: 16, baseDef: 10, baseVit: 24, baseAgi: 6, baseInt: 0, abilities: ['bone_strike', 'bone_shield'] },
+  { name: 'Cave Ogre', tier: 5, baseAtk: 22, baseDef: 12, baseVit: 38, baseAgi: 4, baseInt: 0, abilities: ['smash', 'roar_fear'] },
+  { name: 'Awakened Lich', tier: 7, baseAtk: 22, baseDef: 14, baseVit: 50, baseAgi: 10, baseInt: 30, abilities: ['arcane_bolt', 'curse_mob', 'drain_life'] },
+  { name: 'Young Dragon', tier: 10, baseAtk: 42, baseDef: 22, baseVit: 80, baseAgi: 12, baseInt: 20, abilities: ['fire_breath', 'tail_swipe', 'dragon_roar'] }
 ];
+
+// Monster-only abilities (not class talents). Keyed by id, referenced from
+// each monster's `abilities` array. Mirrors the ability shape used by hero
+// talents so chooseAbility / executeAbility can run them directly.
+const MONSTER_ABILITIES = {
+  quick_jab:     { name: 'Quick Jab',    type: 'active', school: 'melee',   ability: { dmgMult: 1.2, cd: 3 } },
+  rend:          { name: 'Rend',         type: 'active', school: 'melee',   ability: { dmgMult: 1.3, dot: 4, dur: 3, cd: 4 } },
+  bone_strike:   { name: 'Bone Strike',  type: 'active', school: 'melee',   ability: { dmgMult: 1.5, armorPen: 0.3, cd: 4 } },
+  bone_shield:   { name: 'Bone Shield',  type: 'active', school: 'melee',   ability: { buffDef: 0.5, dur: 2, cd: 5 } },
+  smash:         { name: 'Smash',        type: 'active', school: 'melee',   ability: { dmgMult: 1.7, stun: 1, cd: 5 } },
+  roar_fear:     { name: 'Frightful Roar', type: 'active', school: 'melee', ability: { debuffAtk: 0.3, dur: 3, cd: 6 } },
+  arcane_bolt:   { name: 'Arcane Bolt',  type: 'active', school: 'magical', ability: { dmgMult: 1.6, magical: true, trueDmg: true, cd: 3 } },
+  curse_mob:     { name: 'Curse',        type: 'active', school: 'magical', ability: { dot: 10, dur: 4, magical: true, cd: 5 } },
+  drain_life:    { name: 'Drain Life',   type: 'active', school: 'magical', ability: { dmgMult: 1.5, lifestealOnce: 0.8, magical: true, cd: 5 } },
+  fire_breath:   { name: 'Fire Breath',  type: 'active', school: 'magical', ability: { dmgMult: 2, dot: 8, dur: 3, magical: true, cd: 5 } },
+  tail_swipe:    { name: 'Tail Swipe',   type: 'active', school: 'melee',   ability: { dmgMult: 1.8, stun: 1, cd: 4 } },
+  dragon_roar:   { name: "Dragon's Roar", type: 'active', school: 'melee',  ability: { debuffAtk: 0.4, debuffAgi: 0.3, dur: 3, cd: 7 } }
+};
+
+// Scale a monster template by hero level. Effective monster level matches
+// hero level (capped near max). Stats grow with a soft curve. Returns a
+// fresh runtime monster object suitable for combat.
+function scaleMonster(template, heroLevel) {
+  // Effective level: clamp around the hero so monsters stay relevant but
+  // the lowest-tier creature is always easier than the highest.
+  const heroL = Math.max(1, heroLevel || 1);
+  // Each monster anchors at `tier`. Level = max(tier, heroL - tierOffset).
+  // Easier monsters stay easier; the dragon stays the toughest, but all
+  // scale up if the hero outlevels them.
+  const lvl = Math.max(template.tier, heroL - (10 - template.tier));
+  const mult = 1 + (lvl - 1) * 0.18; // +18% stats per level
+  const m = {
+    name: template.name,
+    level: lvl,
+    atk: Math.floor(template.baseAtk * mult),
+    def: Math.floor(template.baseDef * mult),
+    vit: Math.floor(template.baseVit * mult),
+    agi: Math.floor(template.baseAgi * mult),
+    int: Math.floor((template.baseInt || 0) * mult),
+    abilities: (template.abilities || []).map(k => MONSTER_ABILITIES[k]).filter(Boolean),
+    isMonster: true,
+    tier: template.tier
+  };
+  m.gold = [Math.floor(5 * lvl), Math.floor(12 * lvl)];
+  m.xp = Math.floor(15 * Math.pow(lvl, 1.3));
+  return m;
+}
 
 const PVP_NAMES = ['Aldric the Black', 'Sylvana Silverleaf', 'Grosh Skullbreaker', 'Mira the Whisper', 'Kael Ironhand', 'Lirien of the Vales', 'Drogath the Cruel', 'Vendra Catseye', 'Borin Deepforge', 'Skarn Faceless'];
 
@@ -1339,6 +1394,13 @@ function migrateHero(hero) {
   }
   delete hero.unlockedTalents;
   delete hero.talentPoints;
+  // Phase C migration: existing saves lack INT in base, and lack mana fields.
+  if (hero.base && typeof hero.base.int !== 'number') {
+    const cls = CLASSES[hero.class];
+    hero.base.int = (cls && cls.baseInt) || 5;
+  }
+  if (typeof hero.maxMp !== 'number') hero.maxMp = 0;
+  if (typeof hero.mp !== 'number') hero.mp = 0;
   return hero;
 }
 
@@ -1504,9 +1566,11 @@ function createHero() {
       atk: cls.base.atk + race.mods.atk,
       def: cls.base.def + race.mods.def,
       vit: cls.base.vit + race.mods.vit,
-      agi: cls.base.agi + race.mods.agi
+      agi: cls.base.agi + race.mods.agi,
+      int: (cls.baseInt || 5) // INT starts at 5 + class flavor
     },
     hp: 0, maxHp: 0,
+    mp: 0, maxMp: 0,
     equipment: emptyEquipment(),
     inventory: [generateItem('common', 'weapon'), generateItem('common', 'armor')]
   };
@@ -1521,7 +1585,7 @@ function createHero() {
 function spendStatPoint(stat) {
   const h = state.hero;
   if (!h || h.statPoints <= 0) return;
-  if (!['atk', 'def', 'vit', 'agi'].includes(stat)) return;
+  if (!['atk', 'def', 'vit', 'agi', 'int'].includes(stat)) return;
   h.statPoints--;
   h.base[stat] = (h.base[stat] || 0) + 1;
   recalculate();
@@ -1581,7 +1645,7 @@ function isTierUnlocked(tier) {
 
 function recalculate() {
   const h = state.hero;
-  const total = { ...h.base };
+  const total = { atk: 0, def: 0, vit: 0, agi: 0, int: 0, ...h.base };
   Object.values(h.equipment).forEach(item => {
     if (!item) return;
     Object.entries(item.stats).forEach(([k, v]) => {
@@ -1592,13 +1656,18 @@ function recalculate() {
   getPickedTalents().forEach(talent => {
     if (talent.type === 'passive' && talent.effect) {
       Object.entries(talent.effect).forEach(([k, v]) => {
-        if (typeof v === 'number' && ['atk', 'def', 'vit', 'agi'].includes(k)) {
+        if (typeof v === 'number' && ['atk', 'def', 'vit', 'agi', 'int'].includes(k)) {
           total[k] += v;
         }
       });
     }
   });
+  // LIFE (vit) contributes to defense — folds DEF and LIFE together so the
+  // user-facing model is "Life = HP + defense" while existing items/talents
+  // that grant DEF keep working as additional armor.
+  total.def = (total.def || 0) + Math.floor((total.vit || 0) * 0.5);
   h.stats = total;
+  // HP from VIT (Life)
   const newMax = total.vit * 5 + 20;
   if (!h.maxHp) {
     h.maxHp = newMax; h.hp = newMax;
@@ -1606,6 +1675,15 @@ function recalculate() {
     const ratio = h.hp / h.maxHp;
     h.maxHp = newMax;
     h.hp = Math.min(h.maxHp, Math.max(1, Math.floor(h.maxHp * ratio)));
+  }
+  // MP from INT (Intellect)
+  const newMaxMp = total.int * 3 + 20;
+  if (!h.maxMp) {
+    h.maxMp = newMaxMp; h.mp = newMaxMp;
+  } else {
+    const mpRatio = h.mp / h.maxMp;
+    h.maxMp = newMaxMp;
+    h.mp = Math.min(h.maxMp, Math.max(0, Math.floor(h.maxMp * mpRatio)));
   }
 }
 
@@ -1650,6 +1728,19 @@ function renderHero() {
   document.getElementById('hp-bar').style.width = hpPct + '%';
   document.getElementById('hp-text').textContent = `${h.hp} / ${h.maxHp} HP`;
 
+  // Mana bar: only shown if the hero actually has any (INT > 0 grants mana).
+  const mpWrap = document.getElementById('mp-bar-wrap');
+  if (mpWrap) {
+    if (h.maxMp && h.maxMp > 0) {
+      mpWrap.classList.remove('hidden');
+      const mpPct = (h.mp / h.maxMp) * 100;
+      document.getElementById('mp-bar').style.width = mpPct + '%';
+      document.getElementById('mp-text').textContent = `${h.mp} / ${h.maxMp} MP`;
+    } else {
+      mpWrap.classList.add('hidden');
+    }
+  }
+
   const atCap = h.level >= MAX_LEVEL;
   const xpPct = atCap ? 100 : (h.xpNext > 0 ? (h.xp / h.xpNext) * 100 : 0);
   document.getElementById('xp-bar').style.width = xpPct + '%';
@@ -1660,10 +1751,11 @@ function renderHero() {
   const grid = document.getElementById('stats-grid');
   const canSpend = (h.statPoints || 0) > 0;
   const rows = [
-    { key: 'atk', label: 'Attack', val: h.stats.atk },
-    { key: 'def', label: 'Defense', val: h.stats.def },
-    { key: 'vit', label: 'Vitality', val: h.stats.vit },
-    { key: 'agi', label: 'Agility', val: h.stats.agi }
+    { key: 'atk', label: 'Strength', val: h.stats.atk },
+    { key: 'agi', label: 'Agility', val: h.stats.agi },
+    { key: 'int', label: 'Intellect', val: h.stats.int || 0 },
+    { key: 'vit', label: 'Life', val: h.stats.vit },
+    { key: 'def', label: 'Defense', val: h.stats.def }
   ];
   grid.innerHTML = rows.map(r => `
     <div class="stat-row">
@@ -2011,8 +2103,10 @@ function handleCompareAction(action) {
 
 function renderPve() {
   const list = document.getElementById('pve-list');
-  list.innerHTML = MONSTERS.map((m, idx) => {
-    const power = m.atk + m.def + Math.floor(m.vit / 4) + m.agi;
+  const heroLevel = state.hero ? state.hero.level : 1;
+  list.innerHTML = MONSTERS.map((tpl, idx) => {
+    const m = scaleMonster(tpl, heroLevel);
+    const power = m.atk + m.def + Math.floor(m.vit / 4) + m.agi + Math.floor((m.int || 0) / 2);
     return `<div class="enemy-card" data-monster="${idx}">
       <div class="enemy-info">
         <div class="enemy-name">${m.name}</div>
@@ -2023,7 +2117,8 @@ function renderPve() {
   }).join('');
   list.querySelectorAll('[data-monster]').forEach(el => {
     el.addEventListener('click', () => {
-      startCombat({ ...MONSTERS[parseInt(el.dataset.monster)] }, 'pve');
+      const tpl = MONSTERS[parseInt(el.dataset.monster)];
+      startCombat(scaleMonster(tpl, heroLevel), 'pve');
     });
   });
 }
@@ -2037,6 +2132,15 @@ function generatePvpOpponents() {
     const raceKey = cls.race;
     const r = RACES[raceKey];
     const lvl = Math.max(1, state.hero.level + Math.floor(Math.random() * 3) - 1);
+    // Pick one talent per unlocked tier (random choice between the two options)
+    const talentPicks = {};
+    cls.talentTree.forEach((options, idx) => {
+      const tier = idx + 1;
+      if (TIER_UNLOCKS[idx] <= lvl) {
+        const pick = options[Math.floor(Math.random() * options.length)];
+        talentPicks[tier] = pick.key;
+      }
+    });
     state.pvpOpponents.push({
       name: PVP_NAMES[Math.floor(Math.random() * PVP_NAMES.length)],
       race: raceKey, class: clsKey, level: lvl,
@@ -2044,6 +2148,8 @@ function generatePvpOpponents() {
       def: cls.base.def + r.mods.def + lvl * 1,
       vit: cls.base.vit + r.mods.vit + lvl * 2,
       agi: cls.base.agi + r.mods.agi + lvl,
+      int: 5 + lvl, // baseline INT for spellcasting opponents
+      talentPicks,
       gold: [20 * lvl, 40 * lvl],
       xp: lvl * 30,
       isPlayer: true
@@ -2129,7 +2235,8 @@ function buildFighter(source, isHero) {
     name: source.name,
     isHero,
     hp: 0, maxHp: 0,
-    atk: 0, def: 0, agi: 0,
+    mp: 0, maxMp: 0,
+    atk: 0, def: 0, agi: 0, int: 0,
     race: source.race, class: source.class,
     abilities: [], cooldowns: {},
     statusBuffs: [], dots: [],
@@ -2141,8 +2248,11 @@ function buildFighter(source, isHero) {
     f.atk = source.stats.atk;
     f.def = source.stats.def;
     f.agi = source.stats.agi;
+    f.int = source.stats.int || 0;
     f.maxHp = source.maxHp;
     f.hp = source.hp;
+    f.maxMp = source.maxMp || 0;
+    f.mp = source.mp || 0;
     f.abilities = getActiveAbilities();
     const bonuses = getAllPassiveBonuses();
     f.critBonus += bonuses.critBonus;
@@ -2152,6 +2262,9 @@ function buildFighter(source, isHero) {
     f.savior = bonuses.savior;
     f.doubleMutate = bonuses.doubleMutate;
     f.passiveOverrides = bonuses.overrides;
+    // AGI gives a small permanent crit + dodge bonus
+    f.critBonus += (f.agi || 0) * 0.005;
+    f.dodgeBase = (f.dodgeBase || 0) + (f.agi || 0) * 0.003;
     // Equipment effects
     Object.values(source.equipment).forEach(item => {
       if (!item || !item.effect) return;
@@ -2171,8 +2284,45 @@ function buildFighter(source, isHero) {
     f.atk = source.atk;
     f.def = source.def;
     f.agi = source.agi;
+    f.int = source.int || 0;
     f.maxHp = source.vit * 4 + 25;
     f.hp = f.maxHp;
+    f.maxMp = (source.int || 0) * 3 + 20;
+    f.mp = f.maxMp;
+    // AGI bonuses also apply to non-heroes
+    f.critBonus += (f.agi || 0) * 0.005;
+    f.dodgeBase = (f.dodgeBase || 0) + (f.agi || 0) * 0.003;
+    // Build ability list:
+    // - PvP opponents: resolve from class talentTree + talentPicks
+    // - PvE monsters: use the source.abilities array of MONSTER_ABILITIES entries
+    if (source.isPlayer && source.talentPicks && source.class) {
+      const cls = CLASSES[source.class];
+      f.abilities = [];
+      Object.entries(source.talentPicks).forEach(([tier, key]) => {
+        const opts = cls.talentTree[parseInt(tier) - 1];
+        if (!opts) return;
+        const opt = opts.find(o => o.key === key);
+        if (opt && opt.type === 'active') f.abilities.push(opt);
+        // Also collect passive bonuses for the AI opponent
+        if (opt && opt.type === 'passive' && opt.effect) {
+          if (opt.effect.critBonus) f.critBonus += opt.effect.critBonus;
+          if (opt.effect.regen) f.regenBase += opt.effect.regen;
+          if (opt.effect.dmgReduce) f.flatDmgReduce += opt.effect.dmgReduce;
+          if (opt.effect.lifesteal) f.lifestealBase += opt.effect.lifesteal;
+          if (opt.effect.savior) f.savior = true;
+          ['atk', 'def', 'vit', 'agi', 'int'].forEach(s => {
+            if (typeof opt.effect[s] === 'number') f[s] += opt.effect[s];
+          });
+        }
+      });
+      // Recompute HP/MP with applied talents
+      f.maxHp = (source.vit + (f.vitBonus || 0)) * 4 + 25;
+      f.hp = f.maxHp;
+      f.maxMp = f.int * 3 + 20;
+      f.mp = f.maxMp;
+    } else if (source.abilities && source.abilities.length) {
+      f.abilities = source.abilities.slice();
+    }
   }
   return f;
 }
@@ -2275,6 +2425,11 @@ async function resolveCombat(enemy, mode, log, token) {
 async function tickStartOfTurn(f, opponent, log) {
   if (f.hp <= 0) return;
 
+  // Mana regen (silent — no log spam, just refills)
+  if (f.maxMp > 0 && f.mp < f.maxMp) {
+    f.mp = Math.min(f.maxMp, (f.mp || 0) + 5);
+  }
+
   // Regen
   if (f.regenBase > 0 && f.hp < f.maxHp) {
     const amt = f.regenBase;
@@ -2376,9 +2531,10 @@ async function takeAction(attacker, defender, log) {
     return;
   }
 
-  // Choose ability (heroes prioritise abilities; foes fall back to basic attack)
+  // Choose ability: both heroes and AI fighters now use their pool when
+  // available. Falls back to a basic attack if none are off-cooldown / affordable.
   let abilityToUse = null;
-  if (attacker.isHero && attacker.abilities.length > 0) {
+  if (attacker.abilities && attacker.abilities.length > 0) {
     abilityToUse = chooseAbility(attacker, defender);
   }
 
@@ -2390,23 +2546,26 @@ async function takeAction(attacker, defender, log) {
 }
 
 function chooseAbility(attacker, defender) {
-  // Priority logic: heals if low HP, executes if enemy low HP, otherwise highest damage
-  const available = attacker.abilities.filter(a => !attacker.cooldowns[a.key]);
+  // Priority logic: heals if low HP, executes if enemy low HP, otherwise highest damage.
+  // Also respects mana costs and cooldowns. Falls back to null = basic attack.
+  const available = attacker.abilities.filter(a => {
+    if (attacker.cooldowns[a.key]) return false;
+    const mpCost = abilityMpCost(a, attacker.class);
+    if (mpCost > 0 && (attacker.mp || 0) < mpCost) return false;
+    return true;
+  });
   if (available.length === 0) return null;
 
   const hpPct = attacker.hp / attacker.maxHp;
   const defHpPct = defender.hp / defender.maxHp;
 
-  // Heal if low
   if (hpPct < 0.5) {
     const heal = available.find(a => a.ability.heal);
     if (heal) return heal;
   }
-  // Execute opportunity
   const exec = available.find(a => a.ability.execThreshold && defHpPct < a.ability.execThreshold);
   if (exec) return exec;
 
-  // Random damaging ability or buff
   const damaging = available.filter(a => a.ability.dmgMult || a.ability.multiHit);
   if (damaging.length > 0) {
     return damaging[Math.floor(Math.random() * damaging.length)];
@@ -2414,10 +2573,42 @@ function chooseAbility(attacker, defender) {
   return available[Math.floor(Math.random() * available.length)];
 }
 
+// Classes whose toolkit is treated as magical by default. Their active
+// talents cost mana even without an explicit school tag.
+const MAGICAL_CLASSES = new Set(['cleric', 'druid', 'shaman', 'priest', 'chaos']);
+
+function isTalentMagical(talent, attackerClass) {
+  const a = talent.ability || {};
+  if (talent.school === 'magical' || a.magical === true) return true;
+  if (a.trueDmg === true) return true;
+  if (a.heal) return true; // heals always magical
+  if (a.cleanse) return true;
+  if (attackerClass && MAGICAL_CLASSES.has(attackerClass)) return true;
+  return false;
+}
+
+// Mana cost helper. Magical abilities cost mana scaled with their power.
+// Melee/physical abilities cost nothing.
+function abilityMpCost(talent, attackerClass) {
+  if (!isTalentMagical(talent, attackerClass)) return 0;
+  const a = talent.ability || {};
+  let cost = 6;
+  if (a.dmgMult) cost += Math.floor((Array.isArray(a.dmgMult) ? a.dmgMult[1] : a.dmgMult) * 2);
+  if (a.multiHit) cost += a.multiHit;
+  if (a.dot) cost += 2;
+  if (a.heal) cost += Math.floor(a.heal * 10);
+  return cost;
+}
+
 async function executeAbility(attacker, defender, talent, log) {
   const a = talent.ability;
   attacker.cooldowns[talent.key] = a.cd + 1;
-  appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}!</span>`);
+  // Spend mana for magical abilities
+  const magical = isTalentMagical(talent, attacker.class);
+  const mpCost = abilityMpCost(talent, attacker.class);
+  if (mpCost > 0) attacker.mp = Math.max(0, (attacker.mp || 0) - mpCost);
+  const tag = magical ? ' ✦' : '';
+  appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}${tag}!</span>`);
   await sleep(380);
 
   // Heal
@@ -2432,6 +2623,7 @@ async function executeAbility(attacker, defender, talent, log) {
   // Damage hits
   if (a.dmgMult !== undefined || a.multiHit) {
     const hits = a.multiHit || 1;
+    const isMagical = magical;
     for (let i = 0; i < hits; i++) {
       await doDamage(attacker, defender, log, {
         mult: Array.isArray(a.dmgMult) ? randRange(a.dmgMult[0], a.dmgMult[1]) : (a.dmgMult || 1),
@@ -2443,6 +2635,7 @@ async function executeAbility(attacker, defender, talent, log) {
         execThreshold: a.execThreshold,
         defAsDmg: a.defAsDmg,
         missChance: a.missChance,
+        magical: isMagical, // scales damage from INT instead of ATK
         abilityLabel: talent.name
       });
       if (defender.hp <= 0 || attacker.hp <= 0) break;
@@ -2555,8 +2748,15 @@ async function doDamage(attacker, defender, log, opts) {
     return;
   }
 
-  // Base damage
-  let baseAtk = attacker.atk;
+  // Base damage — magical attacks scale from INT, physical from ATK (Strength).
+  // If INT is 0 (no Intellect investment) magical hits fall back to ATK so it
+  // at least does something instead of being a wet noodle.
+  let baseAtk;
+  if (opts.magical && attacker.int && attacker.int > 0) {
+    baseAtk = attacker.int;
+  } else {
+    baseAtk = attacker.atk;
+  }
   const rp = getRacePassive(attacker);
   if (rp && rp.key === 'orcFury' && attacker.hp / attacker.maxHp < 0.5) {
     baseAtk = Math.floor(baseAtk * 1.3);
@@ -2777,6 +2977,9 @@ function finishVictory(enemy, mode, log, heroFighter) {
     state.hero.xpNext = 0;
   }
   recalculate();
+  // Fully restore HP between fights so the next combat starts fresh.
+  state.hero.hp = state.hero.maxHp;
+  if (state.hero.maxMp) state.hero.mp = state.hero.maxMp;
   if (mode === 'pvp') generatePvpOpponents();
   saveGame();
 }
@@ -2787,8 +2990,10 @@ function finishDefeat(log, draw) {
   } else {
     appendLog(log, `<div class="log-defeat">— DEFEAT —</div>`);
   }
-  state.hero.hp = Math.max(1, Math.floor(state.hero.maxHp * 0.15));
-  appendLog(log, `<div style="text-align:center; font-style:italic; color:var(--text-dim); padding:8px;">You wake wounded. You've recovered just enough to breathe.</div>`);
+  // Even on defeat / draw, HP refills between fights — combat is the loop.
+  state.hero.hp = state.hero.maxHp;
+  if (state.hero.maxMp) state.hero.mp = state.hero.maxMp;
+  appendLog(log, `<div style="text-align:center; font-style:italic; color:var(--text-dim); padding:8px;">You wake fully healed. The next fight awaits.</div>`);
   saveGame();
 }
 

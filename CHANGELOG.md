@@ -6,6 +6,51 @@
 
 ---
 
+## Session 4 — 2026-05-18 — HP refill + monster scaling + enemy AI + Phase C (INT, mana, magical)
+
+### Fixes
+- **HP / MP refills to 100% after every fight** (win, lose, draw). Combat is the loop — downtime between fights doesn't exist any more.
+
+### Monsters scale with hero level
+- `MONSTERS` table reshaped: each entry has a `tier` (1-10) and base stats. `scaleMonster(template, heroLevel)` computes effective level = `max(tier, heroLevel - (10 - tier))` and applies `+18% stats per level` over the tier. Easier-tier creatures stay easier; the dragon stays the toughest; everything stays relevant past level 10.
+- Gold and XP rewards scale with effective level.
+
+### Enemy AI uses abilities (PvE + PvP)
+- New `MONSTER_ABILITIES` table: per-monster ability sets (e.g. Ogre has `smash` + `roar_fear`; Lich has `arcane_bolt`, `curse`, `drain_life`; Dragon has `fire_breath`, `tail_swipe`, `dragon_roar`).
+- `buildFighter` for non-heroes now installs `abilities`: from monster's template for PvE, or resolved from PvP opponent's random `talentPicks` from their class talent tree.
+- PvP generation: each opponent rolls one talent per unlocked tier (random A/B); both passive bonuses (stats/regen/crit/etc.) and active abilities get applied to their fighter.
+- `takeAction` now lets BOTH heroes and AI fighters use `chooseAbility`.
+
+### Phase C — Intellect + Mana + Magical damage
+- **New stat: INT (Intellect)**. Added to `hero.base.int`, scales magical damage, and grows mana pool.
+- **Mana pool**: `maxMp = INT * 3 + 20`. Regen +5/turn (silent — no log spam). Magical abilities consume mana with a cost scaled to the ability's power. If MP is too low, the ability is skipped (basic attack fallback).
+- **Magical detection**: `isTalentMagical(talent, attackerClass)` — explicit `school: 'magical'` / `ability.magical` / `trueDmg` / `heal` / `cleanse` count, plus everything from magical-leaning classes (Cleric, Druid, Shaman, Stone Priest, Chaos Shifter).
+- **Damage formula**: magical attacks scale from INT (`baseAtk = attacker.int`); melee from ATK (Strength). Falls back to ATK if INT is 0 so non-mages aren't crippled.
+- **AGI bonuses**: every point of Agility now also gives **+0.5% crit** and **+0.3% dodge** (applied at fighter build time, applies to both heroes and AI).
+- **LIFE bonus**: Vitality now contributes `+0.5 DEF per point` (folded into the user-facing "Life = HP + defense" model). Existing items/talents that grant DEF still stack as raw armor.
+- **Stat point allocation**: INT is the 5th option in the attribute panel (`+` button works on it).
+- **Class base INT** added: Cleric 12, Shaman 11, Druid 10, Priest 10, Chaos 10 (magic-focused) · Devourer/Engineer 6 (hybrid) · Stalker/Archer/Hunter 3-4 · pure melee 2-3.
+
+### UI
+- HP and MP bars in the Hero panel header. MP bar auto-hides for heroes with no Intellect / no mana pool.
+- Attribute panel relabeled: **Strength** (atk), **Agility** (agi), **Intellect** (int — new), **Life** (vit), **Defense** (def).
+- Magical abilities are marked in combat log with a `✦` next to the name (`X uses Smite ✦!`).
+
+### Migration
+- Older saves get `hero.base.int` injected (uses class's `baseInt` if set, else 5).
+- `maxMp` / `mp` initialised to 0 then recomputed on first `recalculate()`.
+- All existing fighters, items, classes still work — no item/class data needed to change for Phase C beyond adding INT.
+
+### Files touched
+- `index.html` only.
+
+### Known follow-ups
+- Items don't roll INT in the current pool — could add a few INT-focused items (caster gear) in a follow-up.
+- The Defense row is still shown on the Hero tab; if the user wants to fully hide DEF and merge into Life visually, that's a small UI tweak.
+- `app.css` doesn't exist (single file) but if we ever modularise we'll move the `bar-fill.mp` style there.
+
+---
+
 ## Session 3 (continued) — 2026-05-18 — Phase 3: talent tree rework (300 talents)
 
 ### Goal
@@ -99,6 +144,7 @@ All 15 classes redesigned around 10-tier flow:
 - Deployed to GitHub Pages ✅
 - Session 3 part 1: gear expansion (9 slots) + Bag redesign + compare popup ✅
 - Session 3 part 2: talent tree rework (300 talents, 10 tiers, mutual exclusion) ✅
+- Session 4: HP refill, monster scaling, enemy AI (PvE + PvP), Phase C (INT, mana, magical damage) ✅
 
 ### Re-deploy workflow (already automatic)
 ```bash
