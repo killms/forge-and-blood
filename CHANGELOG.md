@@ -6,6 +6,36 @@
 
 ---
 
+## Session 5 — 2026-05-18 — INT items + visible rarity borders
+
+### Caster gear (32 new items)
+Added INT-bearing items across every slot and rarity tier:
+- **Weapons (6)**: Apprentice Wand → Lich's Phylactery (common→legendary). High-INT weapons make Cleric/Druid/Shaman/etc. far stronger.
+- **Helms (5)**: Hood of Insight → Halo of Stars.
+- **Amulets (5)**: Pendant of Wisdom → Soul of the Archmage.
+- **Rings (5)**: Sigil Ring → Crown of the Archon.
+- **Vests (5)**: Apprentice Robes → Robes of the Archmage.
+- **Pants (5)**: Mage Trousers → Pants of the Archmage.
+
+Many carry INT + secondary stats (def/vit/atk) and effects (burn, crit, regen, dodge, lifesteal).
+
+### Rarity colours now visible at a glance
+- Items used to only show colour on the name. Now the entire **inventory card**, **equipment slot** (when filled), and **compare modal cell** all get a coloured border based on rarity:
+  - Common: subtle grey
+  - Uncommon: green
+  - Rare: blue (+ soft glow)
+  - Epic: purple (stronger glow)
+  - Legendary: orange (animated pulse)
+- New CSS classes `.rarity-common` / `.rarity-uncommon` / `.rarity-rare` / `.rarity-epic` / `.rarity-legendary` applied alongside existing `.r-*` name colours.
+
+### Loot
+- Drops stay **random/global** (no per-class filtering — user explicitly said "o loot nao quero por class").
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 4 — 2026-05-18 — HP refill + monster scaling + enemy AI + Phase C (INT, mana, magical)
 
 ### Fixes

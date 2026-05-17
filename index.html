@@ -242,6 +242,22 @@
   .r-rare { color: var(--rare); }
   .r-epic { color: var(--epic); }
   .r-legendary { color: var(--legendary); text-shadow: 0 0 8px rgba(232,149,48,0.4); }
+
+  /* Rarity borders on item cards / slots / compare cells.
+     The colour name on the item name still adds a second cue. */
+  .rarity-common    { border-color: rgba(176,168,144,0.55); }
+  .rarity-uncommon  { border-color: var(--uncommon); }
+  .rarity-rare      { border-color: var(--rare); box-shadow: 0 0 6px rgba(74,143,214,0.25); }
+  .rarity-epic      { border-color: var(--epic); box-shadow: 0 0 8px rgba(168,95,214,0.35); }
+  .rarity-legendary {
+    border-color: var(--legendary);
+    box-shadow: 0 0 12px rgba(232,149,48,0.55);
+    animation: legendary-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes legendary-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(232,149,48,0.45); }
+    50%      { box-shadow: 0 0 18px rgba(232,149,48,0.75); }
+  }
   .inv-list { display: grid; gap: 6px; max-height: 400px; overflow-y: auto; }
   .inv-item {
     background: var(--bg-deep); border: 1px solid var(--border);
@@ -1213,7 +1229,45 @@ const ITEM_POOL = [
   { slot: 'pants', name: 'Stalker Leggings', rarity: 'rare', stats: { def: 3, agi: 5 }, effect: { type: 'dodge', val: 0.07, desc: '7% dodge' } },
   { slot: 'pants', name: 'Plated Greaves', rarity: 'rare', stats: { def: 6, vit: 3 } },
   { slot: 'pants', name: 'Wyrmscale Pants', rarity: 'epic', stats: { def: 7, vit: 4, atk: 2 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
-  { slot: 'pants', name: 'Legs of the Titan', rarity: 'legendary', stats: { def: 9, vit: 8 }, effect: { type: 'thorns', val: 6, desc: 'Thorns: returns 6 damage' } }
+  { slot: 'pants', name: 'Legs of the Titan', rarity: 'legendary', stats: { def: 9, vit: 8 }, effect: { type: 'thorns', val: 6, desc: 'Thorns: returns 6 damage' } },
+
+  // INT / caster gear — magical weapons, regalia, rings, robes
+  { slot: 'weapon', name: 'Apprentice Wand', rarity: 'common', stats: { atk: 2, int: 3 } },
+  { slot: 'weapon', name: 'Initiate Staff', rarity: 'uncommon', stats: { atk: 3, int: 5 } },
+  { slot: 'weapon', name: 'Spellblade', rarity: 'rare', stats: { atk: 5, int: 6 }, effect: { type: 'burn', val: 3, desc: 'Burn: 3 damage/turn' } },
+  { slot: 'weapon', name: 'Tome of Embers', rarity: 'rare', stats: { atk: 2, int: 9 }, effect: { type: 'burn', val: 5, desc: 'Burn: 5 damage/turn' } },
+  { slot: 'weapon', name: 'Archmage Scepter', rarity: 'epic', stats: { atk: 6, int: 11 }, effect: { type: 'crit', val: 0.12, desc: '+12% crit' } },
+  { slot: 'weapon', name: "Lich's Phylactery", rarity: 'legendary', stats: { atk: 8, int: 15, vit: 4 }, effect: { type: 'lifesteal', val: 0.18, desc: '18% lifesteal' } },
+
+  { slot: 'helm', name: 'Hood of Insight', rarity: 'common', stats: { def: 1, int: 2 } },
+  { slot: 'helm', name: 'Mystic Cap', rarity: 'uncommon', stats: { def: 2, int: 3 } },
+  { slot: 'helm', name: 'Crown of Knowledge', rarity: 'rare', stats: { def: 3, int: 5 } },
+  { slot: 'helm', name: 'Diadem of the Magi', rarity: 'epic', stats: { def: 4, int: 8 }, effect: { type: 'crit', val: 0.10, desc: '+10% crit' } },
+  { slot: 'helm', name: 'Halo of Stars', rarity: 'legendary', stats: { def: 5, int: 12, vit: 4 }, effect: { type: 'regen', val: 4, desc: 'Regenerates 4 HP/turn' } },
+
+  { slot: 'amulet', name: 'Pendant of Wisdom', rarity: 'common', stats: { int: 3 } },
+  { slot: 'amulet', name: 'Talisman of Mind', rarity: 'uncommon', stats: { int: 4, vit: 1 } },
+  { slot: 'amulet', name: 'Amulet of Arcana', rarity: 'rare', stats: { int: 6, atk: 2 } },
+  { slot: 'amulet', name: 'Eye of the Beholder', rarity: 'epic', stats: { int: 9, atk: 4, vit: 3 }, effect: { type: 'crit', val: 0.12, desc: '+12% crit' } },
+  { slot: 'amulet', name: 'Soul of the Archmage', rarity: 'legendary', stats: { int: 14, atk: 6, vit: 5 }, effect: { type: 'burn', val: 5, desc: 'Burn: 5 damage/turn' } },
+
+  { slot: 'ring', name: 'Sigil Ring', rarity: 'common', stats: { int: 2 } },
+  { slot: 'ring', name: 'Band of Ether', rarity: 'uncommon', stats: { int: 3, atk: 1 } },
+  { slot: 'ring', name: 'Arcane Coil', rarity: 'rare', stats: { int: 5, def: 2 }, effect: { type: 'crit', val: 0.10, desc: '+10% crit' } },
+  { slot: 'ring', name: 'Loop of the Old Magic', rarity: 'epic', stats: { int: 8, atk: 3 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
+  { slot: 'ring', name: 'Crown of the Archon', rarity: 'legendary', stats: { int: 12, atk: 5, vit: 3 }, effect: { type: 'lifesteal', val: 0.12, desc: '12% lifesteal' } },
+
+  { slot: 'vest', name: 'Apprentice Robes', rarity: 'common', stats: { def: 1, int: 2 } },
+  { slot: 'vest', name: 'Initiate Robes', rarity: 'uncommon', stats: { def: 2, int: 4, agi: 1 } },
+  { slot: 'vest', name: 'Robes of Concentration', rarity: 'rare', stats: { def: 3, int: 6 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
+  { slot: 'vest', name: 'Vestment of the Magi', rarity: 'epic', stats: { def: 4, int: 9, vit: 3 }, effect: { type: 'crit', val: 0.10, desc: '+10% crit' } },
+  { slot: 'vest', name: 'Robes of the Archmage', rarity: 'legendary', stats: { def: 6, int: 14, vit: 5 }, effect: { type: 'dodge', val: 0.10, desc: '10% dodge' } },
+
+  { slot: 'pants', name: 'Mage Trousers', rarity: 'common', stats: { def: 1, int: 2 } },
+  { slot: 'pants', name: 'Spellcaster Leggings', rarity: 'uncommon', stats: { def: 2, int: 4 } },
+  { slot: 'pants', name: 'Leggings of the Mind', rarity: 'rare', stats: { def: 3, int: 6 } },
+  { slot: 'pants', name: 'Leggings of the Magi', rarity: 'epic', stats: { def: 5, int: 9, vit: 3 }, effect: { type: 'regen', val: 3, desc: 'Regenerates 3 HP/turn' } },
+  { slot: 'pants', name: 'Pants of the Archmage', rarity: 'legendary', stats: { def: 7, int: 13, vit: 5 }, effect: { type: 'crit', val: 0.08, desc: '+8% crit' } }
 ];
 
 // Monsters define a "tier" (relative difficulty) and base stats at tier level.
@@ -1804,7 +1858,8 @@ function renderHero() {
   const eq = document.getElementById('equipment');
   eq.innerHTML = SLOT_ORDER.map(key => {
     const item = h.equipment[key];
-    return `<div class="slot" data-slot="${key}">
+    const rarityCls = item ? `rarity-${item.rarity}` : '';
+    return `<div class="slot ${rarityCls}" data-slot="${key}">
       <div class="slot-label">${SLOT_LABELS[key]}</div>
       ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
     </div>`;
@@ -1910,7 +1965,8 @@ function renderInventory() {
     const h = state.hero;
     eqPanel.innerHTML = SLOT_ORDER.map(key => {
       const item = h.equipment[key];
-      return `<div class="slot" data-bagslot="${key}">
+      const rarityCls = item ? `rarity-${item.rarity}` : '';
+      return `<div class="slot ${rarityCls}" data-bagslot="${key}">
         <div class="slot-label">${SLOT_LABELS[key]}</div>
         ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
       </div>`;
@@ -1936,7 +1992,7 @@ function renderInventory() {
   list.innerHTML = state.hero.inventory.map((item, idx) => {
     const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
     const slotLabel = item.slot === 'ring' ? 'Ring' : (SLOT_LABELS[item.slot] || item.slot);
-    return `<div class="inv-item" data-idx="${idx}">
+    return `<div class="inv-item rarity-${item.rarity}" data-idx="${idx}">
       <div class="inv-item-header">
         <span class="inv-item-name r-${item.rarity}">${item.name}</span>
         <span class="inv-item-slot">${slotLabel}</span>
@@ -1968,7 +2024,8 @@ function resolveEquipTargets(item) {
 }
 
 function renderItemCell(item, labelText, isNew) {
-  const cls = isNew ? 'compare-cell new' : 'compare-cell';
+  let cls = isNew ? 'compare-cell new' : 'compare-cell';
+  if (item) cls += ` rarity-${item.rarity}`;
   if (!item) {
     return `<div class="${cls}">
       <div class="compare-cell-label">${labelText}</div>
