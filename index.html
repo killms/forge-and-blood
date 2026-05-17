@@ -42,6 +42,40 @@
     cursor: pointer; transition: all 0.2s;
   }
   .tab.active { background: var(--border); color: var(--gold-bright); }
+
+  /* Shop tab */
+  .shop-intro {
+    font-style: italic; color: var(--text-dim); font-size: 13px;
+    margin-bottom: 16px; padding: 8px 10px;
+    background: rgba(201,165,87,0.06); border-left: 3px solid var(--gold);
+  }
+  .shop-offer {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px;
+  }
+  .shop-offer-info { flex: 1; }
+  .shop-offer-name {
+    font-family: 'Cinzel', serif; font-size: 14px;
+    color: var(--gold-bright); margin-bottom: 4px;
+  }
+  .shop-offer-desc { font-size: 12px; color: var(--text-dim); font-style: italic; }
+  .shop-offer-price {
+    font-family: 'Cinzel', serif; color: var(--gold-bright);
+    background: var(--bg); padding: 8px 12px; border: 1px solid var(--gold);
+    cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .shop-offer-price:hover { background: var(--gold); color: var(--bg); }
+  .shop-offer-price:disabled, .shop-offer-price.disabled {
+    opacity: 0.4; cursor: not-allowed;
+  }
+  .shop-purchase-result {
+    margin-top: 12px; padding: 12px;
+    background: rgba(201,165,87,0.08); border: 1px solid var(--gold);
+    text-align: center; font-family: 'Cinzel', serif; font-size: 14px;
+  }
   .panel {
     background: var(--bg-panel); border: 1px solid var(--border);
     padding: 16px; margin-bottom: 12px; position: relative;
@@ -346,6 +380,26 @@
     padding: 16px; max-width: 460px; width: 100%;
     box-shadow: 0 0 30px rgba(201,165,87,0.25);
     position: relative;
+    max-height: 92vh; overflow-y: auto;
+  }
+  .modal-panel-wide { max-width: 520px; }
+  .slot-picker-current {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px; margin: 8px 0 12px;
+  }
+  .slot-picker-current.has-item { border-color: var(--gold); }
+  .slot-picker-list-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 2px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .slot-picker-current-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 4px;
+  }
+  .slot-picker-empty-note {
+    color: var(--text-dim); font-style: italic; font-size: 13px;
+    text-align: center; padding: 18px;
   }
   .modal-panel::before {
     content: ''; position: absolute; top: -1px; left: -1px; right: -1px;
@@ -395,10 +449,50 @@
     color: var(--text-dim);
   }
   .btn-cancel:hover { background: var(--border); color: var(--text); }
-  .auto-close-note {
-    text-align: center; color: var(--text-dim); font-style: italic;
-    font-size: 12px; padding: 10px 0 4px;
+  .btn-sell {
+    background: var(--bg-deep); border-color: var(--gold);
+    color: var(--gold);
   }
+  .btn-sell:hover { background: var(--gold); color: var(--bg); }
+  /* Combat summary panel — shown when a fight ends, no auto-close */
+  .combat-summary {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .summary-verdict {
+    font-family: 'Cinzel', serif; font-size: 18px;
+    letter-spacing: 4px; text-align: center;
+    padding: 6px 0; margin-bottom: 4px;
+  }
+  .verdict-win  { color: var(--gold-bright); text-shadow: 0 0 12px rgba(201,165,87,0.45); }
+  .verdict-loss { color: var(--blood-bright); }
+  .verdict-draw { color: var(--text-dim); }
+  .summary-meta {
+    text-align: center; font-style: italic; font-size: 12px;
+    color: var(--text-dim); margin-bottom: 10px;
+  }
+  .summary-table-wrap { margin-bottom: 10px; }
+  .summary-table-title {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 2px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .summary-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--bg-deep); border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .summary-table th, .summary-table td {
+    padding: 6px 10px;
+    border-bottom: 1px dashed rgba(74,56,38,0.5);
+  }
+  .summary-table th {
+    text-align: right; font-family: 'Cinzel', serif;
+    font-size: 11px; letter-spacing: 1px; color: var(--gold);
+  }
+  .summary-table th:first-child { text-align: left; }
+  .summary-table td.metric-label { color: var(--text-dim); }
+  .summary-table td.metric-val { text-align: right; color: var(--text); font-weight: 600; }
 
   /* Talent Tree */
   .talent-header {
@@ -527,6 +621,7 @@
       <button class="tab active" data-tab="hero">HERO</button>
       <button class="tab" data-tab="talents">TALENTS</button>
       <button class="tab" data-tab="inventory">BAG</button>
+      <button class="tab" data-tab="shop">SHOP</button>
       <button class="tab" data-tab="pve">HUNT</button>
       <button class="tab" data-tab="pvp">ARENA</button>
     </div>
@@ -605,6 +700,14 @@
       </div>
     </div>
 
+    <div id="tab-shop" class="tab-content hidden">
+      <div class="panel">
+        <div class="section-title">Merchant</div>
+        <div class="shop-intro">A weathered trader. Coin for sealed crates of fate.</div>
+        <div id="shop-list"></div>
+      </div>
+    </div>
+
     <div id="tab-pve" class="tab-content hidden">
       <div class="panel">
         <div class="section-title">Creatures to Hunt</div>
@@ -625,6 +728,18 @@
         <div class="section-title">Equip Item?</div>
         <div id="compare-body"></div>
         <div class="modal-actions" id="compare-actions"></div>
+      </div>
+    </div>
+
+    <div id="slot-picker-modal" class="modal-overlay hidden">
+      <div class="modal-panel modal-panel-wide">
+        <div class="section-title" id="slot-picker-title">Pick gear</div>
+        <div id="slot-picker-current"></div>
+        <div class="slot-picker-list-label">Available in bag</div>
+        <div class="inv-list" id="slot-picker-list"></div>
+        <div class="modal-actions">
+          <button class="btn btn-cancel" id="slot-picker-cancel">CLOSE</button>
+        </div>
       </div>
     </div>
 
@@ -649,7 +764,7 @@
           </div>
         </div>
         <div class="combat-log" id="combat-log"></div>
-        <div class="auto-close-note hidden" id="combat-autoclose">— returning to the world —</div>
+        <div class="combat-summary hidden" id="combat-summary"></div>
       </div>
     </div>
   </div>
@@ -1769,8 +1884,55 @@ function renderAll() {
   renderHero();
   renderTalents();
   renderInventory();
+  renderShop();
   renderPve();
   renderPvp();
+}
+
+// ============ SHOP ============
+function shopBuyPrice() {
+  // 50 base + 8 per hero level. Roughly 1-2 fights worth of gold mid-game.
+  return 50 + (state.hero ? state.hero.level : 1) * 8;
+}
+
+function renderShop() {
+  const list = document.getElementById('shop-list');
+  if (!list) return;
+  const price = shopBuyPrice();
+  const gold = state.hero ? state.hero.gold : 0;
+  const canAfford = gold >= price;
+  list.innerHTML = `
+    <div class="shop-offer">
+      <div class="shop-offer-info">
+        <div class="shop-offer-name">Sealed Crate</div>
+        <div class="shop-offer-desc">One random piece of gear. Rarity scales with your level.</div>
+      </div>
+      <button class="shop-offer-price ${canAfford ? '' : 'disabled'}" id="shop-buy-crate" ${canAfford ? '' : 'disabled'}>${price} ◊</button>
+    </div>
+    <div id="shop-result-mount"></div>
+  `;
+  const btn = document.getElementById('shop-buy-crate');
+  if (btn) btn.addEventListener('click', shopBuyCrate);
+}
+
+function shopBuyCrate() {
+  const h = state.hero;
+  if (!h) return;
+  const price = shopBuyPrice();
+  if (h.gold < price) return;
+  h.gold -= price;
+  const loot = rollLootByLevel(h.level);
+  h.inventory.push(loot);
+  saveGame();
+  // Render the result in place, then re-render the rest so gold/inventory update
+  renderAll();
+  const mount = document.getElementById('shop-result-mount');
+  if (mount) {
+    mount.innerHTML = `<div class="shop-purchase-result">
+      You unsealed: <span class="r-${loot.rarity}">✦ ${loot.name}</span>
+      <div style="font-size: 12px; font-style: italic; color: var(--text-dim); margin-top: 4px;">added to your bag</div>
+    </div>`;
+  }
 }
 
 function renderHero() {
@@ -1865,14 +2027,7 @@ function renderHero() {
     </div>`;
   }).join('');
   eq.querySelectorAll('[data-slot]').forEach(el => {
-    el.addEventListener('click', () => {
-      const slot = el.dataset.slot;
-      if (h.equipment[slot]) {
-        h.inventory.push(h.equipment[slot]);
-        h.equipment[slot] = null;
-        recalculate(); saveGame(); renderAll();
-      }
-    });
+    el.addEventListener('click', () => openSlotPicker(el.dataset.slot));
   });
 }
 
@@ -1972,14 +2127,7 @@ function renderInventory() {
       </div>`;
     }).join('');
     eqPanel.querySelectorAll('[data-bagslot]').forEach(el => {
-      el.addEventListener('click', () => {
-        const slot = el.dataset.bagslot;
-        if (h.equipment[slot]) {
-          h.inventory.push(h.equipment[slot]);
-          h.equipment[slot] = null;
-          recalculate(); saveGame(); renderAll();
-        }
-      });
+      el.addEventListener('click', () => openSlotPicker(el.dataset.bagslot));
     });
   }
 
@@ -2066,17 +2214,27 @@ function renderDeltas(current, candidate) {
   </div>`;
 }
 
+// Sell price by rarity. Common items are barely worth anything; legendaries
+// give meaningful gold and let the player save up for shop purchases.
+const SELL_PRICE = { common: 5, uncommon: 15, rare: 40, epic: 120, legendary: 400 };
+function sellPrice(item) {
+  return SELL_PRICE[item && item.rarity] || 0;
+}
+
 let _pendingEquip = null; // { invIdx, item, targets[] }
 
-function openCompareModal(invIdx) {
+function openCompareModal(invIdx, forcedSlot) {
   const item = state.hero.inventory[invIdx];
   if (!item) return;
-  const targets = resolveEquipTargets(item);
+  // If caller forces a specific slot (e.g. ring1 from slot picker), use it;
+  // otherwise auto-resolve (empty slot first; both filled → user choice).
+  const targets = forcedSlot ? [forcedSlot] : resolveEquipTargets(item);
   _pendingEquip = { invIdx, item, targets };
 
   const body = document.getElementById('compare-body');
   const actions = document.getElementById('compare-actions');
 
+  const sellAmt = sellPrice(item);
   if (targets.length === 1) {
     // Single target — simple two-column compare
     const slotKey = targets[0];
@@ -2089,10 +2247,11 @@ function openCompareModal(invIdx) {
       </div>
       ${renderDeltas(current, item)}
     `;
-    actions.className = 'modal-actions two';
+    actions.className = 'modal-actions';
     actions.innerHTML = `
-      <button class="btn btn-cancel" data-action="cancel">CANCEL</button>
       <button class="btn" data-action="equip">EQUIP</button>
+      <button class="btn btn-sell" data-action="sell">SELL FOR ${sellAmt} ◊</button>
+      <button class="btn btn-cancel" data-action="cancel">CANCEL</button>
     `;
   } else {
     // Two ring slots filled — pick which to replace
@@ -2117,6 +2276,7 @@ function openCompareModal(invIdx) {
     actions.innerHTML = `
       <button class="btn" data-action="replace-ring1">REPLACE RING I</button>
       <button class="btn" data-action="replace-ring2">REPLACE RING II</button>
+      <button class="btn btn-sell" data-action="sell">SELL FOR ${sellAmt} ◊</button>
       <button class="btn btn-cancel" data-action="cancel">CANCEL</button>
     `;
   }
@@ -2133,10 +2293,123 @@ function closeCompareModal() {
   _pendingEquip = null;
 }
 
+// ============ SLOT PICKER MODAL ============
+// Opens when the user clicks an equipped slot. Shows the currently equipped
+// item (with UNEQUIP), and every inventory item that fits that slot.
+// Picking one of them feeds straight into the existing compare modal.
+function openSlotPicker(slotKey) {
+  const h = state.hero;
+  if (!h) return;
+  const title = document.getElementById('slot-picker-title');
+  const currentDiv = document.getElementById('slot-picker-current');
+  const list = document.getElementById('slot-picker-list');
+
+  title.textContent = `${SLOT_LABELS[slotKey]} — pick gear`;
+
+  const current = h.equipment[slotKey];
+  if (current) {
+    const statStr = Object.entries(current.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+    currentDiv.className = `slot-picker-current has-item rarity-${current.rarity}`;
+    currentDiv.innerHTML = `
+      <div class="slot-picker-current-header">
+        <span class="slot-label">Equipped</span>
+        <button class="btn btn-cancel btn-small" data-action="unequip">UNEQUIP</button>
+      </div>
+      <div class="inv-item-name r-${current.rarity}">${current.name}</div>
+      <div class="inv-item-stats">${statStr}</div>
+      ${current.effect ? `<div class="inv-item-effect">✦ ${current.effect.desc}</div>` : ''}
+    `;
+    currentDiv.querySelector('[data-action="unequip"]').addEventListener('click', () => {
+      unequipSlot(slotKey);
+      closeSlotPicker();
+    });
+  } else {
+    currentDiv.className = 'slot-picker-current';
+    currentDiv.innerHTML = `<div class="slot-picker-empty-note">— this slot is empty —</div>`;
+  }
+
+  // Inventory items that fit this slot.
+  // For ring1/ring2 the pool is items with slot === 'ring'.
+  const wantsRing = (slotKey === 'ring1' || slotKey === 'ring2');
+  const compatible = h.inventory
+    .map((item, idx) => ({ item, idx }))
+    .filter(({ item }) => wantsRing ? item.slot === 'ring' : item.slot === slotKey);
+
+  // Sort by rarity (best first), then by total stat sum
+  const RARITY_ORDER = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+  compatible.sort((a, b) => {
+    const r = (RARITY_ORDER[b.item.rarity] || 0) - (RARITY_ORDER[a.item.rarity] || 0);
+    if (r !== 0) return r;
+    const sumA = Object.values(a.item.stats).reduce((s, v) => s + v, 0);
+    const sumB = Object.values(b.item.stats).reduce((s, v) => s + v, 0);
+    return sumB - sumA;
+  });
+
+  if (compatible.length === 0) {
+    list.innerHTML = `<div class="slot-picker-empty-note">Bag has no gear for this slot.</div>`;
+  } else {
+    list.innerHTML = compatible.map(({ item, idx }) => {
+      const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+      return `<div class="inv-item rarity-${item.rarity}" data-picker-idx="${idx}">
+        <div class="inv-item-header">
+          <span class="inv-item-name r-${item.rarity}">${item.name}</span>
+          <span class="inv-item-slot">${item.rarity}</span>
+        </div>
+        <div class="inv-item-stats">${statStr}</div>
+        ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
+      </div>`;
+    }).join('');
+    list.querySelectorAll('[data-picker-idx]').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.dataset.pickerIdx);
+        // For rings: target specifically the slot the user clicked (ring1 or ring2),
+        // not the auto-resolver in resolveEquipTargets.
+        closeSlotPicker();
+        if (wantsRing) {
+          openCompareModal(idx, slotKey);
+        } else {
+          openCompareModal(idx);
+        }
+      });
+    });
+  }
+
+  document.getElementById('slot-picker-modal').classList.remove('hidden');
+}
+
+function closeSlotPicker() {
+  document.getElementById('slot-picker-modal').classList.add('hidden');
+}
+
+function unequipSlot(slotKey) {
+  const h = state.hero;
+  if (!h.equipment[slotKey]) return;
+  h.inventory.push(h.equipment[slotKey]);
+  h.equipment[slotKey] = null;
+  recalculate();
+  saveGame();
+  renderAll();
+}
+
+document.getElementById('slot-picker-cancel').addEventListener('click', closeSlotPicker);
+
 function handleCompareAction(action) {
   if (action === 'cancel') { closeCompareModal(); return; }
   if (!_pendingEquip) { closeCompareModal(); return; }
   const { invIdx, item, targets } = _pendingEquip;
+
+  if (action === 'sell') {
+    const realIdx = state.hero.inventory.indexOf(item);
+    if (realIdx !== -1) {
+      state.hero.gold += sellPrice(item);
+      state.hero.inventory.splice(realIdx, 1);
+      saveGame();
+      renderAll();
+    }
+    closeCompareModal();
+    return;
+  }
+
   let slotKey = null;
   if (action === 'equip') slotKey = targets[0];
   else if (action === 'replace-ring1') slotKey = 'ring1';
@@ -2234,17 +2507,17 @@ function renderPvp() {
 }
 
 // ============ COMBAT ============
-// Pure idle: zero clicks during combat. The combat panel auto-closes
-// shortly after the fight ends and returns the player to the previous tab.
+// Pure idle: zero clicks during combat. After the fight ends the panel
+// shows a summary with metrics and a CONCLUDE button.
 //
 // Combat resolves with an async/await loop. Each tick applies state changes
 // synchronously, paints the log, then awaits a short sleep for pacing. This
 // guarantees the loop's `if (fighter.hp <= 0) break` checks always see the
 // latest HP, so rounds never continue past a death.
-const COMBAT_AUTO_CLOSE_MS = 2800;
 let _previousTab = 'hero';
-let _autoCloseTimer = null;
 let _combatToken = 0; // bumped on every new combat; lets stale awaits bail
+let _combatStats = null; // per-fight metrics, reset in resolveCombat
+let _combatResult = null; // 'victory' | 'defeat' | 'draw' — set at end
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -2255,12 +2528,12 @@ function startCombat(enemy, mode) {
   if (h.hp <= 0) {
     return; // can't fight while down; flow stays in tab
   }
-  if (_autoCloseTimer) { clearTimeout(_autoCloseTimer); _autoCloseTimer = null; }
   _previousTab = mode === 'pvp' ? 'pvp' : 'pve';
   document.getElementById('combat').classList.remove('hidden');
   document.querySelector('#game .tabs').classList.add('hidden');
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  document.getElementById('combat-autoclose').classList.add('hidden');
+  const summary = document.getElementById('combat-summary');
+  if (summary) summary.classList.add('hidden');
   document.getElementById('combat-title').textContent = mode === 'pvp' ? 'ARENA DUEL' : 'HUNT';
   document.getElementById('f1-name').textContent = h.name;
   document.getElementById('f2-name').textContent = enemy.name;
@@ -2277,14 +2550,17 @@ function closeCombat() {
   renderAll();
 }
 
-function scheduleAutoClose(delay) {
-  if (_autoCloseTimer) clearTimeout(_autoCloseTimer);
-  const note = document.getElementById('combat-autoclose');
-  note.classList.remove('hidden');
-  _autoCloseTimer = setTimeout(() => {
-    _autoCloseTimer = null;
-    closeCombat();
-  }, delay);
+function newCombatStats() {
+  return {
+    turns: 0,
+    hero: { dmgDealt: 0, dmgTaken: 0, crits: 0, dodges: 0, blocks: 0, healed: 0, abilitiesUsed: 0, mpSpent: 0 },
+    foe:  { dmgDealt: 0, dmgTaken: 0, crits: 0, dodges: 0, blocks: 0, healed: 0, abilitiesUsed: 0, mpSpent: 0 }
+  };
+}
+
+function statsBucket(fighter) {
+  if (!_combatStats) return null;
+  return fighter && fighter.isHero ? _combatStats.hero : _combatStats.foe;
 }
 
 function buildFighter(source, isHero) {
@@ -2405,6 +2681,8 @@ async function resolveCombat(enemy, mode, log, token) {
   const foe = buildFighter(enemy, false);
   _currentFighters.hero = hero;
   _currentFighters.foe = foe;
+  _combatStats = newCombatStats();
+  _combatResult = null;
 
   updateCombatBars(hero, foe);
 
@@ -2462,21 +2740,27 @@ async function resolveCombat(enemy, mode, log, token) {
 
     turn++;
   }
+  if (_combatStats) _combatStats.turns = turn - 1;
 
   await sleep(300);
   if (stale()) return;
 
+  let rewards = null;
   if (hero.hp > 0 && foe.hp <= 0) {
-    finishVictory(enemy, mode, log, hero);
+    _combatResult = 'victory';
+    rewards = finishVictory(enemy, mode, log, hero);
   } else if (foe.hp > 0 && hero.hp <= 0) {
+    _combatResult = 'defeat';
     finishDefeat(log);
   } else if (hero.hp <= 0 && foe.hp <= 0) {
+    _combatResult = 'draw';
     finishDefeat(log, true); // mutual KO
   } else {
+    _combatResult = 'draw';
     finishDefeat(log, true); // turn limit reached
   }
   updateCombatBars(hero, foe);
-  scheduleAutoClose(COMBAT_AUTO_CLOSE_MS);
+  showCombatSummary(enemy, mode, rewards, hero, foe);
 }
 
 async function tickStartOfTurn(f, opponent, log) {
@@ -2487,10 +2771,13 @@ async function tickStartOfTurn(f, opponent, log) {
     f.mp = Math.min(f.maxMp, (f.mp || 0) + 5);
   }
 
+  const sb = statsBucket(f);
+
   // Regen
   if (f.regenBase > 0 && f.hp < f.maxHp) {
-    const amt = f.regenBase;
-    f.hp = Math.min(f.maxHp, f.hp + amt);
+    const amt = Math.min(f.regenBase, f.maxHp - f.hp);
+    f.hp += amt;
+    if (sb) sb.healed += amt;
     appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP.</span>`);
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(280);
@@ -2498,19 +2785,25 @@ async function tickStartOfTurn(f, opponent, log) {
 
   // Class regen override (cleric aura, stone priest)
   if (f.passiveOverrides && f.passiveOverrides.regen) {
-    const amt = f.passiveOverrides.regen.val;
-    f.hp = Math.min(f.maxHp, f.hp + amt);
-    appendLog(log, `<span class="log-effect">${f.name} is blessed: +${amt} HP.</span>`);
-    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
-    await sleep(280);
+    const amt = Math.min(f.passiveOverrides.regen.val, f.maxHp - f.hp);
+    if (amt > 0) {
+      f.hp += amt;
+      if (sb) sb.healed += amt;
+      appendLog(log, `<span class="log-effect">${f.name} is blessed: +${amt} HP.</span>`);
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+      await sleep(280);
+    }
   } else {
     const cp = getClassPassive(f);
     if (cp && cp.proc === 'regen' && cp.val) {
-      const amt = cp.val;
-      f.hp = Math.min(f.maxHp, f.hp + amt);
-      appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP (${cp.name}).</span>`);
-      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
-      await sleep(280);
+      const amt = Math.min(cp.val, f.maxHp - f.hp);
+      if (amt > 0) {
+        f.hp += amt;
+        if (sb) sb.healed += amt;
+        appendLog(log, `<span class="log-effect">${f.name} regenerates ${amt} HP (${cp.name}).</span>`);
+        updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+        await sleep(280);
+      }
     }
   }
 
@@ -2664,6 +2957,12 @@ async function executeAbility(attacker, defender, talent, log) {
   const magical = isTalentMagical(talent, attacker.class);
   const mpCost = abilityMpCost(talent, attacker.class);
   if (mpCost > 0) attacker.mp = Math.max(0, (attacker.mp || 0) - mpCost);
+  // Metrics
+  const sb = statsBucket(attacker);
+  if (sb) {
+    sb.abilitiesUsed++;
+    sb.mpSpent += mpCost;
+  }
   const tag = magical ? ' ✦' : '';
   appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}${tag}!</span>`);
   await sleep(380);
@@ -2672,6 +2971,7 @@ async function executeAbility(attacker, defender, talent, log) {
   if (a.heal) {
     const amt = Math.floor(attacker.maxHp * a.heal);
     attacker.hp = Math.min(attacker.maxHp, attacker.hp + amt);
+    if (sb) sb.healed += amt;
     appendLog(log, `<span class="log-effect">${attacker.name} heals ${amt} HP.</span>`);
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(380);
@@ -2800,6 +3100,8 @@ async function doDamage(attacker, defender, log, opts) {
   }
   if (Math.random() < dodgeChance) {
     appendLog(log, `<span class="log-effect">${defender.name} dodges!</span>`);
+    const dStats = statsBucket(defender);
+    if (dStats) dStats.dodges++;
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(550);
     return;
@@ -2901,6 +3203,14 @@ async function doDamage(attacker, defender, log, opts) {
   // APPLY DAMAGE
   defender.hp = Math.max(0, defender.hp - dmg);
 
+  // Track metrics
+  const aStats = statsBucket(attacker);
+  const dStats = statsBucket(defender);
+  if (aStats) aStats.dmgDealt += dmg;
+  if (dStats) dStats.dmgTaken += dmg;
+  if (isCrit && aStats) aStats.crits++;
+  if (blocked && dStats) dStats.blocks++;
+
   // Savior (berserker)
   let savior = false;
   if (defender.hp === 0 && defender.savior && !defender.usedSavior) {
@@ -2922,7 +3232,10 @@ async function doDamage(attacker, defender, log, opts) {
   let lifestealHeal = 0;
   if (lifesteal > 0 && dmg > 0) {
     lifestealHeal = Math.floor(dmg * lifesteal);
-    if (lifestealHeal > 0) attacker.hp = Math.min(attacker.maxHp, attacker.hp + lifestealHeal);
+    if (lifestealHeal > 0) {
+      attacker.hp = Math.min(attacker.maxHp, attacker.hp + lifestealHeal);
+      if (aStats) aStats.healed += lifestealHeal;
+    }
   }
 
   // Druid healOnHit
@@ -2930,6 +3243,7 @@ async function doDamage(attacker, defender, log, opts) {
   if (apCls && apCls.proc === 'healOnHit' && dmg > 0) {
     druidHeal = apCls.val;
     attacker.hp = Math.min(attacker.maxHp, attacker.hp + druidHeal);
+    if (aStats) aStats.healed += druidHeal;
   }
 
   // Devour on kill
@@ -2937,6 +3251,7 @@ async function doDamage(attacker, defender, log, opts) {
   if (defender.hp <= 0 && apCls && apCls.proc === 'devour') {
     devourHeal = Math.floor(attacker.maxHp * 0.3);
     attacker.hp = Math.min(attacker.maxHp, attacker.hp + devourHeal);
+    if (aStats) aStats.healed += devourHeal;
   }
 
   // Equipment burn
@@ -3003,9 +3318,11 @@ function finishVictory(enemy, mode, log, heroFighter) {
   // Persist post-combat HP from the live fighter (more reliable than reading the DOM)
   if (heroFighter) state.hero.hp = Math.max(1, Math.floor(heroFighter.hp));
 
+  const levelsBefore = state.hero.level;
+  let loot = null;
   let lootMsg = '';
   if (Math.random() < 0.6) {
-    const loot = rollLootByLevel(enemy.level || state.hero.level);
+    loot = rollLootByLevel(enemy.level || state.hero.level);
     state.hero.inventory.push(loot);
     lootMsg = `<span class="reward-item r-${loot.rarity}">✦ ${loot.name}</span>`;
   }
@@ -3014,6 +3331,7 @@ function finishVictory(enemy, mode, log, heroFighter) {
 
   // Level up. Each level grants 1 stat point and 1 talent point.
   // Base stats no longer auto-increment — the player allocates them.
+  const tierUnlocks = [];
   while (state.hero.level < MAX_LEVEL && state.hero.xp >= state.hero.xpNext) {
     state.hero.xp -= state.hero.xpNext;
     state.hero.level++;
@@ -3021,6 +3339,7 @@ function finishVictory(enemy, mode, log, heroFighter) {
     state.hero.xpNext = xpForLevel(state.hero.level);
     // Did this level unlock a new talent tier?
     const tierIdx = TIER_UNLOCKS.indexOf(state.hero.level);
+    if (tierIdx >= 0) tierUnlocks.push(tierIdx + 1);
     const tierMsg = tierIdx >= 0
       ? ` · <span style="color: var(--rare);">Talent tier ${tierIdx + 1} unlocked!</span>`
       : '';
@@ -3039,6 +3358,7 @@ function finishVictory(enemy, mode, log, heroFighter) {
   if (state.hero.maxMp) state.hero.mp = state.hero.maxMp;
   if (mode === 'pvp') generatePvpOpponents();
   saveGame();
+  return { gold, xp, loot, levelsBefore, levelsAfter: state.hero.level, tierUnlocks };
 }
 
 function finishDefeat(log, draw) {
@@ -3060,6 +3380,77 @@ function appendLog(log, html) {
   entry.innerHTML = html;
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight;
+}
+
+// ============ COMBAT SUMMARY ============
+function showCombatSummary(enemy, mode, rewards, hero, foe) {
+  const panel = document.getElementById('combat-summary');
+  if (!panel) return;
+  const stats = _combatStats || newCombatStats();
+  const result = _combatResult || 'draw';
+  const verdictText = result === 'victory' ? '⚔ VICTORY ⚔' : (result === 'defeat' ? '— DEFEAT —' : '— DRAW —');
+  const verdictClass = result === 'victory' ? 'verdict-win' : (result === 'defeat' ? 'verdict-loss' : 'verdict-draw');
+
+  // Performance table (hero vs foe)
+  const rows = [
+    ['Damage dealt', stats.hero.dmgDealt, stats.foe.dmgDealt],
+    ['Damage taken', stats.hero.dmgTaken, stats.foe.dmgTaken],
+    ['Crits', stats.hero.crits, stats.foe.crits],
+    ['Blocked', stats.hero.blocks, stats.foe.blocks],
+    ['Dodges', stats.hero.dodges, stats.foe.dodges],
+    ['Healed', stats.hero.healed, stats.foe.healed],
+    ['Abilities used', stats.hero.abilitiesUsed, stats.foe.abilitiesUsed]
+  ];
+  if (stats.hero.mpSpent > 0 || stats.foe.mpSpent > 0) {
+    rows.push(['MP spent', stats.hero.mpSpent, stats.foe.mpSpent]);
+  }
+  const perfRows = rows.map(([label, h, f]) => `
+    <tr>
+      <td class="metric-label">${label}</td>
+      <td class="metric-val">${h}</td>
+      <td class="metric-val">${f}</td>
+    </tr>`).join('');
+
+  // Rewards table
+  let rewardRows = '';
+  if (result === 'victory' && rewards) {
+    rewardRows += `<tr><td class="metric-label">Gold</td><td class="metric-val">+${rewards.gold}</td></tr>`;
+    rewardRows += `<tr><td class="metric-label">XP</td><td class="metric-val">+${rewards.xp}</td></tr>`;
+    if (rewards.levelsAfter > rewards.levelsBefore) {
+      rewardRows += `<tr><td class="metric-label">Level</td><td class="metric-val">${rewards.levelsBefore} → ${rewards.levelsAfter}</td></tr>`;
+    }
+    if (rewards.tierUnlocks && rewards.tierUnlocks.length) {
+      rewardRows += `<tr><td class="metric-label">Talent tiers unlocked</td><td class="metric-val">${rewards.tierUnlocks.join(', ')}</td></tr>`;
+    }
+    if (rewards.loot) {
+      rewardRows += `<tr><td class="metric-label">Loot</td><td class="metric-val r-${rewards.loot.rarity}">✦ ${rewards.loot.name}</td></tr>`;
+    } else {
+      rewardRows += `<tr><td class="metric-label">Loot</td><td class="metric-val" style="color: var(--text-dim); font-style: italic;">— none —</td></tr>`;
+    }
+  } else {
+    rewardRows += `<tr><td class="metric-label" colspan="2" style="text-align:center; color: var(--text-dim); font-style: italic;">No rewards. HP restored for the next fight.</td></tr>`;
+  }
+
+  panel.innerHTML = `
+    <div class="summary-verdict ${verdictClass}">${verdictText}</div>
+    <div class="summary-meta">${state.hero.name} vs ${enemy.name} · ${stats.turns} turn${stats.turns === 1 ? '' : 's'}</div>
+    <div class="summary-table-wrap">
+      <div class="summary-table-title">Performance</div>
+      <table class="summary-table">
+        <thead><tr><th></th><th>${state.hero.name}</th><th>${enemy.name}</th></tr></thead>
+        <tbody>${perfRows}</tbody>
+      </table>
+    </div>
+    <div class="summary-table-wrap">
+      <div class="summary-table-title">Rewards</div>
+      <table class="summary-table">
+        <tbody>${rewardRows}</tbody>
+      </table>
+    </div>
+    <button class="btn" id="summary-conclude">CONCLUDE</button>
+  `;
+  panel.classList.remove('hidden');
+  document.getElementById('summary-conclude').addEventListener('click', closeCombat);
 }
 
 function updateCombatBars(hero, foe) {

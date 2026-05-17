@@ -6,6 +6,44 @@
 
 ---
 
+## Session 6 — 2026-05-18 — Combat summary + slot picker + shop + sell
+
+### Combat ends with a summary, not auto-close
+- `_combatStats` tracks per-fighter metrics during the fight: damage dealt, damage taken, crits, blocks, dodges, healing, abilities used, mp spent.
+- After the last action, the combat panel now shows a **summary** instead of closing automatically:
+  - Verdict line (VICTORY / DEFEAT / DRAW)
+  - "X vs Y · N turns" meta
+  - **Performance table**: hero vs foe columns for all 7-8 metrics
+  - **Rewards table**: gold, XP, level changes, talent tier unlocks, loot drop (or "No rewards" on loss/draw)
+  - **CONCLUDE** button — player clicks when ready, no time limit
+
+### Slot picker — click any equipped slot to browse compatible gear
+- Old behaviour (click equipped slot → instant unequip) replaced.
+- Clicking a slot in either the Hero or Bag tab now opens a modal showing:
+  - The currently equipped item with an **UNEQUIP** button
+  - All inventory items that fit that slot, sorted by rarity (best first) then total stat sum
+- Clicking an inventory item from the picker opens the existing compare modal — for ring1/ring2 the picker forces the right slot so the user picks for exactly the ring they tapped.
+
+### Sell gear for gold
+- New **SELL FOR X ◊** button inside the compare modal. Prices by rarity:
+  - common 5 · uncommon 15 · rare 40 · epic 120 · legendary 400
+- The CANCEL / EQUIP / SELL trio is now a 3-row stack of buttons; the ring 3-column variant has all four.
+
+### Shop tab
+- New tab between BAG and HUNT. Single offer for now: **Sealed Crate**.
+- Crate price: `50 + level * 8` gold. Opens to one random item from `rollLootByLevel(hero.level)` (same scaling as combat loot).
+- Buy button disabled when gold is insufficient. After purchase, the new item is logged in a result strip below the offer.
+- Loot stays generic (no per-class filtering — explicit user pref).
+
+### Files touched
+- `index.html` only.
+
+### Known follow-ups
+- Multiple shop offers (tiered crates, single-rarity boxes) would slot in cleanly — the offer container is already a list.
+- Sell from inventory directly (without opening compare) is a one-liner if the user wants it; currently the only entry is via the compare modal.
+
+---
+
 ## Session 5 — 2026-05-18 — INT items + visible rarity borders
 
 ### Caster gear (32 new items)
