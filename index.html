@@ -110,6 +110,99 @@
     margin-bottom: 14px; overflow: hidden;
   }
   .exp-progress-fill { height: 100%; transition: width 0.3s; }
+
+  /* The visual map — vertical layers with 2 nodes each */
+  .exp-map {
+    display: grid; gap: 4px;
+    margin-bottom: 14px; padding: 12px;
+    background: var(--bg); border: 1px solid var(--border);
+  }
+  .exp-map-layer {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .exp-map-layer.boss-layer {
+    grid-template-columns: 1fr;
+    max-width: 70%; margin: 0 auto;
+  }
+  .exp-map-node {
+    background: var(--bg-deep); border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+    transition: all 0.2s;
+    min-height: 76px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: default;
+  }
+  .exp-map-node-icon { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+  .exp-map-node-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 1px; color: var(--text-dim);
+  }
+  .exp-map-node.combat   { border-color: var(--blood); }
+  .exp-map-node.treasure { border-color: var(--gold); }
+  .exp-map-node.event    { border-color: var(--epic); }
+  .exp-map-node.boss     { border-color: var(--legendary); }
+  .exp-map-layer.boss-layer .exp-map-node {
+    min-height: 96px;
+    padding: 14px;
+    box-shadow: 0 0 14px rgba(232,149,48,0.4);
+  }
+  .exp-map-layer.boss-layer .exp-map-node-icon { font-size: 32px; }
+  .exp-map-layer.boss-layer .exp-map-node-label { font-size: 12px; color: var(--legendary); }
+
+  /* States: future / current / past */
+  .exp-map-layer.future .exp-map-node {
+    opacity: 0.45;
+    filter: grayscale(0.4);
+  }
+  .exp-map-layer.current .exp-map-node.clickable {
+    cursor: pointer;
+    animation: map-current-pulse 1.8s ease-in-out infinite;
+  }
+  .exp-map-layer.current .exp-map-node.clickable:hover {
+    background: rgba(201,165,87,0.08);
+    transform: translateY(-2px);
+  }
+  .exp-map-layer.past .exp-map-node.picked {
+    opacity: 0.85;
+    background: rgba(95,168,95,0.08);
+  }
+  .exp-map-layer.past .exp-map-node.picked::after {
+    content: '✓';
+    position: absolute; top: 2px; right: 4px;
+    color: var(--uncommon); font-weight: 900;
+    font-size: 14px;
+  }
+  .exp-map-layer.past .exp-map-node.unpicked {
+    opacity: 0.2;
+    filter: grayscale(0.8);
+  }
+  .exp-map-node { position: relative; }
+  @keyframes map-current-pulse {
+    0%, 100% { box-shadow: 0 0 4px currentColor; }
+    50%      { box-shadow: 0 0 14px currentColor; }
+  }
+
+  .exp-map-arrow {
+    text-align: center; color: var(--text-dim);
+    font-size: 12px; line-height: 1;
+    padding: 2px 0;
+  }
+  .exp-pick-hint {
+    text-align: center; padding: 14px;
+    font-style: italic; color: var(--text-dim);
+    background: var(--bg-deep); border: 1px dashed var(--border);
+    margin-bottom: 12px;
+  }
+  .verdict-loss { color: var(--blood-bright); }
+  .exp-verdict-loss {
+    font-family: 'Cinzel', serif; font-size: 18px;
+    letter-spacing: 4px; text-align: center;
+    color: var(--blood-bright);
+    padding: 6px 0; margin-bottom: 10px;
+  }
   .exp-encounter {
     background: var(--bg-panel); border: 1px solid var(--border);
     padding: 14px; margin-bottom: 12px;
@@ -2894,6 +2987,41 @@ function handleCompareAction(action) {
 }
 
 // ============ EXPEDITION LOGIC ============
+// An expedition's full map is generated up-front: N layers of 2 nodes each,
+// plus a final boss layer with 1 node. The player picks one node per layer;
+// the other becomes locked. Saves serialise the map as IDs (no functions) so
+// it survives reloads.
+function generateNode(def) {
+  const r = Math.random();
+  if (r < def.eventChance) {
+    const ev = rollEvent();
+    return { type: 'event', eventKey: ev.key };
+  }
+  if (r < def.eventChance + def.treasureChance) {
+    return { type: 'treasure' };
+  }
+  const monsterName = def.monsters[Math.floor(Math.random() * def.monsters.length)];
+  return { type: 'combat', monsterName };
+}
+
+function generateExpeditionMap(def) {
+  const map = [];
+  for (let i = 0; i < def.nodes; i++) {
+    let a = generateNode(def);
+    let b = generateNode(def);
+    // Avoid showing two identical treasures or two identical events in the
+    // same layer — the choice feels meaningless otherwise.
+    let tries = 0;
+    while (b.type === a.type && (a.type === 'treasure' || a.type === 'event') && tries < 5) {
+      b = generateNode(def); tries++;
+    }
+    map.push([a, b]);
+  }
+  // Boss layer — single node
+  map.push([{ type: 'boss', monsterName: def.boss }]);
+  return map;
+}
+
 function startExpedition(key) {
   const def = EXPEDITIONS.find(e => e.key === key);
   if (!def) return;
@@ -2902,78 +3030,59 @@ function startExpedition(key) {
     name: def.name,
     glyph: def.glyph,
     tint: def.tint,
-    nodeIdx: 0,
-    totalNodes: def.nodes + 1, // +1 boss
+    map: generateExpeditionMap(def),
+    currentLayer: 0,
+    path: [],             // index picked at each completed layer
     gold: 0, xp: 0,
     monstersSlain: 0,
     loot: [],
-    pending: null,
+    pending: null,        // the chosen node, being resolved
+    pendingResolved: false,
+    pendingResult: '',
+    pendingLootRarity: null,
     finished: false,
     _awaitingCombat: false
   };
-  generateNextEncounter();
   saveGame();
   renderPve();
 }
 
-// Returns the expedition's full definition (so we can roll monster pools etc.)
 function _expDef() {
   if (!state.expedition) return null;
   return EXPEDITIONS.find(e => e.key === state.expedition.key) || null;
 }
 
-function generateNextEncounter() {
+// Player taps a node in the current layer. Snapshot it as pending and let
+// the encounter card below the map drive resolution.
+function expeditionPickNode(optionIdx) {
   const exp = state.expedition;
   if (!exp) return;
-  const def = _expDef();
-  if (!def) return;
-  // Last node = boss
-  if (exp.nodeIdx >= def.nodes) {
-    exp.pending = {
-      type: 'boss',
-      title: 'The end of the path',
-      text: `${def.boss} stands between you and the way out.`,
-      monsterName: def.boss
-    };
-    return;
-  }
-  // Otherwise roll a node type. Default: combat
-  const r = Math.random();
-  let kind = 'combat';
-  if (r < def.eventChance) kind = 'event';
-  else if (r < def.eventChance + def.treasureChance) kind = 'treasure';
-
-  if (kind === 'combat') {
-    const monsterName = def.monsters[Math.floor(Math.random() * def.monsters.length)];
-    exp.pending = {
-      type: 'combat',
-      title: 'An encounter',
-      text: `${monsterName} blocks your path.`,
-      monsterName
-    };
-  } else if (kind === 'treasure') {
-    exp.pending = {
-      type: 'treasure',
-      title: 'A treasure',
-      text: 'An old chest, half-buried.'
-    };
-  } else {
-    const ev = rollEvent();
-    exp.pending = {
-      type: 'event',
-      eventKey: ev.key,
-      title: ev.title,
-      text: ev.text,
-      choices: ev.choices
-    };
-  }
+  if (exp.pending && !exp.pendingResolved) return; // already mid-encounter
+  const layer = exp.map[exp.currentLayer];
+  if (!layer) return;
+  const node = layer[optionIdx];
+  if (!node) return;
+  exp.path[exp.currentLayer] = optionIdx;
+  exp.pending = JSON.parse(JSON.stringify(node));
+  exp.pendingResolved = false;
+  exp.pendingResult = '';
+  exp.pendingLootRarity = null;
+  saveGame();
+  renderPve();
 }
 
 function expeditionAdvance() {
   const exp = state.expedition;
   if (!exp) return;
-  exp.nodeIdx++;
-  generateNextEncounter();
+  exp.currentLayer++;
+  exp.pending = null;
+  exp.pendingResolved = false;
+  exp.pendingResult = '';
+  exp.pendingLootRarity = null;
+  // Reached the end?
+  if (exp.currentLayer >= exp.map.length) {
+    exp.finished = true;
+  }
   saveGame();
   renderPve();
 }
@@ -2985,7 +3094,6 @@ function expeditionAcceptCombat() {
   exp._awaitingCombat = true;
   const tpl = MONSTERS.find(m => m.name === exp.pending.monsterName);
   if (!tpl) {
-    // Defensive: monster name typo — just skip the node
     exp._awaitingCombat = false;
     expeditionAdvance();
     return;
@@ -2994,7 +3102,6 @@ function expeditionAcceptCombat() {
   const isBoss = exp.pending.type === 'boss';
   const scaled = scaleMonster(tpl, heroLevel);
   if (isBoss) {
-    // Boss = +25% stats and named "Boss · Monster"
     scaled.atk = Math.floor(scaled.atk * 1.25);
     scaled.def = Math.floor(scaled.def * 1.25);
     scaled.vit = Math.floor(scaled.vit * 1.5);
@@ -3013,17 +3120,19 @@ function expeditionOpenTreasure() {
   h.gold += gold;
   exp.gold += gold;
   let lootName = '';
+  let lootRarity = null;
   if (Math.random() < 0.7) {
     const loot = rollLootByLevel(h.level);
     h.inventory.push(loot);
     exp.loot.push(loot);
     lootName = loot.name;
+    lootRarity = loot.rarity;
   }
-  exp.pending.resolved = true;
-  exp.pending.result = lootName
+  exp.pendingResolved = true;
+  exp.pendingResult = lootName
     ? `+${gold} ◊  ·  ✦ ${lootName}`
     : `+${gold} ◊`;
-  exp.pending.lootRarity = lootName && exp.loot.length ? exp.loot[exp.loot.length - 1].rarity : null;
+  exp.pendingLootRarity = lootRarity;
   saveGame();
   renderPve();
 }
@@ -3031,7 +3140,9 @@ function expeditionOpenTreasure() {
 function expeditionResolveEvent(choiceKey) {
   const exp = state.expedition;
   if (!exp || !exp.pending || exp.pending.type !== 'event') return;
-  const choice = exp.pending.choices.find(c => c.key === choiceKey);
+  const ev = EXPEDITION_EVENTS.find(e => e.key === exp.pending.eventKey);
+  if (!ev) return;
+  const choice = ev.choices.find(c => c.key === choiceKey);
   if (!choice) return;
   let resultText = '';
   if (typeof choice.effect === 'function') {
@@ -3041,7 +3152,6 @@ function expeditionResolveEvent(choiceKey) {
     if (state.hero.level < MAX_LEVEL) {
       state.hero.xp += choice.xp;
       exp.xp += choice.xp;
-      // Apply level-ups
       while (state.hero.level < MAX_LEVEL && state.hero.xp >= state.hero.xpNext) {
         state.hero.xp -= state.hero.xpNext;
         state.hero.level++;
@@ -3051,8 +3161,8 @@ function expeditionResolveEvent(choiceKey) {
       recalculate();
     }
   }
-  exp.pending.resolved = true;
-  exp.pending.result = resultText;
+  exp.pendingResolved = true;
+  exp.pendingResult = resultText;
   saveGame();
   renderPve();
 }
@@ -3128,10 +3238,9 @@ function renderPve() {
   }
 
   // ===== ACTIVE EXPEDITION VIEW =====
-  const def = _expDef();
-  const progressPct = Math.min(100, ((exp.nodeIdx) / exp.totalNodes) * 100);
+  const totalLayers = exp.map.length;
+  const progressPct = Math.min(100, (exp.currentLayer / totalLayers) * 100);
 
-  // Summary footer (always shown)
   const summary = `
     <div class="exp-summary">
       <span>+${exp.gold} ◊</span>
@@ -3141,20 +3250,23 @@ function renderPve() {
     </div>
   `;
 
-  // If finished, show complete screen
+  // Finished screen (win or defeat)
   if (exp.finished) {
+    const won = exp.pending && exp.pending.type === 'defeat' ? false : true;
+    const headline = won ? '⚔ EXPEDITION COMPLETE ⚔' : '— EXPEDITION ENDED —';
+    const headlineClass = won ? 'exp-verdict-win' : 'exp-verdict-loss';
     list.innerHTML = `
       <div class="exp-active" style="border-color: ${exp.tint};">
         <div class="exp-active-header">
           <div class="exp-active-icon" style="color: ${exp.tint};">${exp.glyph}</div>
           <div>
             <div class="exp-active-name">${exp.name}</div>
-            <div class="exp-active-progress">Expedition complete!</div>
+            <div class="exp-active-progress">${won ? 'Expedition complete!' : 'You return wounded.'}</div>
           </div>
         </div>
         <div class="exp-encounter">
-          <div class="exp-verdict-win">⚔ EXPEDITION COMPLETE ⚔</div>
-          <div class="exp-encounter-text">You return with everything you found.</div>
+          <div class="${headlineClass}">${headline}</div>
+          <div class="exp-encounter-text">${won ? 'You return with everything you found.' : (exp.pending && exp.pending.text) || 'The expedition ends here. Loot you collected stays with you.'}</div>
           ${summary}
           <div class="modal-actions">
             <button class="btn" id="exp-finish">RETURN HOME</button>
@@ -3166,72 +3278,117 @@ function renderPve() {
     return;
   }
 
-  // Active node
-  const p = exp.pending;
+  // Build the visual map. Each layer is a row with 2 nodes (or 1 for boss).
+  function nodeMeta(node) {
+    if (node.type === 'combat')   return { icon: '⚔', label: node.monsterName, cls: 'combat' };
+    if (node.type === 'treasure') return { icon: '💰', label: 'Chest', cls: 'treasure' };
+    if (node.type === 'event') {
+      const ev = EXPEDITION_EVENTS.find(e => e.key === node.eventKey);
+      return { icon: '✦', label: ev ? ev.title : 'Encounter', cls: 'event' };
+    }
+    if (node.type === 'boss')     return { icon: '🔥', label: node.monsterName, cls: 'boss' };
+    return { icon: '?', label: '?', cls: '' };
+  }
+
+  const mapHtml = exp.map.map((layer, layerIdx) => {
+    let layerState = 'future';
+    if (layerIdx < exp.currentLayer) layerState = 'past';
+    else if (layerIdx === exp.currentLayer) {
+      // Once a node is picked, treat the layer as past visually (no more
+      // clicks). The encounter card below the map is the active focus.
+      layerState = exp.pending ? 'past' : 'current';
+    }
+    const isBossLayer = layer.length === 1 && layer[0].type === 'boss';
+    const picked = exp.path[layerIdx];
+    const nodes = layer.map((node, i) => {
+      const meta = nodeMeta(node);
+      let extra = '';
+      if (layerState === 'past') extra = (picked === i) ? ' picked' : ' unpicked';
+      if (layerState === 'current') extra = ' clickable';
+      return `<div class="exp-map-node ${meta.cls}${extra}" ${layerState === 'current' ? `data-pick="${i}"` : ''}>
+        <div class="exp-map-node-icon">${meta.icon}</div>
+        <div class="exp-map-node-label">${meta.label}</div>
+      </div>`;
+    }).join('');
+    return `
+      <div class="exp-map-layer ${layerState} ${isBossLayer ? 'boss-layer' : ''}">${nodes}</div>
+      ${layerIdx < exp.map.length - 1 ? '<div class="exp-map-arrow">▼</div>' : ''}
+    `;
+  }).join('');
+
+  // Pending encounter card below the map (only if player has picked a node
+  // in the current layer)
   let nodeHtml = '';
+  const p = exp.pending;
   if (p) {
     if (p.type === 'combat' || p.type === 'boss') {
       const isBoss = p.type === 'boss';
+      const title = isBoss ? `🔥 The end of the path` : '⚔ An encounter';
+      const text = isBoss
+        ? `${p.monsterName} stands between you and the way out.`
+        : `${p.monsterName} blocks your path.`;
       nodeHtml = `
         <div class="exp-encounter ${isBoss ? 'boss' : ''}">
-          <div class="exp-encounter-title">${isBoss ? '🔥 ' : '⚔ '}${p.title}</div>
-          <div class="exp-encounter-text">${p.text}</div>
+          <div class="exp-encounter-title">${title}</div>
+          <div class="exp-encounter-text">${text}</div>
           <div class="modal-actions">
             <button class="btn" id="exp-fight">${isBoss ? 'FACE THE BOSS' : 'FIGHT'}</button>
-            <button class="btn btn-cancel" id="exp-leave">LEAVE EXPEDITION</button>
           </div>
         </div>
       `;
     } else if (p.type === 'treasure') {
-      if (p.resolved) {
+      if (exp.pendingResolved) {
         nodeHtml = `
           <div class="exp-encounter resolved">
-            <div class="exp-encounter-title">💰 ${p.title}</div>
+            <div class="exp-encounter-title">💰 A treasure</div>
             <div class="exp-encounter-text">You crack the chest open.</div>
-            <div class="exp-result ${p.lootRarity ? 'r-' + p.lootRarity : ''}">${p.result}</div>
+            <div class="exp-result ${exp.pendingLootRarity ? 'r-' + exp.pendingLootRarity : ''}">${exp.pendingResult}</div>
             <div class="modal-actions">
               <button class="btn" id="exp-continue">CONTINUE</button>
-              <button class="btn btn-cancel" id="exp-leave">LEAVE</button>
             </div>
           </div>
         `;
       } else {
         nodeHtml = `
           <div class="exp-encounter">
-            <div class="exp-encounter-title">💰 ${p.title}</div>
-            <div class="exp-encounter-text">${p.text}</div>
+            <div class="exp-encounter-title">💰 A treasure</div>
+            <div class="exp-encounter-text">An old chest, half-buried.</div>
             <div class="modal-actions">
               <button class="btn" id="exp-treasure">OPEN</button>
-              <button class="btn btn-cancel" id="exp-skip">SKIP IT</button>
             </div>
           </div>
         `;
       }
     } else if (p.type === 'event') {
-      if (p.resolved) {
+      const ev = EXPEDITION_EVENTS.find(e => e.key === p.eventKey);
+      if (!ev) {
+        nodeHtml = `<div class="exp-encounter">Event missing. <button class="btn" id="exp-continue">CONTINUE</button></div>`;
+      } else if (exp.pendingResolved) {
         nodeHtml = `
           <div class="exp-encounter resolved">
-            <div class="exp-encounter-title">✦ ${p.title}</div>
-            <div class="exp-result">${p.result}</div>
+            <div class="exp-encounter-title">✦ ${ev.title}</div>
+            <div class="exp-result">${exp.pendingResult}</div>
             <div class="modal-actions">
               <button class="btn" id="exp-continue">CONTINUE</button>
-              <button class="btn btn-cancel" id="exp-leave">LEAVE</button>
             </div>
           </div>
         `;
       } else {
-        const buttons = p.choices.map(c =>
+        const buttons = ev.choices.map(c =>
           `<button class="btn" data-event-choice="${c.key}" ${c.cost && state.hero.gold < c.cost ? 'disabled' : ''}>${c.label}</button>`
         ).join('');
         nodeHtml = `
           <div class="exp-encounter">
-            <div class="exp-encounter-title">✦ ${p.title}</div>
-            <div class="exp-encounter-text">${p.text}</div>
+            <div class="exp-encounter-title">✦ ${ev.title}</div>
+            <div class="exp-encounter-text">${ev.text}</div>
             <div class="modal-actions">${buttons}</div>
           </div>
         `;
       }
     }
+  } else {
+    // No pending — show "pick a path" hint
+    nodeHtml = `<div class="exp-pick-hint">Tap a node above to take that path.</div>`;
   }
 
   list.innerHTML = `
@@ -3240,21 +3397,28 @@ function renderPve() {
         <div class="exp-active-icon" style="color: ${exp.tint};">${exp.glyph}</div>
         <div>
           <div class="exp-active-name">${exp.name}</div>
-          <div class="exp-active-progress">Node ${exp.nodeIdx + 1} of ${exp.totalNodes}</div>
+          <div class="exp-active-progress">Layer ${Math.min(exp.currentLayer + 1, totalLayers)} of ${totalLayers}</div>
         </div>
       </div>
       <div class="exp-progress-bar"><div class="exp-progress-fill" style="width: ${progressPct}%; background: ${exp.tint};"></div></div>
+      <div class="exp-map">${mapHtml}</div>
       ${nodeHtml}
       ${summary}
+      <div class="modal-actions" style="margin-top: 8px;">
+        <button class="btn btn-cancel" id="exp-leave">LEAVE EXPEDITION</button>
+      </div>
     </div>
   `;
 
-  // Wire buttons
+  // Wire map node clicks (only current layer is clickable)
+  list.querySelectorAll('.exp-map-node.clickable[data-pick]').forEach(el => {
+    el.addEventListener('click', () => expeditionPickNode(parseInt(el.dataset.pick)));
+  });
+  // Wire encounter buttons
   const wire = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
   wire('exp-fight', expeditionAcceptCombat);
   wire('exp-leave', leaveExpedition);
   wire('exp-treasure', expeditionOpenTreasure);
-  wire('exp-skip', expeditionAdvance);
   wire('exp-continue', expeditionAdvance);
   list.querySelectorAll('[data-event-choice]').forEach(el => {
     el.addEventListener('click', () => expeditionResolveEvent(el.dataset.eventChoice));
@@ -4568,7 +4732,9 @@ async function handleAuthSubmit() {
     // Logged in — route based on whether this account has a hero
     if (result.account.hero) {
       state.hero = migrateHero(result.account.hero);
-      state.expedition = result.account.expedition || null;
+      // Old expeditions (pre-map schema) get dropped — start fresh
+    const savedExp = result.account.expedition;
+    state.expedition = (savedExp && Array.isArray(savedExp.map)) ? savedExp : null;
       recalculate();
       generatePvpOpponents();
       showGameScreen();
@@ -4611,7 +4777,8 @@ function init() {
   }
   if (acc.hero) {
     state.hero = migrateHero(acc.hero);
-    state.expedition = acc.expedition || null;
+    const savedExp = acc.expedition;
+    state.expedition = (savedExp && Array.isArray(savedExp.map)) ? savedExp : null;
     recalculate();
     generatePvpOpponents();
     showGameScreen();

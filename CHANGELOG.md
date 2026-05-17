@@ -6,6 +6,53 @@
 
 ---
 
+## Session 14 — 2026-05-18 — Visual expedition map (Slay-the-Spire style)
+
+### What changed
+The Hunt tab's active expedition no longer reveals encounters one at a time. The full path is **pre-generated and shown upfront** as a vertical map:
+
+```
+  [ ⚔ Goblin ] [ 💰 Chest ]   ← layer 1: tap one
+       ▼
+  [ ✦ Event ] [ ⚔ Wolf ]    ← layer 2 (locked until you finish layer 1)
+       ▼
+  [ ⚔ Ogre ] [ 💰 Chest ]   ← layer 3
+       ▼
+      [ 🔥 Boss ]            ← final
+```
+
+- Each layer has **2 options**; the boss layer has 1.
+- Current layer pulses gold; future layers are dimmed and locked; past layers show ✓ on the picked node and grey out the unpicked one.
+- Tap a node → that becomes your pending encounter; the resolution card appears below the map (FIGHT / OPEN / event choices).
+- Once you've picked, the layer is treated as past — you can't undo or pick the alternative.
+
+### Code
+- New `generateNode(def)` and `generateExpeditionMap(def)` produce a serialisable structure (node types reference IDs like `monsterName` / `eventKey`, never functions).
+- `state.expedition` schema:
+  ```js
+  {
+    key, name, glyph, tint,
+    map: [[node, node], ..., [bossNode]],
+    currentLayer: 0,
+    path: [],   // option index picked at each completed layer
+    pending: null,
+    pendingResolved, pendingResult, pendingLootRarity,
+    gold, xp, monstersSlain, loot, finished, _awaitingCombat
+  }
+  ```
+- New `expeditionPickNode(optionIdx)` snapshots the chosen node into `pending`.
+- Encounter resolution uses `EXPEDITION_EVENTS.find(e => e.key === pending.eventKey)` — looks up the function at resolve time (functions never get serialised).
+- Layer-state classes: `.current` (gold pulse, clickable), `.past` (✓ on picked, faded on unpicked), `.future` (locked, dimmed + grayscale).
+- Boss layer styled larger with a permanent orange glow.
+
+### Migration
+- Old expedition state (no `map` field) gets cleared at load time. Existing players in mid-expedition will see the expedition list again — they didn't lose anything else (gold/loot/level all stay on the hero).
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 13 — 2026-05-18 — Sell-all + damage school indicator
 
 ### Sell all (Bag)
