@@ -23,12 +23,13 @@ for i in range(9):
     im = Image.open(fp).convert('RGBA')
     frames.append(im)
 
-# Save as animated GIF, ~80ms per frame
+# Save as animated GIF, ~50ms per frame (snappier — full anim ~450ms)
+# Plays once and then holds last frame; setFighterAnim reverts to idle anyway.
 frames[0].save(os.path.join(DST, 'elf-knight-attack.gif'),
                save_all=True,
                append_images=frames[1:],
-               duration=80,
-               loop=0,
+               duration=50,
+               loop=1,
                disposal=2,
                transparency=0,
                optimize=True)

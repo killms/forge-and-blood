@@ -7409,7 +7409,8 @@ function setFighterAnim(fighter, state) {
 // Play attack pose for ms, then revert to idle (if still alive). Consecutive
 // calls (multi-hit abilities) cancel the previous revert so the attack pose
 // keeps playing instead of flickering back to idle between hits.
-function playAttackAnim(fighter, ms = 480) {
+// 550ms gives a 9-frame @ 50ms GIF (~450ms) time to fully play + breathing room.
+function playAttackAnim(fighter, ms = 550) {
   setFighterAnim(fighter, 'attack');
   if (fighter._attackTimer) clearTimeout(fighter._attackTimer);
   fighter._attackTimer = setTimeout(() => {
