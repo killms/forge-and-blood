@@ -1002,6 +1002,52 @@
   .summary-table td.metric-label { color: var(--text-dim); }
   .summary-table td.metric-val { text-align: right; color: var(--text); font-weight: 600; }
 
+  /* Specialisation panel (above the talent tree) */
+  .spec-panel {
+    background: linear-gradient(180deg, var(--bg-panel) 0%, #1a1118 100%);
+  }
+  .spec-locked {
+    display: flex; gap: 14px; align-items: center;
+    padding: 8px 4px;
+    color: var(--text-dim); font-style: italic; font-size: 13px;
+  }
+  .spec-locked-icon { font-size: 28px; line-height: 1; }
+  .spec-locked-sub { font-size: 11px; margin-top: 4px; color: var(--text-dim); }
+  .spec-card {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .spec-card.available {
+    cursor: pointer;
+    border-color: var(--uncommon);
+    box-shadow: 0 0 8px rgba(95,168,95,0.2);
+  }
+  .spec-card.available:hover {
+    background: rgba(95,168,95,0.06);
+    transform: translateX(2px);
+  }
+  .spec-card.picked {
+    border-color: var(--legendary);
+    background: rgba(232,149,48,0.08);
+    box-shadow: 0 0 14px rgba(232,149,48,0.3);
+  }
+  .spec-card.locked-out {
+    opacity: 0.3; filter: grayscale(0.7);
+    cursor: not-allowed;
+  }
+  .spec-card-name {
+    font-family: 'Cinzel', serif; font-size: 15px;
+    color: var(--gold-bright); letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .spec-card.picked .spec-card-name { color: var(--legendary); }
+  .spec-card-desc { font-size: 13px; color: var(--text); font-style: italic; line-height: 1.5; }
+  .spec-empty {
+    padding: 12px; text-align: center;
+    color: var(--text-dim); font-style: italic;
+  }
+
   /* Talent Tree */
   .talent-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -1090,6 +1136,18 @@
   }
   .school-chip.school-melee { border-color: var(--blood); color: var(--blood-bright); }
   .school-chip.school-magic { border-color: var(--rare); color: var(--rare); }
+  .spec-chip {
+    border-color: var(--legendary) !important;
+    color: var(--legendary) !important;
+    background: rgba(232,149,48,0.06);
+  }
+  .spec-chip::before { content: '' !important; }
+  .spec-available {
+    border-color: var(--uncommon) !important;
+    color: var(--uncommon) !important;
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+  .spec-available::before { content: '' !important; }
 </style>
 </head>
 <body>
@@ -1263,6 +1321,10 @@
     </div>
 
     <div id="tab-talents" class="tab-content hidden">
+      <div class="panel spec-panel">
+        <div class="section-title">Specialisation</div>
+        <div id="spec-content"></div>
+      </div>
       <div class="panel">
         <div class="talent-header">
           <div class="section-title" style="margin: 0;">Talent Tree</div>
@@ -1920,6 +1982,104 @@ const CLASSES = {
   }
 };
 
+// ============ SPECIALIZATIONS ============
+// At level SPEC_UNLOCK_LEVEL the player picks one of two specs for their class.
+// Specs grant permanent stat / passive bonuses and may override the class's
+// base passive proc. Choice is permanent (like talents).
+const SPEC_UNLOCK_LEVEL = 15;
+const CLASS_SPECS = {
+  knight: [
+    { key: 'templar',  name: 'Templar',  desc: '+10 Melee · +5 Life · +10% crit. The path of the holy crusader.',
+      effect: { atk: 10, vit: 5, critBonus: 0.10 } },
+    { key: 'sentinel', name: 'Sentinel', desc: '+10 Defense · +5 Life. Oath upgrades to 25% block / 70% reduction.',
+      effect: { def: 10, vit: 5 }, passiveOverride: { proc: 'block', val: 0.25, mult: 0.3 } }
+  ],
+  cleric: [
+    { key: 'light',   name: 'Light',  desc: '+5 Magic · +5 Life. Blessing upgrades to regen 10 HP/turn.',
+      effect: { int: 5, vit: 5 }, passiveOverride: { proc: 'regen', val: 10 } },
+    { key: 'wrath',   name: 'Wrath',  desc: '+12 Magic · +10% crit. Embrace the punishing side of the light.',
+      effect: { int: 12, critBonus: 0.10 } }
+  ],
+  bountyHunter: [
+    { key: 'sharpshooter', name: 'Sharpshooter', desc: '+10 Melee · +15% crit. Cold precision.',
+      effect: { atk: 10, critBonus: 0.15 } },
+    { key: 'ambusher',     name: 'Ambusher',     desc: '+8 Melee · +8 Agility · regen 4/turn.',
+      effect: { atk: 8, agi: 8, regen: 4 } }
+  ],
+  archer: [
+    { key: 'volley_master', name: 'Volley Master', desc: '+6 Melee · +5 Agility · +15% crit. Multi-hit synergy.',
+      effect: { atk: 6, agi: 5, critBonus: 0.15 } },
+    { key: 'sniper',        name: 'Sniper',        desc: '+12 Melee · +20% crit. One arrow, one kill.',
+      effect: { atk: 12, critBonus: 0.20 } }
+  ],
+  druid: [
+    { key: 'wildwarden',   name: 'Wildwarden',   desc: '+5 Defense · +10 Life · regen 6/turn.',
+      effect: { def: 5, vit: 10, regen: 6 } },
+    { key: 'shapeshifter', name: 'Shapeshifter', desc: '+10 Melee · +5 Life · +10% crit. Embrace the beast.',
+      effect: { atk: 10, vit: 5, critBonus: 0.10 } }
+  ],
+  bladeDancer: [
+    { key: 'wind_dancer', name: 'Wind Dancer', desc: '+10 Agility · +5 Melee. Dance of Blades upgrades to 25% dodge.',
+      effect: { agi: 10, atk: 5 }, passiveOverride: { proc: 'dodge', val: 0.25 } },
+    { key: 'stormblade',  name: 'Stormblade',  desc: '+8 Melee · +5 Agility · +10% crit. Steel storm.',
+      effect: { atk: 8, agi: 5, critBonus: 0.10 } }
+  ],
+  berserker: [
+    { key: 'bloodlord', name: 'Bloodlord', desc: '+12 Melee · +5 Life · 15% lifesteal. Drink deep.',
+      effect: { atk: 12, vit: 5, lifesteal: 0.15 } },
+    { key: 'undying',   name: 'Undying',   desc: '+5 Melee · +10 Life · regen 6/turn · savior (survive killing blow at 1 HP).',
+      effect: { atk: 5, vit: 10, regen: 6, savior: true } }
+  ],
+  shaman: [
+    { key: 'vampire',      name: 'Vampire',      desc: '+5 Melee · +5 Magic. Blood Pact upgrades to 25% lifesteal.',
+      effect: { atk: 5, int: 5 }, passiveOverride: { proc: 'lifesteal', val: 0.25 } },
+    { key: 'plaguemaster', name: 'Plaguemaster', desc: '+12 Magic · +5 Life · regen 6/turn. Master of decay.',
+      effect: { int: 12, vit: 5, regen: 6 } }
+  ],
+  devourer: [
+    { key: 'ravager', name: 'Ravager', desc: '+12 Melee · +5 Life · 10% lifesteal.',
+      effect: { atk: 12, vit: 5, lifesteal: 0.10 } },
+    { key: 'eternal', name: 'Eternal', desc: '+10 Life · regen 6/turn · savior. The hunger persists.',
+      effect: { vit: 10, regen: 6, savior: true } }
+  ],
+  guardian: [
+    { key: 'wallbreaker',   name: 'Wallbreaker',   desc: '+5 Defense · +5 Life · 8% lifesteal · regen 6/turn.',
+      effect: { def: 5, vit: 5, lifesteal: 0.08, regen: 6 } },
+    { key: 'mountainshield', name: 'Mountainshield', desc: '+15 Defense · +5 Life · -5 damage taken flat.',
+      effect: { def: 15, vit: 5, dmgReduce: 5 } }
+  ],
+  priest: [
+    { key: 'earthwarden',  name: 'Earthwarden',  desc: '+5 Magic · +10 Life. Ancestral Blessing upgrades to regen 12/turn.',
+      effect: { int: 5, vit: 10 }, passiveOverride: { proc: 'regen', val: 12 } },
+    { key: 'earthbreaker', name: 'Earthbreaker', desc: '+12 Magic · +5 Life · +15% crit. Wrath of the deep stones.',
+      effect: { int: 12, vit: 5, critBonus: 0.15 } }
+  ],
+  engineer: [
+    { key: 'bombardier', name: 'Bombardier', desc: '+8 Melee · +5 Magic. Gunpowder upgrades to 40% proc / +100% damage.',
+      effect: { atk: 8, int: 5 }, passiveOverride: { proc: 'burst', val: 0.40, mult: 1.0 } },
+    { key: 'sapper',     name: 'Sapper',     desc: '+6 Melee · +5 Agility · +10% crit. Trap-and-detonate specialist.',
+      effect: { atk: 6, agi: 5, critBonus: 0.10 } }
+  ],
+  stalker: [
+    { key: 'assassin', name: 'Assassin', desc: '+10 Melee · +20% crit. Strike, vanish, repeat.',
+      effect: { atk: 10, critBonus: 0.20 } },
+    { key: 'shadow',   name: 'Shadow',   desc: '+8 Agility · +10 Melee · 12% lifesteal. Faceless and patient.',
+      effect: { agi: 8, atk: 10, lifesteal: 0.12 } }
+  ],
+  bearForm: [
+    { key: 'berserker_bear', name: 'Berserker Bear', desc: '+12 Melee · +5 Life · 8% lifesteal. Pure fury.',
+      effect: { atk: 12, vit: 5, lifesteal: 0.08 } },
+    { key: 'ancient_bear',   name: 'Ancient Bear',   desc: '+10 Life. Thick Fur upgrades to -8 damage taken.',
+      effect: { vit: 10 }, passiveOverride: { proc: 'dmgReduce', val: 8 } }
+  ],
+  chaos: [
+    { key: 'lord_chaos',    name: 'Lord of Chaos',  desc: '+8 Melee · +5 Magic. Mutation upgrades to +4 per turn.',
+      effect: { atk: 8, int: 5 }, passiveOverride: { proc: 'mutate', val: 4 } },
+    { key: 'order_chaos',   name: 'Order in Chaos', desc: '+5 to all stats · doubleMutate (mutate hits 2 stats per turn).',
+      effect: { atk: 5, def: 5, vit: 5, agi: 5, int: 5, doubleMutate: true } }
+  ]
+};
+
 // ============ ITEMS ============
 const ITEM_POOL = [
   { slot: 'weapon', name: 'Rusty Sword', rarity: 'common', stats: { atk: 3 } },
@@ -2561,6 +2721,7 @@ function migrateHero(hero) {
   }
   if (typeof hero.maxMp !== 'number') hero.maxMp = 0;
   if (typeof hero.mp !== 'number') hero.mp = 0;
+  if (!('specKey' in hero)) hero.specKey = null;
   ensureTracking(hero);
   return hero;
 }
@@ -2921,6 +3082,7 @@ function createHero() {
     xpNext: xpForLevel(1),
     gold: 50,
     talentPicks: {},  // { tier: talentKey }
+    specKey: null,    // chosen specialization key (CLASS_SPECS[class][*].key)
     statPoints: 0,    // unspent attribute points; +1 per level
     base: {
       atk: cls.base.atk + race.mods.atk,
@@ -3004,6 +3166,39 @@ function isTierUnlocked(tier) {
   return h.level >= lvl;
 }
 
+// ============ SPEC HELPERS ============
+function getClassSpecs() {
+  if (!state.hero) return [];
+  return CLASS_SPECS[state.hero.class] || [];
+}
+function getSpec() {
+  if (!state.hero || !state.hero.specKey) return null;
+  const specs = getClassSpecs();
+  return specs.find(s => s.key === state.hero.specKey) || null;
+}
+function isSpecUnlocked() {
+  return state.hero && state.hero.level >= SPEC_UNLOCK_LEVEL;
+}
+function pickSpec(specKey) {
+  const h = state.hero;
+  if (!h) return;
+  if (h.specKey) return; // already chosen, permanent
+  if (!isSpecUnlocked()) return;
+  const specs = getClassSpecs();
+  const spec = specs.find(s => s.key === specKey);
+  if (!spec) return;
+  h.specKey = specKey;
+  recalculate();
+  saveGame();
+  renderAll();
+  showToast({
+    icon: '⚜',
+    title: 'Specialisation chosen: ' + spec.name,
+    desc: spec.desc.split('.')[0],
+    kind: 'achievement'
+  });
+}
+
 function recalculate() {
   const h = state.hero;
   const total = { atk: 0, def: 0, vit: 0, agi: 0, int: 0, ...h.base };
@@ -3023,6 +3218,15 @@ function recalculate() {
       });
     }
   });
+  // Specialisation stat bonuses (effect: { atk, def, ... })
+  const spec = getSpec();
+  if (spec && spec.effect) {
+    Object.entries(spec.effect).forEach(([k, v]) => {
+      if (typeof v === 'number' && ['atk', 'def', 'vit', 'agi', 'int'].includes(k)) {
+        total[k] += v;
+      }
+    });
+  }
   // Item set bonuses (Iron Guard, Ranger, Arcane, Vampyric)
   const setRes = getSetBonuses();
   Object.entries(setRes.totals).forEach(([k, v]) => { total[k] = (total[k] || 0) + v; });
@@ -3077,6 +3281,19 @@ function getAllPassiveBonuses() {
     }
     if (t.override) bonuses.overrides[t.override.proc] = t.override;
   });
+  // Specialisation contributes the same kinds of passive bonuses + an override
+  const spec = getSpec();
+  if (spec) {
+    if (spec.effect) {
+      if (spec.effect.critBonus) bonuses.critBonus += spec.effect.critBonus;
+      if (spec.effect.regen)     bonuses.regen     += spec.effect.regen;
+      if (spec.effect.dmgReduce) bonuses.dmgReduce += spec.effect.dmgReduce;
+      if (spec.effect.lifesteal) bonuses.lifesteal += spec.effect.lifesteal;
+      if (spec.effect.savior)    bonuses.savior = true;
+      if (spec.effect.doubleMutate) bonuses.doubleMutate = true;
+    }
+    if (spec.passiveOverride) bonuses.overrides[spec.passiveOverride.proc] = spec.passiveOverride;
+  }
   return bonuses;
 }
 
@@ -3246,8 +3463,13 @@ function renderHero() {
   const schoolChip = isMagicClass
     ? `<div class="school-chip school-magic">⚡ Spell caster — scales with <strong>Magic</strong> (INT). Active abilities cost mana.</div>`
     : `<div class="school-chip school-melee">⚔ Melee striker — scales with <strong>Melee</strong> (ATK). Some talents can still be magical.</div>`;
+  const spec = getSpec();
+  const specChip = spec
+    ? `<div class="passive-chip spec-chip"><strong>⚜ ${spec.name}</strong>: ${spec.desc}</div>`
+    : (isSpecUnlocked() ? `<div class="passive-chip spec-available">⚜ Specialisation available — go to Talents tab</div>` : '');
   document.getElementById('class-passive').innerHTML = `
     ${schoolChip}
+    ${specChip}
     <div class="passive-chip">${cls.passive.name}: ${cls.passive.desc}</div>
     <div class="passive-chip">${RACES[h.race].passive.name}: ${RACES[h.race].passive.desc}</div>
   `;
@@ -3308,10 +3530,15 @@ function renderTalents() {
     const tier = idx + 1;
     if (isTierUnlocked(tier) && !h.talentPicks[tier]) pending++;
   });
+  // Add spec choice if unlocked and not picked
+  if (isSpecUnlocked() && !h.specKey) pending++;
   const points = document.getElementById('talent-points');
   points.textContent = pending > 0 ? `${pending} to choose` : `${Object.keys(h.talentPicks).length} picked`;
   points.style.borderColor = pending > 0 ? 'var(--uncommon)' : 'var(--gold)';
   points.style.color = pending > 0 ? 'var(--uncommon)' : 'var(--gold-bright)';
+
+  // ===== SPECIALIZATION PANEL =====
+  renderSpecPanel();
 
   const tree = document.getElementById('talent-tree');
   tree.innerHTML = cls.talentTree.map((options, idx) => {
@@ -3364,6 +3591,52 @@ function renderTalents() {
       pickTalent(parseInt(tierStr), key);
     });
   });
+}
+
+function renderSpecPanel() {
+  const el = document.getElementById('spec-content');
+  if (!el) return;
+  const h = state.hero;
+  const specs = getClassSpecs();
+  if (specs.length === 0) {
+    el.innerHTML = '<div class="spec-empty">No specialisations defined for this class.</div>';
+    return;
+  }
+  // Locked: level not high enough yet
+  if (!isSpecUnlocked()) {
+    el.innerHTML = `<div class="spec-locked">
+      <div class="spec-locked-icon">🔒</div>
+      <div class="spec-locked-text">
+        Unlocks at level ${SPEC_UNLOCK_LEVEL}.
+        <div class="spec-locked-sub">You'll choose between <strong>${specs[0].name}</strong> and <strong>${specs[1].name}</strong>.</div>
+      </div>
+    </div>`;
+    return;
+  }
+  // Unlocked: render cards (chosen vs available)
+  el.innerHTML = specs.map(s => {
+    const picked = h.specKey === s.key;
+    const lockedOut = h.specKey && !picked;
+    let cls = 'spec-card';
+    if (picked) cls += ' picked';
+    else if (lockedOut) cls += ' locked-out';
+    else cls += ' available';
+    return `<div class="${cls}" ${!h.specKey ? `data-spec="${s.key}"` : ''}>
+      <div class="spec-card-name">${s.name}${picked ? ' ✓' : ''}</div>
+      <div class="spec-card-desc">${s.desc}</div>
+    </div>`;
+  }).join('');
+  if (!h.specKey) {
+    el.querySelectorAll('[data-spec]').forEach(card => {
+      card.addEventListener('click', () => {
+        const spec = specs.find(s => s.key === card.dataset.spec);
+        if (!spec) return;
+        if (confirm(`Pick ${spec.name}?\n\n${spec.desc}\n\nThis choice is permanent.`)) {
+          pickSpec(spec.key);
+        }
+      });
+    });
+  }
 }
 
 function pickTalent(tier, key) {
@@ -5169,6 +5442,15 @@ function finishVictory(enemy, mode, log, heroFighter) {
       desc: '+1 stat point' + (state.hero.level === MAX_LEVEL ? ' · Max level reached!' : ''),
       kind: 'levelup'
     });
+    // Specialisation unlock notification — fires when crossing the threshold
+    if (levelsBefore < SPEC_UNLOCK_LEVEL && state.hero.level >= SPEC_UNLOCK_LEVEL && !state.hero.specKey) {
+      showToast({
+        icon: '⚜',
+        title: 'Specialisation available!',
+        desc: 'Visit the Talents tab to choose your path.',
+        kind: 'achievement'
+      });
+    }
   }
   checkAchievements();
   saveGame();

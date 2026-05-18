@@ -6,6 +6,49 @@
 
 ---
 
+## Session 18 — 2026-05-18 — Sub-classes / Specs (build depth)
+
+### What's new
+Each of the 15 classes now has **2 specialisations** that unlock at **level 15**. Pick one — permanent — to define your build. 15 × 2 = **30 specs**, and a Knight Templar plays very differently from a Knight Sentinel.
+
+### Examples
+- **Knight** → Templar (+10 Melee, +5 Life, +10% crit) **OR** Sentinel (+10 Def, +5 Life, Oath upgrades to Fortify-tier block).
+- **Cleric** → Light (+5 Magic, +5 Life, regen 10/turn override) **OR** Wrath (+12 Magic, +10% crit).
+- **Berserker** → Bloodlord (+12 Melee, lifesteal 15%) **OR** Undying (+10 Life, regen 6, savior).
+- **Chaos Shifter** → Lord of Chaos (mutate +4) **OR** Order in Chaos (+5 to all + doubleMutate).
+- … (full list in `CLASS_SPECS` const).
+
+### How they work
+Specs grant the same kinds of bonuses talents do:
+- Direct stat bonuses (`atk`, `def`, `vit`, `agi`, `int`).
+- Passive numeric bonuses (`critBonus`, `regen`, `dmgReduce`, `lifesteal`, `savior`, `doubleMutate`).
+- Optional **`passiveOverride`** that swaps the class's base passive proc (e.g. Sentinel upgrades Oath to 25% block / 70% reduction; Light upgrades Blessing regen from 4 to 10).
+
+All processing fits into the existing `recalculate` and `getAllPassiveBonuses` flow — no new combat code needed.
+
+### State + migration
+- `state.hero.specKey` (null until chosen).
+- `migrateHero` injects `specKey: null` on older saves.
+
+### UI
+- New **Specialisation** panel at the top of the Talents tab:
+  - **Locked**: shows lock icon, "Unlocks at level 15", names the two future options.
+  - **Available**: both spec cards highlighted green, clickable. Pick triggers a `confirm()` (permanent choice).
+  - **Picked**: chosen card gold-glowing with ✓; the other greyed and unclickable.
+- The Talents-tab badge (`X to choose`) now also counts the spec as a pending pick if unlocked but not chosen.
+- Hero tab Class Abilities panel shows:
+  - **Spec available** (pulsing green) if unlocked but not picked.
+  - **Spec chosen** (gold-bordered) describing your spec when picked.
+
+### Notifications
+- New toast when the player crosses level 15: "Specialisation available! Visit the Talents tab to choose your path."
+- Picking a spec fires an "achievement" toast naming the choice.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 17 — 2026-05-18 — Visual polish pack (SVG icons, card depth, typography, tab animations)
 
 ### Inline SVG icon library
