@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge & Blood — Combat Backdrop Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --bg-deep: #120c0a;
+    --bg-panel: #1a1410;
+    --border: #3a2d22;
+    --text: #d4c4a0;
+    --text-dim: #8a7960;
+    --gold: #c9a557;
+    --gold-bright: #e8c980;
+    --blood: #8b1e1e;
+    --blood-bright: #cc2828;
+    --uncommon: #5fa85f;
+    --rare: #4a8fd6;
+    --epic: #a85fd6;
+    --legendary: #e89530;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Text', serif;
+    min-height: 100vh;
+  }
+  body {
+    padding: 24px 12px;
+    background:
+      radial-gradient(ellipse at top, #1a0c08 0%, #080808 60%),
+      var(--bg);
+  }
+
+  /* ===== Page header ===== */
+  .page-header {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .page-header h1 {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: 28px; letter-spacing: 4px;
+    color: var(--gold-bright);
+    text-shadow: 0 0 12px rgba(232,201,128,0.4);
+  }
+  .page-header .subtitle {
+    font-style: italic; color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ===== Biome tabs ===== */
+  .biome-tabs {
+    display: flex; justify-content: center; gap: 8px;
+    margin: 20px auto 14px;
+    max-width: 760px; flex-wrap: wrap;
+  }
+  .biome-tab {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 8px 14px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .biome-tab:hover {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+  }
+  .biome-tab.active {
+    background: var(--gold); color: var(--bg);
+    border-color: var(--gold);
+  }
+
+  /* ===== Combat arena wrapper ===== */
+  .arena-wrap {
+    max-width: 760px; margin: 0 auto;
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 24px rgba(201,165,87,0.2);
+    background: var(--bg-deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .arena-header {
+    background: linear-gradient(180deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; z-index: 5;
+  }
+  .arena-title {
+    font-family: 'Cinzel', serif; font-size: 13px;
+    letter-spacing: 2.5px; color: var(--gold-bright);
+  }
+  .arena-biome-label {
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* ===== The combat scene ===== */
+  .combat-scene {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+  }
+  .combat-backdrop {
+    position: absolute; inset: 0;
+    transition: opacity 0.4s;
+    image-rendering: pixelated;
+  }
+  .combat-overlay {
+    /* Dark vignette so fighters pop */
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .combat-particles {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* ===== Fighters ===== */
+  .combat-arena {
+    position: absolute; inset: 0;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 8px; align-items: center;
+    padding: 24px 24px 32px;
+    z-index: 4;
+  }
+  .fighter { text-align: center; position: relative; }
+  .fighter-portrait {
+    width: 128px; height: 128px;
+    margin: 0 auto 6px;
+    background: rgba(0,0,0,0.35);
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px; line-height: 1;
+    user-select: none;
+    overflow: hidden;
+    backdrop-filter: blur(2px);
+    box-shadow:
+      inset 0 0 16px rgba(0,0,0,0.7),
+      0 4px 24px rgba(0,0,0,0.6);
+    animation: idle-bob 2.6s ease-in-out infinite;
+  }
+  .fighter-portrait img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+  .fighter.hero .fighter-portrait { border-color: #5fa85f; }
+  .fighter.enemy .fighter-portrait { border-color: var(--blood); }
+  .fighter-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px; color: var(--gold-bright);
+    margin-bottom: 4px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+  }
+  .fighter-bar {
+    width: 100%; height: 12px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .fighter-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--blood) 0%, var(--blood-bright) 100%);
+    transition: width 0.4s;
+  }
+  .fighter-bar-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--text); letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  }
+  .versus-indicator {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: 22px; color: var(--blood-bright);
+    letter-spacing: 4px;
+    text-shadow:
+      0 0 12px rgba(204,40,40,0.8),
+      0 2px 4px rgba(0,0,0,0.9);
+    align-self: center;
+    margin-top: -32px;
+  }
+  @keyframes idle-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+
+  /* ===== Biome backdrops (gradient placeholders) ===== */
+  .bd-forest {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(180,220,150,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 70%, rgba(40,80,40,0.5) 0%, transparent 60%),
+      linear-gradient(180deg, #1a2a18 0%, #0a1208 70%, #050a04 100%);
+  }
+  /* Tree silhouettes for forest */
+  .bd-forest::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(ellipse 80px 180px at 10% 70%, #0a1408 50%, transparent 51%),
+      radial-gradient(ellipse 60px 140px at 25% 80%, #0a1408 50%, transparent 51%),
+      radial-gradient(ellipse 100px 220px at 90% 75%, #0a1408 50%, transparent 51%),
+      radial-gradient(ellipse 70px 160px at 75% 85%, #0a1408 50%, transparent 51%);
+    opacity: 0.7;
+  }
+  .bd-forest::after {
+    /* Moon glow upper-left */
+    content: '';
+    position: absolute; top: 18px; left: 18px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #e8e0c8 0%, rgba(232,224,200,0.4) 30%, transparent 70%);
+    filter: blur(3px);
+  }
+
+  .bd-crypt {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(168,95,214,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 80%, rgba(60,30,90,0.35) 0%, transparent 60%),
+      linear-gradient(180deg, #1a0e22 0%, #0c0614 70%, #050208 100%);
+  }
+  .bd-crypt::before {
+    /* Pillars / arches */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(90deg, transparent 8%, rgba(40,20,55,0.6) 9%, rgba(40,20,55,0.6) 14%, transparent 15%),
+      linear-gradient(90deg, transparent 30%, rgba(40,20,55,0.6) 31%, rgba(40,20,55,0.6) 36%, transparent 37%),
+      linear-gradient(90deg, transparent 60%, rgba(40,20,55,0.6) 61%, rgba(40,20,55,0.6) 66%, transparent 67%),
+      linear-gradient(90deg, transparent 84%, rgba(40,20,55,0.6) 85%, rgba(40,20,55,0.6) 90%, transparent 91%);
+    background-size: 100% 100%;
+  }
+  .bd-crypt::after {
+    /* Cracked stone texture overlay */
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 45% 35%, transparent 0, transparent 80px, rgba(20,10,30,0.3) 81px, rgba(20,10,30,0.3) 82px, transparent 83px),
+      radial-gradient(circle at 60% 60%, transparent 0, transparent 50px, rgba(20,10,30,0.3) 51px, rgba(20,10,30,0.3) 52px, transparent 53px);
+    opacity: 0.6;
+  }
+
+  .bd-lava {
+    background:
+      radial-gradient(ellipse at 50% 95%, rgba(255,120,40,0.55) 0%, rgba(180,60,20,0.3) 30%, transparent 60%),
+      radial-gradient(ellipse at 30% 30%, rgba(80,20,10,0.5) 0%, transparent 50%),
+      linear-gradient(180deg, #2a0a08 0%, #1a0604 50%, #4a1408 100%);
+  }
+  .bd-lava::before {
+    /* Lava cracks on the ground */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(ellipse 200px 30px at 20% 90%, rgba(255,160,60,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 180px 25px at 60% 95%, rgba(255,140,50,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 220px 35px at 85% 88%, rgba(255,180,80,0.6) 0%, transparent 70%);
+    animation: lava-pulse 3s ease-in-out infinite;
+  }
+  .bd-lava::after {
+    /* Mountain silhouettes */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(135deg, transparent 50%, #1a0604 50.5%),
+      linear-gradient(-135deg, transparent 50%, #1a0604 50.5%);
+    background-size: 240px 120px;
+    background-repeat: no-repeat;
+    background-position: 0 60%, 100% 55%;
+    opacity: 0.55;
+  }
+  @keyframes lava-pulse {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; filter: brightness(1.2); }
+  }
+
+  .bd-frost {
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(200,230,255,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(100,140,180,0.3) 0%, transparent 60%),
+      linear-gradient(180deg, #1a2440 0%, #0c1428 60%, #2a3850 100%);
+  }
+  .bd-frost::before {
+    /* Snow on the ground */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(ellipse 300px 40px at 50% 92%, rgba(220,240,255,0.4) 0%, transparent 70%),
+      radial-gradient(ellipse 200px 30px at 20% 95%, rgba(220,240,255,0.3) 0%, transparent 70%),
+      radial-gradient(ellipse 200px 30px at 80% 96%, rgba(220,240,255,0.3) 0%, transparent 70%);
+  }
+  .bd-frost::after {
+    /* Ice mountain silhouettes */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(135deg, transparent 60%, rgba(80,120,160,0.55) 60.5%),
+      linear-gradient(-135deg, transparent 60%, rgba(80,120,160,0.55) 60.5%);
+    background-size: 280px 140px;
+    background-repeat: no-repeat;
+    background-position: 10% 50%, 90% 45%;
+    opacity: 0.6;
+  }
+
+  .bd-arena {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(232,201,128,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(120,80,30,0.5) 0%, transparent 60%),
+      linear-gradient(180deg, #1a1208 0%, #0c0804 60%, #221808 100%);
+  }
+  .bd-arena::before {
+    /* Coliseum tier arches */
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(ellipse 50px 80px at 12% 30%, rgba(40,30,15,0.7) 50%, transparent 51%),
+      radial-gradient(ellipse 50px 80px at 30% 30%, rgba(40,30,15,0.7) 50%, transparent 51%),
+      radial-gradient(ellipse 50px 80px at 50% 30%, rgba(40,30,15,0.7) 50%, transparent 51%),
+      radial-gradient(ellipse 50px 80px at 70% 30%, rgba(40,30,15,0.7) 50%, transparent 51%),
+      radial-gradient(ellipse 50px 80px at 88% 30%, rgba(40,30,15,0.7) 50%, transparent 51%);
+  }
+  .bd-arena::after {
+    /* Ground */
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, transparent 70%, rgba(180,140,60,0.25) 70%, rgba(140,100,40,0.4) 100%);
+  }
+
+  /* ===== Particle layers (CSS-only, no assets) ===== */
+  .particle {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  /* Falling leaves (forest) */
+  .leaves .particle {
+    width: 6px; height: 6px;
+    background: #4a7a3a;
+    border-radius: 50% 0 50% 0;
+    animation: leaf-fall linear infinite;
+  }
+  @keyframes leaf-fall {
+    0%   { transform: translateY(-30px) translateX(0) rotate(0); opacity: 0; }
+    10%  { opacity: 0.8; }
+    100% { transform: translateY(360px) translateX(80px) rotate(720deg); opacity: 0; }
+  }
+  .leaves .particle:nth-child(1)  { left: 8%;  animation-duration: 7s;  animation-delay: 0s; }
+  .leaves .particle:nth-child(2)  { left: 22%; animation-duration: 9s;  animation-delay: 1.2s; background: #5a8a44; }
+  .leaves .particle:nth-child(3)  { left: 38%; animation-duration: 6s;  animation-delay: 2.4s; background: #6a9050; }
+  .leaves .particle:nth-child(4)  { left: 55%; animation-duration: 8s;  animation-delay: 0.6s; }
+  .leaves .particle:nth-child(5)  { left: 70%; animation-duration: 7.5s; animation-delay: 3s; background: #5a8a44; }
+  .leaves .particle:nth-child(6)  { left: 85%; animation-duration: 9s;  animation-delay: 1.8s; }
+  .leaves .particle:nth-child(7)  { left: 14%; animation-duration: 8s;  animation-delay: 4s; }
+  .leaves .particle:nth-child(8)  { left: 62%; animation-duration: 6.5s; animation-delay: 2s; }
+
+  /* Floating motes (crypt) */
+  .motes .particle {
+    width: 3px; height: 3px;
+    background: #e8d8ff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #c0a8f0;
+    animation: mote-float linear infinite;
+    opacity: 0.7;
+  }
+  @keyframes mote-float {
+    0%   { transform: translateY(320px) translateX(0); opacity: 0; }
+    20%  { opacity: 0.9; }
+    80%  { opacity: 0.9; }
+    100% { transform: translateY(-30px) translateX(30px); opacity: 0; }
+  }
+  .motes .particle:nth-child(1)  { left: 15%; animation-duration: 8s; animation-delay: 0s; }
+  .motes .particle:nth-child(2)  { left: 32%; animation-duration: 9s; animation-delay: 1s; }
+  .motes .particle:nth-child(3)  { left: 48%; animation-duration: 7s; animation-delay: 2.5s; }
+  .motes .particle:nth-child(4)  { left: 65%; animation-duration: 10s; animation-delay: 0.5s; }
+  .motes .particle:nth-child(5)  { left: 82%; animation-duration: 8.5s; animation-delay: 3s; }
+  .motes .particle:nth-child(6)  { left: 20%; animation-duration: 9.5s; animation-delay: 4s; }
+  .motes .particle:nth-child(7)  { left: 75%; animation-duration: 7.5s; animation-delay: 2s; }
+  .motes .particle:nth-child(8)  { left: 55%; animation-duration: 8s;  animation-delay: 5s; }
+
+  /* Rising embers (lava) */
+  .embers .particle {
+    width: 4px; height: 4px;
+    background: #ff9030;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff6020, 0 0 14px rgba(255,80,20,0.4);
+    animation: ember-rise linear infinite;
+  }
+  @keyframes ember-rise {
+    0%   { transform: translateY(320px) translateX(0) scale(1); opacity: 0; }
+    15%  { opacity: 1; }
+    100% { transform: translateY(-30px) translateX(20px) scale(0.3); opacity: 0; }
+  }
+  .embers .particle:nth-child(1)  { left: 12%; animation-duration: 4s; animation-delay: 0s; }
+  .embers .particle:nth-child(2)  { left: 28%; animation-duration: 5s; animation-delay: 0.6s; }
+  .embers .particle:nth-child(3)  { left: 42%; animation-duration: 3.5s; animation-delay: 1.2s; }
+  .embers .particle:nth-child(4)  { left: 58%; animation-duration: 4.5s; animation-delay: 1.8s; }
+  .embers .particle:nth-child(5)  { left: 72%; animation-duration: 5s; animation-delay: 2.4s; }
+  .embers .particle:nth-child(6)  { left: 88%; animation-duration: 4s; animation-delay: 3s; }
+  .embers .particle:nth-child(7)  { left: 35%; animation-duration: 5.5s; animation-delay: 3.5s; }
+  .embers .particle:nth-child(8)  { left: 65%; animation-duration: 4.5s; animation-delay: 4s; }
+
+  /* Snow (frost) */
+  .snow .particle {
+    width: 5px; height: 5px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(220,240,255,0.6);
+    animation: snow-fall linear infinite;
+  }
+  @keyframes snow-fall {
+    0%   { transform: translateY(-30px) translateX(0); opacity: 0; }
+    10%  { opacity: 0.9; }
+    100% { transform: translateY(360px) translateX(40px); opacity: 0.4; }
+  }
+  .snow .particle:nth-child(1)  { left: 10%; animation-duration: 9s; animation-delay: 0s; }
+  .snow .particle:nth-child(2)  { left: 25%; animation-duration: 11s; animation-delay: 1s; }
+  .snow .particle:nth-child(3)  { left: 40%; animation-duration: 10s; animation-delay: 2s; }
+  .snow .particle:nth-child(4)  { left: 55%; animation-duration: 12s; animation-delay: 0.5s; }
+  .snow .particle:nth-child(5)  { left: 70%; animation-duration: 9.5s; animation-delay: 3s; }
+  .snow .particle:nth-child(6)  { left: 85%; animation-duration: 10.5s; animation-delay: 1.5s; }
+  .snow .particle:nth-child(7)  { left: 18%; animation-duration: 11s; animation-delay: 4s; }
+  .snow .particle:nth-child(8)  { left: 78%; animation-duration: 10s; animation-delay: 2.5s; }
+
+  /* Arena: floating gold dust */
+  .gold-dust .particle {
+    width: 3px; height: 3px;
+    background: #e8c980;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #e8c980;
+    animation: gold-drift linear infinite;
+  }
+  @keyframes gold-drift {
+    0%   { transform: translateY(320px) translateX(0); opacity: 0; }
+    20%  { opacity: 0.7; }
+    100% { transform: translateY(-30px) translateX(-15px); opacity: 0; }
+  }
+  .gold-dust .particle:nth-child(1)  { left: 20%; animation-duration: 9s; animation-delay: 0s; }
+  .gold-dust .particle:nth-child(2)  { left: 38%; animation-duration: 10s; animation-delay: 2s; }
+  .gold-dust .particle:nth-child(3)  { left: 55%; animation-duration: 11s; animation-delay: 4s; }
+  .gold-dust .particle:nth-child(4)  { left: 72%; animation-duration: 9.5s; animation-delay: 1s; }
+  .gold-dust .particle:nth-child(5)  { left: 85%; animation-duration: 10.5s; animation-delay: 3s; }
+  .gold-dust .particle:nth-child(6)  { left: 10%; animation-duration: 11s; animation-delay: 5s; }
+  .gold-dust .particle:nth-child(7)  { left: 45%; animation-duration: 8s; animation-delay: 1.5s; }
+  .gold-dust .particle:nth-child(8)  { left: 62%; animation-duration: 9s; animation-delay: 4.5s; }
+
+  /* ===== Footer with explanatory notes ===== */
+  .notes {
+    max-width: 760px; margin: 24px auto 0;
+    padding: 14px 18px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    font-size: 13px; line-height: 1.6;
+    color: var(--text-dim);
+  }
+  .notes strong { color: var(--gold-bright); font-family: 'Cinzel', serif; }
+  .notes ul { margin-left: 18px; }
+  .notes li { margin: 3px 0; }
+
+  @media (max-width: 480px) {
+    .fighter-portrait { width: 100px; height: 100px; font-size: 50px; }
+    .combat-scene { height: 280px; }
+    .biome-tabs { gap: 4px; }
+    .biome-tab { font-size: 10px; padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>COMBAT BACKDROP MOCKUP</h1>
+  <div class="subtitle">— preview do que faz a Fase 1 (gradientes CSS + partículas, sem assets) —</div>
+</div>
+
+<div class="biome-tabs" id="tabs">
+  <button class="biome-tab active" data-biome="forest">🌲 Whispering Woods</button>
+  <button class="biome-tab" data-biome="crypt">⚰️ Cursed Crypt</button>
+  <button class="biome-tab" data-biome="lava">🌋 Burning Wastes</button>
+  <button class="biome-tab" data-biome="frost">❄️ Frostfell Pass</button>
+  <button class="biome-tab" data-biome="arena">⚔️ Blood Arena</button>
+</div>
+
+<div class="arena-wrap">
+  <div class="arena-header">
+    <div class="arena-title">⚔ COMBAT</div>
+    <div class="arena-biome-label" id="biome-label">Whispering Woods · Lv 4</div>
+  </div>
+  <div class="combat-scene">
+    <div class="combat-backdrop bd-forest" id="backdrop"></div>
+    <div class="combat-overlay"></div>
+    <div class="combat-particles leaves" id="particles">
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    </div>
+    <div class="combat-arena">
+      <div class="fighter hero">
+        <div class="fighter-portrait">
+          <img src="../assets/chars/elf-knight-idle.gif" alt="Elf Knight">
+        </div>
+        <div class="fighter-name">ELF KNIGHT</div>
+        <div class="fighter-bar">
+          <div class="fighter-bar-fill" style="width: 78%;"></div>
+          <div class="fighter-bar-text">62 / 80</div>
+        </div>
+      </div>
+      <div class="versus-indicator">VS</div>
+      <div class="fighter enemy">
+        <div class="fighter-portrait">
+          <img src="../assets/sprites/imp-sword-idle.gif" alt="Goblin Raider">
+        </div>
+        <div class="fighter-name">GOBLIN RAIDER</div>
+        <div class="fighter-bar">
+          <div class="fighter-bar-fill" style="width: 35%;"></div>
+          <div class="fighter-bar-text">14 / 40</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notes">
+  <strong>O que estás a ver</strong>
+  <ul>
+    <li><strong>Backdrop:</strong> gradientes CSS puros — zero imagens externas. Quando o MCP do PixelLab estiver activo, trocamos só o <code>background</code> por <code>url('assets/biomes/forest.png')</code>.</li>
+    <li><strong>Partículas:</strong> 8 elementos animados via <code>@keyframes</code>. Caem folhas (forest), sobem brasas (lava), neve cai (frost), motes flutuam (crypt), poeira dourada (arena).</li>
+    <li><strong>Vignette + darkening:</strong> overlay radial garante que os fighters destacam mesmo num cenário colorido.</li>
+    <li><strong>Fighters:</strong> usei o teu elf knight (assets/chars/elf-knight-idle.gif, 68×68 PixelLab) + goblin (assets/sprites/imp-sword-idle.gif). Mesmo CSS pixel-perfect do jogo real.</li>
+    <li><strong>Idle bob:</strong> os portraits oscilam suavemente como no jogo (animation: idle-bob).</li>
+  </ul>
+  <strong>Quando temos os assets reais (PixelLab via MCP)</strong>
+  <ul>
+    <li>Os gradientes ficam como fallback — se uma imagem falhar a carregar, o gradiente continua a aparecer.</li>
+    <li>Mantemos as partículas. Combinadas com pixel art autêntica, ficam estilo Darkest Dungeon / Ragnarok.</li>
+    <li>Podemos ainda adicionar parallax (sky background + foreground separados) para profundidade.</li>
+  </ul>
+</div>
+
+<script>
+  // Biome switcher
+  const BIOMES = {
+    forest: { bd: 'bd-forest', particles: 'leaves',    label: 'Whispering Woods · Lv 4' },
+    crypt:  { bd: 'bd-crypt',  particles: 'motes',     label: 'Cursed Crypt · Lv 8' },
+    lava:   { bd: 'bd-lava',   particles: 'embers',    label: 'Burning Wastes · Lv 28' },
+    frost:  { bd: 'bd-frost',  particles: 'snow',      label: 'Frostfell Pass · Lv 45' },
+    arena:  { bd: 'bd-arena',  particles: 'gold-dust', label: 'Blood Arena · PvP' }
+  };
+  const tabs = document.getElementById('tabs');
+  const backdrop = document.getElementById('backdrop');
+  const particles = document.getElementById('particles');
+  const label = document.getElementById('biome-label');
+  tabs.addEventListener('click', (e) => {
+    if (!e.target.dataset.biome) return;
+    tabs.querySelectorAll('.biome-tab').forEach(t => t.classList.toggle('active', t === e.target));
+    const cfg = BIOMES[e.target.dataset.biome];
+    backdrop.className = 'combat-backdrop ' + cfg.bd;
+    particles.className = 'combat-particles ' + cfg.particles;
+    label.textContent = cfg.label;
+  });
+</script>
+
+</body>
+</html>
