@@ -495,6 +495,119 @@
     background: rgba(201,165,87,0.08); border: 1px solid var(--gold);
     text-align: center; font-family: 'Cinzel', serif; font-size: 14px;
   }
+  /* ============ FORGE ============ */
+  .forge-row {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px; margin-bottom: 8px;
+  }
+  .forge-row-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; margin-bottom: 6px;
+  }
+  .forge-row-name {
+    font-family: 'Cinzel', serif; font-size: 13px;
+  }
+  .forge-row-slot {
+    font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .forge-stats { font-size: 12px; color: var(--text); margin-bottom: 6px; }
+  .forge-enhance {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; background: rgba(0,0,0,0.25); border: 1px solid rgba(201,165,87,0.18);
+    margin-bottom: 6px;
+  }
+  .forge-enhance-label {
+    flex: 1; font-size: 12px; color: var(--gold-bright);
+    font-family: 'Cinzel', serif;
+  }
+  .forge-enhance-btn {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    color: var(--gold-bright); background: var(--bg);
+    padding: 6px 10px; border: 1px solid var(--gold); cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .forge-enhance-btn:hover:not(:disabled) { background: var(--gold); color: var(--bg); }
+  .forge-enhance-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .forge-sockets { display: flex; gap: 6px; flex-wrap: wrap; }
+  .forge-socket {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(201,165,87,0.35);
+    background: rgba(0,0,0,0.35);
+    font-size: 18px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .forge-socket.empty:hover { border-color: var(--gold); background: rgba(201,165,87,0.12); }
+  .forge-socket.filled { border-color: var(--gold); cursor: pointer; }
+  .forge-socket.filled:hover { background: rgba(180,40,40,0.12); border-color: #c44; }
+  .forge-no-sockets {
+    font-size: 11px; color: var(--text-dim); font-style: italic; padding: 4px 0;
+  }
+  .gem-stash {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .gem-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 8px; background: var(--bg-deep);
+    border: 1px solid var(--border); font-size: 12px;
+  }
+  .gem-stash-empty {
+    font-size: 12px; color: var(--text-dim); font-style: italic; padding: 6px 0;
+  }
+  /* Gem-pick modal — overlay for choosing which gem to socket */
+  .gem-pick-grid {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+  }
+  .gem-pick-card {
+    flex: 1 1 100px; min-width: 100px;
+    padding: 10px; background: var(--bg-deep);
+    border: 1px solid var(--border); text-align: center;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .gem-pick-card:hover { border-color: var(--gold); background: rgba(201,165,87,0.08); }
+  .gem-pick-glyph { font-size: 28px; margin-bottom: 4px; }
+  .gem-pick-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright); }
+  .gem-pick-stat { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  /* Enhancement level pill (e.g. "+3") */
+  .enh-pill {
+    display: inline-block; margin-left: 4px;
+    padding: 1px 6px; background: rgba(201,165,87,0.18);
+    border: 1px solid rgba(201,165,87,0.4); color: var(--gold-bright);
+    font-size: 11px; font-weight: bold;
+  }
+  /* ============ TALENT RESPEC + LOADOUTS ============ */
+  .talent-respec {
+    display: inline-block; margin-left: 8px;
+    padding: 2px 7px; font-size: 11px;
+    background: rgba(180,40,40,0.15); border: 1px solid rgba(180,40,40,0.5);
+    color: #e88; cursor: pointer; transition: all 0.15s;
+  }
+  .talent-respec:hover { background: rgba(180,40,40,0.35); color: #fff; }
+  .loadout-row {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+    padding: 8px 10px; background: var(--bg-deep); border: 1px solid var(--border);
+  }
+  .loadout-name {
+    flex: 1; font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright);
+  }
+  .loadout-sub { font-size: 11px; color: var(--text-dim); font-style: italic; margin-top: 2px; }
+  .loadout-btn {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--gold-bright); background: var(--bg);
+    padding: 5px 9px; border: 1px solid var(--gold); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .loadout-btn:hover { background: var(--gold); color: var(--bg); }
+  .loadout-btn.danger { color: #e88; border-color: rgba(180,40,40,0.5); }
+  .loadout-btn.danger:hover { background: rgba(180,40,40,0.5); color: #fff; }
+  .loadout-save {
+    display: flex; gap: 6px; align-items: center; margin-top: 8px;
+  }
+  .loadout-save input {
+    flex: 1; padding: 6px 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: inherit; font-size: 13px;
+  }
   .panel {
     background: linear-gradient(180deg, var(--bg-panel) 0%, #1c1410 100%);
     border: 1px solid var(--border);
@@ -1454,6 +1567,14 @@
       <path d="M3 3 L5 3 V6 A 2 2 0 0 1 3 4 Z M11 3 L13 3 V4 A 2 2 0 0 1 11 6 Z" fill="currentColor"/>
       <path d="M7 9 H9 V11 H10 V13 H6 V11 H7 Z" fill="currentColor"/>
     </symbol>
+    <symbol id="i-hammer" viewBox="0 0 16 16">
+      <path d="M2 4 H8 V7 H2 Z" fill="currentColor"/>
+      <path d="M7 5 L13 11 L11 13 L5 7 Z" fill="currentColor"/>
+      <path d="M9 2 H11 V5 H9 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-gem" viewBox="0 0 16 16">
+      <path d="M8 1 L13 6 L8 15 L3 6 Z M5 6 H11 L8 3 Z" fill="currentColor"/>
+    </symbol>
   </defs>
 </svg>
 <div class="app">
@@ -1501,6 +1622,7 @@
       <button class="tab" data-tab="talents"><svg class="tab-icon"><use href="#i-star"/></svg><span>TALENTS</span></button>
       <button class="tab" data-tab="inventory"><svg class="tab-icon"><use href="#i-bag"/></svg><span>BAG</span></button>
       <button class="tab" data-tab="shop"><svg class="tab-icon"><use href="#i-coin"/></svg><span>SHOP</span></button>
+      <button class="tab" data-tab="forge"><svg class="tab-icon"><use href="#i-hammer"/></svg><span>FORGE</span></button>
       <button class="tab" data-tab="pve"><svg class="tab-icon"><use href="#i-map"/></svg><span>HUNT</span></button>
       <button class="tab" data-tab="pvp"><svg class="tab-icon"><use href="#i-sword"/></svg><span>ARENA</span></button>
     </div>
@@ -1560,6 +1682,11 @@
       </div>
 
       <div class="panel">
+        <div class="section-title">Loadouts</div>
+        <div id="loadouts-mount"></div>
+      </div>
+
+      <div class="panel">
         <div class="section-title">Companion</div>
         <div id="pet-panel"></div>
       </div>
@@ -1600,6 +1727,18 @@
         <div class="section-title">Merchant</div>
         <div class="shop-intro">A weathered trader. Coin for sealed crates of fate.</div>
         <div id="shop-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-forge" class="tab-content hidden">
+      <div class="panel">
+        <div class="section-title">The Forge</div>
+        <div class="shop-intro">Enhance your gear. Set gems into open sockets. The anvil never sleeps.</div>
+        <div id="forge-equipment"></div>
+      </div>
+      <div class="panel">
+        <div class="section-title">Gem Stash</div>
+        <div id="forge-gems"></div>
       </div>
     </div>
 
@@ -3098,6 +3237,19 @@ function migrateHero(hero) {
   if (typeof hero.mp !== 'number') hero.mp = 0;
   if (!('specKey' in hero)) hero.specKey = null;
   ensureTracking(hero);
+  // S23 — Build depth pack: backfill crafting fields on every item.
+  // Equipped + inventory items get enhanceLevel/sockets/socketed if missing.
+  const backfillItem = (it) => {
+    if (!it) return;
+    if (typeof it.enhanceLevel !== 'number') it.enhanceLevel = 0;
+    if (typeof it.sockets !== 'number') it.sockets = SOCKETS_BY_RARITY[it.rarity] || 0;
+    if (!Array.isArray(it.socketed)) it.socketed = [];
+  };
+  Object.values(hero.equipment || {}).forEach(backfillItem);
+  (hero.inventory || []).forEach(backfillItem);
+  // Gem inventory + loadout slots
+  if (!Array.isArray(hero.gems)) hero.gems = [];
+  if (!Array.isArray(hero.loadouts)) hero.loadouts = [];
   return hero;
 }
 
@@ -3264,6 +3416,61 @@ function formatReward(r) {
   });
   if (r.goldOnce) parts.push(`+${r.goldOnce} ◊`);
   return parts.join(', ');
+}
+
+// ============ CRAFTING: GEMS + ENHANCEMENT ============
+// Gems are a new item type slotted into equipped gear (sockets are rolled at
+// item generation). A socketed gem grants permanent stat bonuses on top of
+// the item's own stats + enhancement bonuses.
+const GEM_POOL = [
+  { name: 'Ruby',     glyph: '🔴', stat: 'atk', val: 5, rarity: 'rare' },
+  { name: 'Sapphire', glyph: '🔵', stat: 'int', val: 5, rarity: 'rare' },
+  { name: 'Emerald',  glyph: '🟢', stat: 'vit', val: 5, rarity: 'rare' },
+  { name: 'Topaz',    glyph: '🟡', stat: 'agi', val: 5, rarity: 'rare' },
+  { name: 'Diamond',  glyph: '⚪', stat: 'all', val: 3, rarity: 'epic' }
+];
+// Pick a random gem (Diamond is rarer than the basic 4)
+function rollGem() {
+  const r = Math.random();
+  if (r < 0.10) return GEM_POOL[4]; // Diamond — 10%
+  return GEM_POOL[Math.floor(r * 4 * (1 / 0.90))]; // basic 4 — 22.5% each
+}
+
+// Sockets-per-rarity table — used when generating items.
+const SOCKETS_BY_RARITY = { common: 0, uncommon: 0, rare: 1, epic: 2, legendary: 3 };
+// Cap and growth for item enhancement.
+const ENHANCE_MAX = 5;
+const ENHANCE_PCT_PER_LEVEL = 0.15; // each +1 adds 15% to base stats
+const ENHANCE_RARITY_MULT = { common: 1, uncommon: 2, rare: 4, epic: 8, legendary: 16 };
+function enhanceCost(item) {
+  if (!item) return 0;
+  const lvl = item.enhanceLevel || 0;
+  if (lvl >= ENHANCE_MAX) return 0;
+  const mult = ENHANCE_RARITY_MULT[item.rarity] || 1;
+  return 50 * (lvl + 1) * mult;
+}
+
+// Compute the stat bonus this item contributes after enhancement + gems.
+function effectiveItemStats(item) {
+  if (!item) return {};
+  const base = item.stats || {};
+  const lvl = item.enhanceLevel || 0;
+  const enhanceMult = 1 + lvl * ENHANCE_PCT_PER_LEVEL;
+  const total = {};
+  Object.entries(base).forEach(([k, v]) => {
+    total[k] = Math.floor(v * enhanceMult);
+  });
+  // Socketed gems
+  (item.socketed || []).forEach(gem => {
+    if (gem.stat === 'all') {
+      ['atk', 'def', 'vit', 'agi', 'int'].forEach(s => {
+        total[s] = (total[s] || 0) + gem.val;
+      });
+    } else {
+      total[gem.stat] = (total[gem.stat] || 0) + gem.val;
+    }
+  });
+  return total;
 }
 
 // ============ ITEM SETS ============
@@ -3478,7 +3685,9 @@ function createHero() {
     hp: 0, maxHp: 0,
     mp: 0, maxMp: 0,
     equipment: emptyEquipment(),
-    inventory: [generateItem('common', 'weapon'), generateItem('common', 'armor')]
+    inventory: [generateItem('common', 'weapon'), generateItem('common', 'armor')],
+    gems: [],         // S23 — gem stash (crafting / sockets)
+    loadouts: []      // S23 — saved gear loadouts (max 3)
   };
   ensureTracking(state.hero);
   recalculate();
@@ -3511,7 +3720,12 @@ function generateItem(rarityHint, slotHint) {
     if (filtered.length) pool = filtered;
   }
   const tpl = pool[Math.floor(Math.random() * pool.length)];
-  return JSON.parse(JSON.stringify(tpl));
+  const item = JSON.parse(JSON.stringify(tpl));
+  // Crafting fields: enhancement starts at +0, sockets depend on rarity
+  item.enhanceLevel = 0;
+  item.sockets = SOCKETS_BY_RARITY[item.rarity] || 0;
+  item.socketed = [];
+  return item;
 }
 
 function rollLootByLevel(monsterLevel) {
@@ -3523,6 +3737,16 @@ function rollLootByLevel(monsterLevel) {
   else if (roll < 0.30 + lvlBonus) rarity = 'rare';
   else if (roll < 0.60) rarity = 'uncommon';
   return generateItem(rarity);
+}
+
+// S23 — gem drops (separate from item loot). Returns the gem if dropped, else null.
+// Higher monster levels nudge the chance up slightly.
+function maybeDropGem(monsterLevel) {
+  const chance = 0.12 + (monsterLevel || 1) * 0.005; // 12% + lvl scaling
+  if (Math.random() > chance) return null;
+  const gem = rollGem();
+  state.hero.gems.push(JSON.parse(JSON.stringify(gem)));
+  return gem;
 }
 
 // ============ STATS & TALENTS ============
@@ -3588,7 +3812,8 @@ function recalculate() {
   const total = { atk: 0, def: 0, vit: 0, agi: 0, int: 0, ...h.base };
   Object.values(h.equipment).forEach(item => {
     if (!item) return;
-    Object.entries(item.stats).forEach(([k, v]) => {
+    // Use effective stats (base × enhance multiplier + socketed gem bonuses)
+    Object.entries(effectiveItemStats(item)).forEach(([k, v]) => {
       total[k] = (total[k] || 0) + v;
     });
   });
@@ -3688,10 +3913,12 @@ function renderAll() {
   renderTalents();
   renderInventory();
   renderShop();
+  renderForge();
   renderPve();
   renderPvp();
   renderAchievements();
   renderPet();
+  renderLoadouts();
 }
 
 // ============ PET PANEL ============
@@ -3952,6 +4179,385 @@ function shopBuyCrate() {
   }
 }
 
+// ============ FORGE (S23) ============
+// Renders the Forge tab: every equipped slot becomes a row with
+// "Enhance +N" button + visual sockets. Also lists the gem stash.
+function renderForge() {
+  const h = state.hero;
+  if (!h) return;
+  const eqMount = document.getElementById('forge-equipment');
+  const gemMount = document.getElementById('forge-gems');
+  if (!eqMount || !gemMount) return;
+
+  // Equipment rows — only show slots that actually have an item
+  const eqRows = SLOT_ORDER.map(slotKey => {
+    const item = h.equipment[slotKey];
+    if (!item) {
+      return `<div class="forge-row" style="opacity:0.45;">
+        <div class="forge-row-head">
+          <div class="forge-row-name">— empty —</div>
+          <div class="forge-row-slot">${SLOT_LABELS[slotKey]}</div>
+        </div>
+      </div>`;
+    }
+    const eff = effectiveItemStats(item);
+    const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
+    const lvl = item.enhanceLevel || 0;
+    const maxed = lvl >= ENHANCE_MAX;
+    const cost = enhanceCost(item);
+    const canAfford = h.gold >= cost;
+    const enhanceBtn = maxed
+      ? `<button class="forge-enhance-btn" disabled>MAX +${ENHANCE_MAX}</button>`
+      : `<button class="forge-enhance-btn ${canAfford ? '' : 'disabled'}" data-enhance="${slotKey}" ${canAfford ? '' : 'disabled'}>+${lvl + 1} · ${cost} ◊</button>`;
+
+    // Sockets
+    const socketsCount = item.sockets || 0;
+    const filled = item.socketed || [];
+    let socketHtml = '';
+    if (socketsCount === 0) {
+      socketHtml = '<div class="forge-no-sockets">No sockets.</div>';
+    } else {
+      const slots = [];
+      for (let i = 0; i < socketsCount; i++) {
+        const gem = filled[i];
+        if (gem) {
+          slots.push(`<div class="forge-socket filled" title="${gem.name} (click to remove)" data-unsocket="${slotKey}:${i}">${gem.glyph}</div>`);
+        } else {
+          slots.push(`<div class="forge-socket empty" title="Click to socket a gem" data-socket="${slotKey}:${i}">＋</div>`);
+        }
+      }
+      socketHtml = `<div class="forge-sockets">${slots.join('')}</div>`;
+    }
+
+    const pill = lvl > 0 ? `<span class="enh-pill">+${lvl}</span>` : '';
+    return `<div class="forge-row rarity-${item.rarity}">
+      <div class="forge-row-head">
+        <div class="forge-row-name r-${item.rarity}">${item.name}${pill}</div>
+        <div class="forge-row-slot">${SLOT_LABELS[slotKey]}</div>
+      </div>
+      <div class="forge-stats">${statStr}</div>
+      <div class="forge-enhance">
+        <div class="forge-enhance-label">Enhance ${maxed ? '(max)' : 'to +' + (lvl + 1)}</div>
+        ${enhanceBtn}
+      </div>
+      ${socketHtml}
+    </div>`;
+  }).join('');
+  eqMount.innerHTML = eqRows;
+
+  // Wire enhance buttons
+  eqMount.querySelectorAll('[data-enhance]').forEach(b => {
+    b.addEventListener('click', () => enhanceItem(b.dataset.enhance));
+  });
+  // Wire empty sockets (pick gem)
+  eqMount.querySelectorAll('[data-socket]').forEach(b => {
+    b.addEventListener('click', () => openGemPicker(b.dataset.socket));
+  });
+  // Wire filled sockets (remove gem)
+  eqMount.querySelectorAll('[data-unsocket]').forEach(b => {
+    b.addEventListener('click', () => unsocketGem(b.dataset.unsocket));
+  });
+
+  // Gem stash
+  if (h.gems.length === 0) {
+    gemMount.innerHTML = '<div class="gem-stash-empty">No gems yet. Slay monsters to find them.</div>';
+  } else {
+    // Group by name for compact display
+    const counts = {};
+    h.gems.forEach(g => {
+      const k = g.name;
+      counts[k] = counts[k] || { gem: g, n: 0 };
+      counts[k].n++;
+    });
+    gemMount.innerHTML = `<div class="gem-stash">${Object.values(counts).map(({ gem, n }) =>
+      `<div class="gem-chip r-${gem.rarity}" title="${gem.name} — ${gemBonusDesc(gem)}">${gem.glyph} ${gem.name} ×${n}</div>`
+    ).join('')}</div>`;
+  }
+}
+
+function gemBonusDesc(gem) {
+  if (gem.stat === 'all') return `+${gem.val} all stats`;
+  return `+${gem.val} ${statLabel(gem.stat)}`;
+}
+
+// Compact badge for slot displays: shows +N enhancement pill and tiny socket dots
+function itemBadgeHtml(item) {
+  if (!item) return '';
+  const lvl = item.enhanceLevel || 0;
+  const sockets = item.sockets || 0;
+  const filled = (item.socketed || []).filter(Boolean).length;
+  let out = '';
+  if (lvl > 0) out += `<span class="enh-pill">+${lvl}</span>`;
+  if (sockets > 0) {
+    let dots = '';
+    for (let i = 0; i < sockets; i++) {
+      const isFilled = i < filled;
+      dots += `<span style="display:inline-block; width:6px; height:6px; margin:0 1px; border-radius:50%; background:${isFilled ? 'var(--gold-bright)' : 'rgba(255,255,255,0.15)'};"></span>`;
+    }
+    out += `<span style="margin-left:4px;" title="${filled}/${sockets} sockets">${dots}</span>`;
+  }
+  return out;
+}
+
+function enhanceItem(slotKey) {
+  const h = state.hero;
+  const item = h.equipment[slotKey];
+  if (!item) return;
+  const lvl = item.enhanceLevel || 0;
+  if (lvl >= ENHANCE_MAX) return;
+  const cost = enhanceCost(item);
+  if (h.gold < cost) return;
+  h.gold -= cost;
+  item.enhanceLevel = lvl + 1;
+  recalculate();
+  saveGame();
+  renderAll();
+  try { sfxClick(); } catch (e) {}
+  showToast({
+    icon: '🔨',
+    title: `${item.name} → +${item.enhanceLevel}`,
+    desc: `Enhanced for ${cost} ◊`,
+    kind: 'success'
+  });
+}
+
+function openGemPicker(socketRef) {
+  const h = state.hero;
+  if (!h || h.gems.length === 0) {
+    showToast({ icon: '✦', title: 'No gems in stash', desc: 'Hunt monsters to find gems.' });
+    return;
+  }
+  // Modal overlay (reused .modal-overlay / .modal-panel pattern)
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  // Group gems by name so the picker is compact
+  const counts = {};
+  h.gems.forEach((g, idx) => {
+    const k = g.name;
+    counts[k] = counts[k] || { gem: g, indices: [] };
+    counts[k].indices.push(idx);
+  });
+  overlay.innerHTML = `<div class="modal-panel">
+    <div class="section-title">Socket a gem</div>
+    <div style="font-size:12px; color:var(--text-dim); font-style:italic; margin-bottom:8px;">Pick a gem from your stash.</div>
+    <div class="gem-pick-grid">
+      ${Object.values(counts).map(({ gem, indices }) => `
+        <div class="gem-pick-card" data-gem-idx="${indices[0]}">
+          <div class="gem-pick-glyph">${gem.glyph}</div>
+          <div class="gem-pick-name r-${gem.rarity}">${gem.name}</div>
+          <div class="gem-pick-stat">${gemBonusDesc(gem)} · ×${indices.length}</div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="forge-enhance-btn" id="gem-pick-cancel" style="margin-top:10px; width:100%;">Cancel</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelectorAll('[data-gem-idx]').forEach(card => {
+    card.addEventListener('click', () => {
+      const gemIdx = parseInt(card.dataset.gemIdx);
+      socketGem(socketRef, gemIdx);
+      document.body.removeChild(overlay);
+    });
+  });
+  overlay.querySelector('#gem-pick-cancel').addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) document.body.removeChild(overlay);
+  });
+}
+
+function socketGem(socketRef, gemIdx) {
+  const h = state.hero;
+  const [slotKey, idxStr] = socketRef.split(':');
+  const sIdx = parseInt(idxStr);
+  const item = h.equipment[slotKey];
+  if (!item) return;
+  const gem = h.gems[gemIdx];
+  if (!gem) return;
+  if (sIdx >= (item.sockets || 0)) return;
+  // Ensure socketed array is long enough
+  while (item.socketed.length <= sIdx) item.socketed.push(null);
+  if (item.socketed[sIdx]) return; // already filled
+  item.socketed[sIdx] = JSON.parse(JSON.stringify(gem));
+  // Remove the gem from the stash
+  h.gems.splice(gemIdx, 1);
+  recalculate();
+  saveGame();
+  renderAll();
+  try { sfxClick(); } catch (e) {}
+  showToast({
+    icon: gem.glyph,
+    title: `${gem.name} socketed`,
+    desc: `Set into ${item.name}`,
+    kind: 'success'
+  });
+}
+
+function unsocketGem(socketRef) {
+  const h = state.hero;
+  const [slotKey, idxStr] = socketRef.split(':');
+  const sIdx = parseInt(idxStr);
+  const item = h.equipment[slotKey];
+  if (!item || !item.socketed || !item.socketed[sIdx]) return;
+  if (!window.confirm('Remove this gem? It returns to your stash.')) return;
+  const gem = item.socketed[sIdx];
+  item.socketed[sIdx] = null;
+  // Compact trailing nulls so the array length matches what's actually filled
+  while (item.socketed.length && item.socketed[item.socketed.length - 1] === null) item.socketed.pop();
+  h.gems.push(gem);
+  recalculate();
+  saveGame();
+  renderAll();
+}
+
+// ============ TALENT RESPEC (S23) ============
+function talentRespecCost(tier) {
+  // 500 × tier — scales with how deep the choice is
+  return 500 * tier;
+}
+function specRespecCost() {
+  return 2000;
+}
+function respecTalent(tier) {
+  const h = state.hero;
+  if (!h.talentPicks[tier]) return;
+  const cost = talentRespecCost(tier);
+  if (h.gold < cost) {
+    showToast({ icon: '✦', title: 'Not enough gold', desc: `Costs ${cost} ◊ to respec this tier.` });
+    return;
+  }
+  if (!window.confirm(`Respec tier ${tier} for ${cost} ◊? The slot opens up to pick again.`)) return;
+  h.gold -= cost;
+  delete h.talentPicks[tier];
+  recalculate();
+  saveGame();
+  renderAll();
+  showToast({ icon: '↺', title: `Tier ${tier} respec`, desc: `Pick a new talent.`, kind: 'success' });
+}
+function respecSpec() {
+  const h = state.hero;
+  if (!h.specKey) return;
+  const cost = specRespecCost();
+  if (h.gold < cost) {
+    showToast({ icon: '✦', title: 'Not enough gold', desc: `Costs ${cost} ◊ to abandon your spec.` });
+    return;
+  }
+  if (!window.confirm(`Abandon your specialisation for ${cost} ◊? You can pick a new one.`)) return;
+  h.gold -= cost;
+  h.specKey = null;
+  recalculate();
+  saveGame();
+  renderAll();
+  showToast({ icon: '↺', title: 'Specialisation cleared', desc: 'The path lies open again.', kind: 'success' });
+}
+
+// ============ LOADOUTS (S23) ============
+const MAX_LOADOUTS = 3;
+function saveLoadout(name) {
+  const h = state.hero;
+  if (!h) return;
+  if (!name || !name.trim()) {
+    showToast({ icon: '✦', title: 'Name required', desc: 'Type a loadout name first.' });
+    return;
+  }
+  if (h.loadouts.length >= MAX_LOADOUTS) {
+    showToast({ icon: '✦', title: 'Loadout slots full', desc: `Max ${MAX_LOADOUTS}. Delete one first.` });
+    return;
+  }
+  // Snapshot the names of currently equipped items — applies by name match
+  // against the bag at equip-time, so it remains valid across sessions.
+  const snap = {};
+  SLOT_ORDER.forEach(k => {
+    const it = h.equipment[k];
+    snap[k] = it ? it.name : null;
+  });
+  h.loadouts.push({ name: name.trim().slice(0, 20), snapshot: snap });
+  saveGame();
+  renderAll();
+  showToast({ icon: '✦', title: 'Loadout saved', desc: name.trim(), kind: 'success' });
+}
+function equipLoadout(idx) {
+  const h = state.hero;
+  if (!h || !h.loadouts[idx]) return;
+  const snap = h.loadouts[idx].snapshot;
+  let equipped = 0, missing = 0;
+  SLOT_ORDER.forEach(slotKey => {
+    const targetName = snap[slotKey];
+    if (!targetName) return; // loadout had this slot empty — leave current alone
+    const current = h.equipment[slotKey];
+    if (current && current.name === targetName) return; // already correct
+    // Find the matching item in inventory (by name)
+    const invIdx = h.inventory.findIndex(it => it.name === targetName);
+    if (invIdx === -1) { missing++; return; }
+    // Swap: put currently equipped back into the bag, pull the target out
+    const target = h.inventory.splice(invIdx, 1)[0];
+    if (current) h.inventory.push(current);
+    h.equipment[slotKey] = target;
+    equipped++;
+  });
+  recalculate();
+  saveGame();
+  renderAll();
+  showToast({
+    icon: '⚔',
+    title: `Loadout: ${h.loadouts[idx].name}`,
+    desc: missing ? `${equipped} equipped · ${missing} missing` : `${equipped} swapped`,
+    kind: 'success'
+  });
+}
+function deleteLoadout(idx) {
+  const h = state.hero;
+  if (!h || !h.loadouts[idx]) return;
+  if (!window.confirm(`Delete loadout "${h.loadouts[idx].name}"?`)) return;
+  h.loadouts.splice(idx, 1);
+  saveGame();
+  renderAll();
+}
+
+function renderLoadouts() {
+  const mount = document.getElementById('loadouts-mount');
+  if (!mount) return;
+  const h = state.hero;
+  if (!h) return;
+  const rows = h.loadouts.map((lo, idx) => {
+    // Count how many slots had something saved (for the sub-line)
+    const slotsSaved = Object.values(lo.snapshot).filter(Boolean).length;
+    return `<div class="loadout-row">
+      <div style="flex:1;">
+        <div class="loadout-name">${lo.name}</div>
+        <div class="loadout-sub">${slotsSaved} slot${slotsSaved === 1 ? '' : 's'} saved</div>
+      </div>
+      <button class="loadout-btn" data-loadout-equip="${idx}">EQUIP</button>
+      <button class="loadout-btn danger" data-loadout-del="${idx}" title="Delete">✕</button>
+    </div>`;
+  }).join('');
+  const empty = h.loadouts.length === 0
+    ? '<div style="font-size:12px; color:var(--text-dim); font-style:italic; margin-bottom:8px;">No loadouts saved. Snapshot your current gear below.</div>'
+    : '';
+  const canAddMore = h.loadouts.length < MAX_LOADOUTS;
+  const saveBar = canAddMore
+    ? `<div class="loadout-save">
+        <input type="text" id="loadout-name-input" maxlength="20" placeholder="Loadout name…" />
+        <button class="loadout-btn" id="loadout-save-btn">SAVE</button>
+      </div>`
+    : `<div style="font-size:11px; color:var(--text-dim); font-style:italic; text-align:center; margin-top:6px;">Max ${MAX_LOADOUTS} loadouts. Delete one to add more.</div>`;
+  mount.innerHTML = empty + rows + saveBar;
+  mount.querySelectorAll('[data-loadout-equip]').forEach(b => {
+    b.addEventListener('click', () => equipLoadout(parseInt(b.dataset.loadoutEquip)));
+  });
+  mount.querySelectorAll('[data-loadout-del]').forEach(b => {
+    b.addEventListener('click', () => deleteLoadout(parseInt(b.dataset.loadoutDel)));
+  });
+  const saveBtn = document.getElementById('loadout-save-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const inp = document.getElementById('loadout-name-input');
+      saveLoadout(inp ? inp.value : '');
+    });
+  }
+}
+
 function renderHero() {
   const h = state.hero;
   document.getElementById('hero-name').textContent = h.name;
@@ -4051,7 +4657,7 @@ function renderHero() {
     const rarityCls = item ? `rarity-${item.rarity}` : '';
     return `<div class="slot ${rarityCls}" data-slot="${key}">
       <div class="slot-label">${SLOT_LABELS[key]}</div>
-      ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
+      ${item ? `<div class="slot-item r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</div>` : `<div class="slot-empty">— empty —</div>`}
     </div>`;
   }).join('');
   eq.querySelectorAll('[data-slot]').forEach(el => {
@@ -4106,8 +4712,9 @@ function renderTalents() {
     const unlocked = isTierUnlocked(tier);
     const picked = h.talentPicks[tier];
 
+    const respecCost = talentRespecCost(tier);
     const headerNote = picked
-      ? `<span class="tier-state picked">picked</span>`
+      ? `<span class="tier-state picked">picked</span><span class="talent-respec" data-respec-tier="${tier}" title="Respec — refund this pick to choose again">↺ ${respecCost} ◊</span>`
       : (unlocked
           ? `<span class="tier-state available">choose one</span>`
           : `<span class="tier-state locked">unlocks at Lv ${unlockLvl}</span>`);
@@ -4150,6 +4757,13 @@ function renderTalents() {
       pickTalent(parseInt(tierStr), key);
     });
   });
+  // Respec buttons — stop propagation so they don't trigger talent-node click
+  tree.querySelectorAll('[data-respec-tier]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      respecTalent(parseInt(el.dataset.respecTier));
+    });
+  });
 }
 
 function renderSpecPanel() {
@@ -4173,7 +4787,12 @@ function renderSpecPanel() {
     return;
   }
   // Unlocked: render cards (chosen vs available)
-  el.innerHTML = specs.map(s => {
+  const respecBar = h.specKey
+    ? `<div style="text-align:right; margin-bottom:6px;">
+        <span class="talent-respec" id="spec-respec-btn" title="Abandon your spec to pick again">↺ Respec spec · ${specRespecCost()} ◊</span>
+      </div>`
+    : '';
+  el.innerHTML = respecBar + specs.map(s => {
     const picked = h.specKey === s.key;
     const lockedOut = h.specKey && !picked;
     let cls = 'spec-card';
@@ -4195,6 +4814,9 @@ function renderSpecPanel() {
         }
       });
     });
+  } else {
+    const specBtn = document.getElementById('spec-respec-btn');
+    if (specBtn) specBtn.addEventListener('click', respecSpec);
   }
 }
 
@@ -4222,7 +4844,7 @@ function renderInventory() {
       const rarityCls = item ? `rarity-${item.rarity}` : '';
       return `<div class="slot ${rarityCls}" data-bagslot="${key}">
         <div class="slot-label">${SLOT_LABELS[key]}</div>
-        ${item ? `<div class="slot-item r-${item.rarity}">${item.name}</div>` : `<div class="slot-empty">— empty —</div>`}
+        ${item ? `<div class="slot-item r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</div>` : `<div class="slot-empty">— empty —</div>`}
       </div>`;
     }).join('');
     eqPanel.querySelectorAll('[data-bagslot]').forEach(el => {
@@ -4240,11 +4862,13 @@ function renderInventory() {
   const totalSellValue = state.hero.inventory.reduce((s, it) => s + sellPrice(it), 0);
   const sellAllHtml = `<button class="btn-sell-all" id="sell-all-btn">SELL ALL (${state.hero.inventory.length}) — ${totalSellValue} ◊</button>`;
   list.innerHTML = sellAllHtml + state.hero.inventory.map((item, idx) => {
-    const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
+    // Show effective stats (so +N enhance + gem bonuses are visible in the bag)
+    const eff = effectiveItemStats(item);
+    const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
     const slotLabel = item.slot === 'ring' ? 'Ring' : (SLOT_LABELS[item.slot] || item.slot);
     return `<div class="inv-item rarity-${item.rarity}" data-idx="${idx}">
       <div class="inv-item-header">
-        <span class="inv-item-name r-${item.rarity}">${item.name}</span>
+        <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
         <span class="inv-item-slot">${slotLabel}</span>
       </div>
       <div class="inv-item-stats">${statStr}</div>
@@ -4284,10 +4908,11 @@ function renderItemCell(item, labelText, isNew) {
       <div class="compare-cell-empty">— empty —</div>
     </div>`;
   }
-  const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
+  const eff = effectiveItemStats(item);
+  const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
   return `<div class="${cls}">
     <div class="compare-cell-label">${labelText}</div>
-    <div class="compare-cell-name r-${item.rarity}">${item.name}</div>
+    <div class="compare-cell-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</div>
     <div class="compare-cell-stats">${statStr}</div>
     ${item.effect ? `<div class="compare-cell-effect">✦ ${item.effect.desc}</div>` : ''}
   </div>`;
@@ -4295,8 +4920,8 @@ function renderItemCell(item, labelText, isNew) {
 
 function renderDeltas(current, candidate) {
   const stats = ['atk', 'int', 'def', 'vit', 'agi'];
-  const cur = current ? current.stats : {};
-  const cand = candidate.stats || {};
+  const cur = current ? effectiveItemStats(current) : {};
+  const cand = effectiveItemStats(candidate);
   const rows = [];
   for (const s of stats) {
     const a = cur[s] || 0;
@@ -4322,7 +4947,10 @@ function renderDeltas(current, candidate) {
 // give meaningful gold and let the player save up for shop purchases.
 const SELL_PRICE = { common: 5, uncommon: 15, rare: 40, epic: 120, legendary: 400 };
 function sellPrice(item) {
-  return SELL_PRICE[item && item.rarity] || 0;
+  const base = SELL_PRICE[item && item.rarity] || 0;
+  // S23 — enhanced items recoup some of the gold spent on the anvil
+  const lvl = (item && item.enhanceLevel) || 0;
+  return base + lvl * 25;
 }
 
 // Sell every item currently in the bag (equipped gear is safe — only the
@@ -4331,8 +4959,13 @@ function sellAllBag() {
   const h = state.hero;
   if (!h || !h.inventory.length) return;
   const total = h.inventory.reduce((sum, item) => sum + sellPrice(item), 0);
-  if (!confirm(`Sell all ${h.inventory.length} items in your bag for ${total} ◊?\n\nYour equipped gear is safe.`)) return;
+  // Count gems that will be salvaged from socketed items
+  const salvagedGems = h.inventory.reduce((arr, it) => arr.concat((it.socketed || []).filter(Boolean)), []);
+  const gemNote = salvagedGems.length ? `\n\n${salvagedGems.length} gem${salvagedGems.length === 1 ? '' : 's'} will return to your stash.` : '';
+  if (!confirm(`Sell all ${h.inventory.length} items in your bag for ${total} ◊?\n\nYour equipped gear is safe.${gemNote}`)) return;
   h.gold += total;
+  // Salvage socketed gems back into the stash before discarding the items
+  salvagedGems.forEach(g => h.gems.push(g));
   h.inventory = [];
   saveGame();
   renderAll();
@@ -4425,14 +5058,15 @@ function openSlotPicker(slotKey) {
 
   const current = h.equipment[slotKey];
   if (current) {
-    const statStr = Object.entries(current.stats).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
+    const eff = effectiveItemStats(current);
+    const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${k.toUpperCase()}`).join(' · ');
     currentDiv.className = `slot-picker-current has-item rarity-${current.rarity}`;
     currentDiv.innerHTML = `
       <div class="slot-picker-current-header">
         <span class="slot-label">Equipped</span>
         <button class="btn btn-cancel btn-small" data-action="unequip">UNEQUIP</button>
       </div>
-      <div class="inv-item-name r-${current.rarity}">${current.name}</div>
+      <div class="inv-item-name r-${current.rarity}">${current.name}${itemBadgeHtml(current)}</div>
       <div class="inv-item-stats">${statStr}</div>
       ${current.effect ? `<div class="inv-item-effect">✦ ${current.effect.desc}</div>` : ''}
     `;
@@ -4457,8 +5091,8 @@ function openSlotPicker(slotKey) {
   compatible.sort((a, b) => {
     const r = (RARITY_ORDER[b.item.rarity] || 0) - (RARITY_ORDER[a.item.rarity] || 0);
     if (r !== 0) return r;
-    const sumA = Object.values(a.item.stats).reduce((s, v) => s + v, 0);
-    const sumB = Object.values(b.item.stats).reduce((s, v) => s + v, 0);
+    const sumA = Object.values(effectiveItemStats(a.item)).reduce((s, v) => s + v, 0);
+    const sumB = Object.values(effectiveItemStats(b.item)).reduce((s, v) => s + v, 0);
     return sumB - sumA;
   });
 
@@ -4466,10 +5100,11 @@ function openSlotPicker(slotKey) {
     list.innerHTML = `<div class="slot-picker-empty-note">Bag has no gear for this slot.</div>`;
   } else {
     list.innerHTML = compatible.map(({ item, idx }) => {
-      const statStr = Object.entries(item.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
+      const eff = effectiveItemStats(item);
+      const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
       return `<div class="inv-item rarity-${item.rarity}" data-picker-idx="${idx}">
         <div class="inv-item-header">
-          <span class="inv-item-name r-${item.rarity}">${item.name}</span>
+          <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
           <span class="inv-item-slot">${item.rarity}</span>
         </div>
         <div class="inv-item-stats">${statStr}</div>
@@ -4519,6 +5154,8 @@ function handleCompareAction(action) {
     const realIdx = state.hero.inventory.indexOf(item);
     if (realIdx !== -1) {
       state.hero.gold += sellPrice(item);
+      // S23 — salvage socketed gems back to the stash before discarding
+      (item.socketed || []).forEach(g => { if (g) state.hero.gems.push(g); });
       state.hero.inventory.splice(realIdx, 1);
       saveGame();
       renderAll();
@@ -5988,6 +6625,11 @@ function finishVictory(enemy, mode, log, heroFighter) {
     loot = rollLootByLevel(enemy.level || state.hero.level);
     state.hero.inventory.push(loot);
     lootMsg = `<span class="reward-item r-${loot.rarity}">✦ ${loot.name}</span>`;
+  }
+  // S23 — gem drop (independent roll, ~12% + level scaling)
+  const gemDrop = maybeDropGem(enemy.level || state.hero.level);
+  if (gemDrop) {
+    lootMsg += `<span class="reward-item r-${gemDrop.rarity}">${gemDrop.glyph} ${gemDrop.name}</span>`;
   }
   appendLog(log, `<div class="log-victory">⚔ VICTORY ⚔</div>`);
   appendLog(log, `<div class="reward">+${gold} gold · +${xp} XP${lootMsg}</div>`);

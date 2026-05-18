@@ -6,6 +6,64 @@
 
 ---
 
+## Session 23 — 2026-05-18 — Build depth pack: Forge (enhancement + gems), talent respec, loadouts
+
+User asked "o que posso melhorar?" and picked **Build depth pack (crafting + respec + loadouts)** from the menu. Three systems land together — none of them touch combat, all add depth between fights.
+
+### Crafting — new FORGE tab (7th nav tab)
+A new tab between **SHOP** and **HUNT**. Two panels: enhancement + sockets for every equipped slot, and a Gem Stash at the bottom listing the gems you've collected.
+
+**Item enhancement (+0 → +5)**
+- Each item carries `enhanceLevel` (0–5). Every +1 multiplies base stats by 15%.
+- Cost scales with rarity: `50 × (level+1) × rarityMult` where mult = 1 / 2 / 4 / 8 / 16 for common→legendary.
+  - Example: common +1 = 50◊ · legendary +5 = 50 × 5 × 16 = 4000◊.
+- Enhancement happens at the Forge; equipment must be **equipped** to be enhanceable (only the 9 wearable slots show up, pet excluded).
+- Sell price of an enhanced item gets +25◊ per enhance level — so the gold isn't fully sunk.
+
+**Gem sockets**
+- Sockets per rarity: common 0 · uncommon 0 · rare 1 · epic 2 · legendary 3.
+- 5 gem types in `GEM_POOL`:
+  - 🔴 Ruby (+5 Melee) · 🔵 Sapphire (+5 Magic) · 🟢 Emerald (+5 Life) · 🟡 Topaz (+5 Agility) — each ~22.5% drop chance.
+  - ⚪ Diamond (+3 all stats) — 10% drop chance, epic rarity.
+- Gems drop from combat at ~12% chance + 0.5% per monster level. Shown alongside the loot in the victory line.
+- Click an empty socket on the Forge → modal grid lets you pick which gem from your stash to set. Click a filled socket → prompt to remove it back to the stash.
+- Selling an item with gems socketed **salvages** them back to the stash first (both single-sell from compare modal and SELL ALL banner).
+
+**Maths plumbing**
+- New `effectiveItemStats(item)` is the single source of truth: `base × (1 + 0.15 × enhanceLevel) + Σ socketed gem bonuses`.
+- `recalculate()`, the compare modal, slot picker, and bag inventory all read effective stats now — so the +N enhance + socketed gems show up everywhere the player sees the item.
+- A small **+N pill** + tiny socket dots appear next to every item name in equipment slots, the bag list, and the compare/picker modals.
+
+### Talent respec
+- Every picked talent tier now shows a `↺ 500×tier ◊` chip next to the "picked" label. Click → confirm → tier opens up again to choose a new node.
+  - Tier 1 = 500◊ · Tier 2 = 1000◊ · Tier 3 = 1500◊.
+- Specialisation has its own respec: `↺ Respec spec · 2000 ◊` button on top of the spec panel once you've picked one. Cleared spec returns to the two-card chooser.
+- No talent points are refunded (level grants them) — the cost is purely the gold sink to undo the decision.
+
+### Loadouts
+- New **Loadouts** panel on the Hero tab. Max **3 saved loadouts** per hero.
+- A loadout snapshots the *names* of every equipped item (not pointers) so it stays valid across saves. Click EQUIP to swap your gear to match the snapshot:
+  - For each slot, if a same-named item exists in the bag, it's pulled into the slot and the current item goes back to the bag.
+  - Missing items are skipped (and reported in the toast: "2 equipped · 1 missing").
+- Save bar: type a name (max 20 chars) + SAVE. ✕ deletes a saved loadout.
+
+### Save schema
+All additions are backwards-compatible. `migrateHero(hero)` backfills:
+- `enhanceLevel: 0`, `sockets: SOCKETS_BY_RARITY[rarity]`, `socketed: []` on every existing item (both equipped and inventory).
+- `hero.gems = []` if missing.
+- `hero.loadouts = []` if missing.
+
+New heroes from `createHero()` initialise `gems` + `loadouts` directly.
+
+### UI / CSS additions
+- New SVG symbols: `#i-hammer` (Forge tab icon), `#i-gem`.
+- New CSS blocks for `.forge-row`, `.forge-enhance`, `.forge-sockets`, `.forge-socket` (empty/filled), `.gem-stash`, `.gem-chip`, `.gem-pick-grid` / `.gem-pick-card` (the socket modal), `.enh-pill` (the +N badge), `.talent-respec` (the ↺ chip), `.loadout-row` / `.loadout-btn` / `.loadout-save`.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 22 — 2026-05-18 — Active pets in combat + procedural audio (SFX)
 
 ### Active pets in combat
