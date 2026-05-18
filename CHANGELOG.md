@@ -6,6 +6,66 @@
 
 ---
 
+## Session 22 — 2026-05-18 — Active pets in combat + procedural audio (SFX)
+
+### Active pets in combat
+Pets that have a `combat` action now actively participate in fights. Pure-passive pets (Stray Cat, Bear Cub, Iron Golem, Carrier Pigeon) still just give stats.
+
+**Pet combat actions**
+Each combat-active pet has a `combat: { kind, ... }` field. Three kinds:
+- **attack** — `mult` percent of hero's ATK (or INT if `school: 'magical'`); optional `dot`/`dur` (poison/burn), optional `lifesteal` of the hit
+- **heal** — restores `val` HP to the hero each turn
+- **mana** — restores `val` MP each turn
+
+**Pet roster combat actions**
+- Wolf Cub: 30% Melee per turn · Owl: heal 3 HP · Spider: 20% Melee + 2 poison/2t · Salamander: 35% Melee + 4 burn/3t · Phantom: heal 4 HP · Direwolf: 55% Melee · Arcane Eye: 45% Magic · Dragon Hatchling: 60% Melee + 4 burn/3t · Phoenix: heal 7 HP · Lich Familiar: 55% Magic + 40% lifesteal.
+
+**Visual**
+- New `.pet-badge` circular icon overlaid on the top-right of the hero's combat portrait. Shows the pet glyph + rarity-tinted border.
+- When the pet acts, the badge bounces up + scales 1.5× with a gold drop shadow.
+- All the usual combat fx fire (slash overlay, damage floater, shake on the target, sound).
+
+**Code**
+- `buildFighter` captures `petCombat`, `petName`, `petGlyph`, `petRarity` from the pet item in `hero.equipment`.
+- New `petAct(hero, opponent, log)` async function runs once per turn from inside `tickStartOfTurn` (after the existing regen/dot ticks, before the turret check).
+- Damage uses `hero.atk` / `hero.int` so pets scale with the player.
+- Death animation + SFX fire if the pet's hit drops the foe.
+- Tracked in the combat metrics (`dmgDealt`, `healed`, `dmgTaken`).
+
+### Procedural audio (Web Audio API)
+No asset files — sounds are generated live via oscillators + gain envelopes. Lightweight (≈0 KB of assets), browser-native, fully mutable.
+
+**SFX**
+- `sfxClick` — UI tap (light square wave).
+- `sfxHit` — generic damage (sawtooth sweep down).
+- `sfxCrit` — two-tone "snap + crack" (square wave).
+- `sfxBlock` — short square thud.
+- `sfxDodge` — rising triangle whoosh.
+- `sfxHeal` — rising sine swell.
+- `sfxDeath` — long descending sawtooth.
+- `sfxLevelUp` — C-major arpeggio (4 notes, triangle).
+- `sfxAchievement` — bright triangle chord (3 notes).
+- `sfxVictory` — 4-note triumph riff.
+- `sfxDefeat` — descending minor triad.
+
+**Hook points**
+- doDamage: hit / crit / block / dodge / death
+- executeAbility heal: heal sound
+- finishVictory level up: level-up arpeggio
+- checkAchievements: achievement chord
+- showCombatSummary: victory or defeat motif
+- petAct: hit / heal / death
+
+**Mute toggle**
+- New 🔊/🔇 button in the persistent header next to the username/logout.
+- Preference persisted in `localStorage` (`forgeBlood.v1.audioMuted`).
+- AudioContext is created lazily on the first sound (browser autoplay policy compliant) and resumed on user gesture.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 21 — 2026-05-18 — XP boost + Pet companion system + pet events
 
 ### Test-mode XP multiplier

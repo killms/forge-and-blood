@@ -61,6 +61,15 @@
     min-height: 28px;
   }
   .ph-logout:hover { border-color: var(--blood-bright); color: var(--blood-bright); }
+  .ph-mute {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer; transition: all 0.2s;
+    min-width: 32px; min-height: 28px;
+    font-size: 14px; line-height: 1;
+    padding: 0 6px;
+  }
+  .ph-mute:hover { border-color: var(--gold); color: var(--gold-bright); }
   .ph-bars { display: grid; gap: 3px; }
   .ph-bar-row { display: grid; grid-template-columns: 18px 1fr 70px; gap: 6px; align-items: center; font-size: 11px; }
   .ph-bar-row .icon { width: 13px; height: 13px; }
@@ -948,6 +957,29 @@
     50%      { filter: brightness(1.6) drop-shadow(0 0 6px var(--blood-bright)); }
   }
   .vs { font-family: 'Cinzel', serif; color: var(--blood-bright); font-size: 14px; font-weight: 900; }
+  /* Pet badge — small circular companion icon on the hero portrait */
+  .pet-badge {
+    position: absolute; top: 0; right: 50%;
+    transform: translate(60px, -2px);
+    width: 30px; height: 30px;
+    background: var(--bg-deep);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; line-height: 1;
+    z-index: 5;
+    box-shadow: 0 0 8px rgba(0,0,0,0.7);
+    transition: transform 0.18s;
+  }
+  .pet-badge.acting {
+    animation: pet-act 0.42s ease;
+  }
+  @keyframes pet-act {
+    0%   { transform: translate(60px, -2px) scale(1); }
+    35%  { transform: translate(60px, -10px) scale(1.5); filter: drop-shadow(0 0 10px var(--gold)) brightness(1.3); }
+    100% { transform: translate(60px, -2px) scale(1); }
+  }
+
   /* Active effect chips below each fighter (buffs, debuffs, dots, stuns) */
   .combat-effects {
     display: flex; flex-wrap: wrap; gap: 3px;
@@ -1635,6 +1667,7 @@
         <div class="combat-arena">
           <div class="fighter" id="f1">
             <div class="fighter-portrait" id="f1-portrait"></div>
+            <div class="pet-badge hidden" id="f1-pet" title="Companion"></div>
             <div class="fighter-name" id="f1-name"></div>
             <div class="bar">
               <div class="bar-fill hp" id="f1-hp"></div>
@@ -2428,20 +2461,35 @@ const ITEM_POOL = [
   // Passive companions equipped in the dedicated 'pet' slot. They give stat
   // bonuses and may carry an effect (lifesteal, crit, regen, etc.) that
   // composes with everything else via the existing equipment effect path.
+  // Common — passive only
   { slot: 'pet', name: 'Stray Cat',         rarity: 'common',    stats: { vit: 2, agi: 1 } },
   { slot: 'pet', name: 'Carrier Pigeon',    rarity: 'common',    stats: { agi: 2 } },
-  { slot: 'pet', name: 'Wolf Cub',          rarity: 'uncommon',  stats: { atk: 4, agi: 2 } },
-  { slot: 'pet', name: 'Owl',               rarity: 'uncommon',  stats: { int: 3, vit: 2 } },
-  { slot: 'pet', name: 'Spider',            rarity: 'uncommon',  stats: { agi: 2, atk: 2 }, effect: { type: 'crit', val: 0.05, desc: '+5% crit' } },
-  { slot: 'pet', name: 'Bear Cub',          rarity: 'rare',      stats: { vit: 8, def: 3 } },
-  { slot: 'pet', name: 'Salamander',        rarity: 'rare',      stats: { atk: 5, int: 3 }, effect: { type: 'burn', val: 3, desc: 'Burn: 3 damage/turn' } },
-  { slot: 'pet', name: 'Phantom',           rarity: 'rare',      stats: { int: 5, vit: 2 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
-  { slot: 'pet', name: 'Direwolf',          rarity: 'epic',      stats: { atk: 10, agi: 5, vit: 3 } },
-  { slot: 'pet', name: 'Iron Golem',        rarity: 'epic',      stats: { def: 12, vit: 5 }, effect: { type: 'thorns', val: 4, desc: 'Thorns: returns 4 damage' } },
-  { slot: 'pet', name: 'Arcane Eye',        rarity: 'epic',      stats: { int: 10, vit: 3 }, effect: { type: 'regen', val: 3, desc: 'Regenerates 3 HP/turn' } },
-  { slot: 'pet', name: 'Dragon Hatchling',  rarity: 'legendary', stats: { atk: 8, def: 8, vit: 8, agi: 8, int: 8 } },
-  { slot: 'pet', name: 'Phoenix',           rarity: 'legendary', stats: { vit: 10, int: 5 }, effect: { type: 'regen', val: 8, desc: 'Regenerates 8 HP/turn' } },
-  { slot: 'pet', name: 'Lich Familiar',     rarity: 'legendary', stats: { int: 15, atk: 5 }, effect: { type: 'lifesteal', val: 0.12, desc: '12% lifesteal' } }
+  // Uncommon — light combat actions
+  { slot: 'pet', name: 'Wolf Cub',          rarity: 'uncommon',  stats: { atk: 4, agi: 2 },
+    combat: { kind: 'attack', mult: 0.30, school: 'melee', desc: '30% Melee per turn' } },
+  { slot: 'pet', name: 'Owl',               rarity: 'uncommon',  stats: { int: 3, vit: 2 },
+    combat: { kind: 'heal', val: 3, desc: 'Heals 3 HP/turn' } },
+  { slot: 'pet', name: 'Spider',            rarity: 'uncommon',  stats: { agi: 2, atk: 2 }, effect: { type: 'crit', val: 0.05, desc: '+5% crit' },
+    combat: { kind: 'attack', mult: 0.20, school: 'melee', dot: 2, dur: 2, desc: '20% Melee + 2 poison/2 turns' } },
+  // Rare
+  { slot: 'pet', name: 'Bear Cub',          rarity: 'rare',      stats: { vit: 8, def: 3 } /* pure tank — no combat action */ },
+  { slot: 'pet', name: 'Salamander',        rarity: 'rare',      stats: { atk: 5, int: 3 }, effect: { type: 'burn', val: 3, desc: 'Burn: 3 damage/turn' },
+    combat: { kind: 'attack', mult: 0.35, school: 'melee', dot: 4, dur: 3, desc: '35% Melee + 4 burn/3 turns' } },
+  { slot: 'pet', name: 'Phantom',           rarity: 'rare',      stats: { int: 5, vit: 2 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' },
+    combat: { kind: 'heal', val: 4, desc: 'Heals 4 HP/turn' } },
+  // Epic
+  { slot: 'pet', name: 'Direwolf',          rarity: 'epic',      stats: { atk: 10, agi: 5, vit: 3 },
+    combat: { kind: 'attack', mult: 0.55, school: 'melee', desc: '55% Melee per turn' } },
+  { slot: 'pet', name: 'Iron Golem',        rarity: 'epic',      stats: { def: 12, vit: 5 }, effect: { type: 'thorns', val: 4, desc: 'Thorns: returns 4 damage' } /* defensive — no action */ },
+  { slot: 'pet', name: 'Arcane Eye',        rarity: 'epic',      stats: { int: 10, vit: 3 }, effect: { type: 'regen', val: 3, desc: 'Regenerates 3 HP/turn' },
+    combat: { kind: 'attack', mult: 0.45, school: 'magical', desc: '45% Magic per turn' } },
+  // Legendary
+  { slot: 'pet', name: 'Dragon Hatchling',  rarity: 'legendary', stats: { atk: 8, def: 8, vit: 8, agi: 8, int: 8 },
+    combat: { kind: 'attack', mult: 0.60, school: 'melee', dot: 4, dur: 3, desc: '60% Melee + 4 burn/3 turns' } },
+  { slot: 'pet', name: 'Phoenix',           rarity: 'legendary', stats: { vit: 10, int: 5 }, effect: { type: 'regen', val: 8, desc: 'Regenerates 8 HP/turn' },
+    combat: { kind: 'heal', val: 7, desc: 'Heals 7 HP/turn' } },
+  { slot: 'pet', name: 'Lich Familiar',     rarity: 'legendary', stats: { int: 15, atk: 5 }, effect: { type: 'lifesteal', val: 0.12, desc: '12% lifesteal' },
+    combat: { kind: 'attack', mult: 0.55, school: 'magical', lifesteal: 0.4, desc: '55% Magic + 40% lifesteal' } }
 ];
 
 // Monsters define a "tier" (relative difficulty) and base stats at tier level.
@@ -3203,6 +3251,7 @@ function checkAchievements() {
       desc: ach.desc + (ach.reward ? ' · ' + formatReward(ach.reward) : ''),
       kind: 'achievement'
     }));
+    sfxAchievement();
     saveGame();
   }
   return newlyUnlocked;
@@ -3701,6 +3750,7 @@ function renderPersistentHeader() {
       <div class="ph-gold">
         <svg class="icon"><use href="#i-coin"/></svg>${h.gold}
       </div>
+      <button class="ph-mute" id="ph-mute-btn" title="Toggle sound">${_audioMuted ? '🔇' : '🔊'}</button>
       ${user ? `<button class="ph-logout" id="ph-logout-btn">${user}</button>` : ''}
     </div>
     <div class="ph-bars">
@@ -3721,6 +3771,8 @@ function renderPersistentHeader() {
   if (logoutBtn) logoutBtn.addEventListener('click', () => {
     if (confirm('Log out? Your progress is saved.')) logout();
   });
+  const muteBtn = document.getElementById('ph-mute-btn');
+  if (muteBtn) muteBtn.addEventListener('click', toggleAudio);
 }
 
 // ============ TUTORIAL ============
@@ -3743,6 +3795,76 @@ function maybeShowTutorial() {
     // Defer to next tick so the game screen renders first
     setTimeout(showTutorial, 250);
   }
+}
+
+// ============ AUDIO (procedural SFX via Web Audio API) ============
+// No assets needed — sounds are generated live with oscillators + gain
+// envelopes. Cheap, browser-native, mutable via a single toggle.
+const AudioCtor = window.AudioContext || window.webkitAudioContext;
+let _audioCtx = null;
+let _audioMuted = false;
+try { _audioMuted = localStorage.getItem('forgeBlood.v1.audioMuted') === '1'; } catch (e) {}
+
+function ensureAudio() {
+  if (!AudioCtor) return null;
+  if (!_audioCtx) _audioCtx = new AudioCtor();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+// Single tone with attack + exponential decay. freqEnd lets us sweep.
+function playTone({ freq, dur, type = 'sine', volume = 0.2, attack = 0.005, freqEnd = null }) {
+  if (_audioMuted) return;
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  try {
+    const t0 = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    if (freqEnd) osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), t0 + dur);
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(volume, t0 + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  } catch (e) { /* swallow — audio is non-essential */ }
+}
+
+function sfxClick()  { playTone({ freq: 720, dur: 0.05, type: 'square',   volume: 0.10 }); }
+function sfxHit()    { playTone({ freq: 220, dur: 0.10, type: 'sawtooth', volume: 0.15, freqEnd: 70 }); }
+function sfxCrit() {
+  playTone({ freq: 680, dur: 0.06, type: 'square',   volume: 0.22 });
+  setTimeout(() => playTone({ freq: 1200, dur: 0.18, type: 'square', volume: 0.20, freqEnd: 380 }), 50);
+}
+function sfxBlock()  { playTone({ freq: 280, dur: 0.12, type: 'square',   volume: 0.18, freqEnd: 200 }); }
+function sfxDodge()  { playTone({ freq: 520, dur: 0.10, type: 'triangle', volume: 0.14, freqEnd: 900 }); }
+function sfxHeal()   { playTone({ freq: 440, dur: 0.30, type: 'sine',     volume: 0.16, freqEnd: 880 }); }
+function sfxDeath()  { playTone({ freq: 220, dur: 0.55, type: 'sawtooth', volume: 0.20, freqEnd: 55 }); }
+function sfxLevelUp() {
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((f, i) => setTimeout(() => playTone({ freq: f, dur: 0.18, type: 'triangle', volume: 0.20 }), i * 90));
+}
+function sfxAchievement() {
+  const notes = [880, 1175, 1568];
+  notes.forEach((f, i) => setTimeout(() => playTone({ freq: f, dur: 0.16, type: 'triangle', volume: 0.18 }), i * 70));
+}
+function sfxVictory() {
+  const notes = [659, 784, 988, 1318];
+  notes.forEach((f, i) => setTimeout(() => playTone({ freq: f, dur: 0.22, type: 'triangle', volume: 0.20 }), i * 110));
+}
+function sfxDefeat() {
+  const notes = [392, 330, 262];
+  notes.forEach((f, i) => setTimeout(() => playTone({ freq: f, dur: 0.32, type: 'sawtooth', volume: 0.18 }), i * 140));
+}
+
+function toggleAudio() {
+  _audioMuted = !_audioMuted;
+  try { localStorage.setItem('forgeBlood.v1.audioMuted', _audioMuted ? '1' : '0'); } catch (e) {}
+  renderPersistentHeader();
+  if (!_audioMuted) sfxClick();
 }
 
 // ============ TOAST NOTIFICATIONS ============
@@ -5046,11 +5168,19 @@ function buildFighter(source, isHero) {
     // AGI gives a small permanent crit + dodge bonus
     f.critBonus += (f.agi || 0) * 0.005;
     f.dodgeBase = (f.dodgeBase || 0) + (f.agi || 0) * 0.003;
-    // Equipment effects
+    // Equipment effects + capture the active pet's combat action (if any)
     Object.values(source.equipment).forEach(item => {
-      if (!item || !item.effect) return;
-      f.equipEffects = f.equipEffects || [];
-      f.equipEffects.push(item.effect);
+      if (!item) return;
+      if (item.effect) {
+        f.equipEffects = f.equipEffects || [];
+        f.equipEffects.push(item.effect);
+      }
+      if (item.slot === 'pet') {
+        f.petName = item.name;
+        f.petGlyph = (PET_GLYPHS && PET_GLYPHS[item.name]) || '🐾';
+        f.petRarity = item.rarity;
+        if (item.combat) f.petCombat = item.combat;
+      }
     });
     if (f.equipEffects) {
       f.equipEffects.forEach(e => {
@@ -5133,6 +5263,7 @@ async function resolveCombat(enemy, mode, log, token) {
   _combatResult = null;
 
   updateCombatBars(hero, foe);
+  renderPetBadge(hero);
   refreshCombatUI();
 
   let heroFirst = hero.agi >= foe.agi;
@@ -5279,6 +5410,12 @@ async function tickStartOfTurn(f, opponent, log) {
     f.dots = f.dots.filter(dot => dot.remaining > 0);
   }
   if (f.hp <= 0) return;
+
+  // Hero's pet action — fires once per turn, after their own ticks
+  if (f.isHero && f.petCombat) {
+    await petAct(f, opponent, log);
+    if (opponent && opponent.hp <= 0) return;
+  }
 
   // Turret (engineer)
   const turret = f.statusBuffs.find(b => b.type === 'turret');
@@ -5442,6 +5579,7 @@ async function executeAbility(attacker, defender, talent, log) {
     appendLog(log, `<span class="log-effect">${attacker.name} heals ${amt} HP.</span>`);
     spawnFloater(attacker, '+' + amt, 'heal');
     shakeFighter(attacker, 'heal');
+    sfxHeal();
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
     await sleep(380);
   }
@@ -5587,6 +5725,7 @@ async function doDamage(attacker, defender, log, opts) {
     appendLog(log, `<span class="log-effect">${defender.name} dodges!</span>`);
     spawnFloater(defender, 'DODGE!', 'dodge');
     lungeFighter(attacker);
+    sfxDodge();
     const dStats = statsBucket(defender);
     if (dStats) dStats.dodges++;
     updateCombatBars(_currentFighters.hero, _currentFighters.foe);
@@ -5783,17 +5922,19 @@ async function doDamage(attacker, defender, log, opts) {
   spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
   shakeFighter(defender, isCrit ? 'crit' : 'hit');
   lungeFighter(attacker);
-  // Sprite swaps: attacker → attack pose, defender → hurt pose (per-fighter,
-  // only if the sprite data has those states; falls back to idle silently)
+  // Sprite swaps: attacker → attack pose, defender → hurt pose
   playAttackAnim(attacker);
   playHurtAnim(defender);
   const slashKind = isCrit ? 'crit' : (opts.magical ? 'magic' : '');
   spawnSlashFx(defender, slashKind);
-  if (blocked) spawnFloater(defender, 'BLOCK', 'block');
-  // If this hit killed the defender, play the death animation
+  if (blocked) { spawnFloater(defender, 'BLOCK', 'block'); sfxBlock(); }
+  // SFX (crit takes priority over hit)
+  if (isCrit) sfxCrit(); else sfxHit();
+  // If this hit killed the defender, play the death animation + sfx
   if (defender.hp <= 0) {
     setFighterAnim(defender, 'dead');
     playDeathAnimation(defender);
+    sfxDeath();
   }
   if (lifestealHeal > 0) {
     appendLog(log, `<span class="log-effect">${attacker.name} drains ${lifestealHeal} HP.</span>`);
@@ -5901,7 +6042,7 @@ function finishVictory(enemy, mode, log, heroFighter) {
       desc: '+1 stat point' + (state.hero.level === MAX_LEVEL ? ' · Max level reached!' : ''),
       kind: 'levelup'
     });
-    // Specialisation unlock notification — fires when crossing the threshold
+    sfxLevelUp();
     if (levelsBefore < SPEC_UNLOCK_LEVEL && state.hero.level >= SPEC_UNLOCK_LEVEL && !state.hero.specKey) {
       showToast({
         icon: '⚜',
@@ -5986,6 +6127,8 @@ function showCombatSummary(enemy, mode, rewards, hero, foe) {
     rewardRows += `<tr><td class="metric-label" colspan="2" style="text-align:center; color: var(--text-dim); font-style: italic;">No rewards. HP restored for the next fight.</td></tr>`;
   }
 
+  if (result === 'victory') sfxVictory();
+  else if (result === 'defeat') sfxDefeat();
   panel.innerHTML = `
     <div class="summary-verdict ${verdictClass}">${verdictText}</div>
     <div class="summary-meta">${state.hero.name} vs ${enemy.name} · ${stats.turns} turn${stats.turns === 1 ? '' : 's'}</div>
@@ -6103,6 +6246,93 @@ function refreshCombatUI() {
   renderCombatEffects(hero, 'f1-effects');
   renderCombatEffects(foe,  'f2-effects');
   renderCombatAbilities(hero);
+}
+
+// ============ PET COMBAT ACTION ============
+// Set the pet badge in the combat UI at fight start (or hide it).
+function renderPetBadge(hero) {
+  const badge = document.getElementById('f1-pet');
+  if (!badge) return;
+  if (hero && (hero.petCombat || hero.petName)) {
+    badge.textContent = hero.petGlyph || '🐾';
+    badge.classList.remove('hidden');
+    if (hero.petRarity) badge.style.borderColor = (PET_TINTS && PET_TINTS[hero.petRarity]) || 'var(--gold)';
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+// Fire the pet's per-turn action (after the hero's start-of-turn ticks).
+// Visual: pet badge pulses, attack/heal floaters, slash on enemy, SFX.
+async function petAct(hero, opponent, log) {
+  const pc = hero.petCombat;
+  if (!pc || hero.hp <= 0) return;
+  const badge = document.getElementById('f1-pet');
+  if (badge) {
+    badge.classList.remove('acting'); void badge.offsetWidth; badge.classList.add('acting');
+    setTimeout(() => badge.classList.remove('acting'), 420);
+  }
+  if (pc.kind === 'attack' && opponent && opponent.hp > 0) {
+    const isMagical = pc.school === 'magical';
+    const baseAtk = isMagical && hero.int > 0 ? hero.int : hero.atk;
+    let dmg = Math.max(1, baseAtk * (pc.mult || 0.3));
+    if (!isMagical) dmg = Math.max(1, dmg - opponent.def / 2);
+    dmg = Math.floor(dmg * (0.9 + Math.random() * 0.2));
+    opponent.hp = Math.max(0, opponent.hp - dmg);
+    appendLog(log, `<span class="log-effect">${hero.petName || 'Pet'} strikes for ${dmg} damage.</span>`);
+    spawnFloater(opponent, '-' + dmg, isMagical ? 'crit' : 'damage');
+    spawnSlashFx(opponent, isMagical ? 'magic' : '');
+    shakeFighter(opponent, 'hit');
+    // DoT application
+    if (pc.dot) {
+      opponent.dots = opponent.dots || [];
+      const label = `${hero.petName || 'Pet'} ${isMagical ? 'spell' : 'wound'}`;
+      if (!opponent.dots.find(d => d.label === label)) {
+        opponent.dots.push({ dmg: pc.dot, remaining: pc.dur || 2, label });
+      }
+    }
+    // Lifesteal on the pet hit
+    if (pc.lifesteal) {
+      const heal = Math.floor(dmg * pc.lifesteal);
+      if (heal > 0) {
+        hero.hp = Math.min(hero.maxHp, hero.hp + heal);
+        spawnFloater(hero, '+' + heal, 'heal');
+      }
+    }
+    sfxHit();
+    // Track stats
+    const hs = statsBucket(hero);
+    const ds = statsBucket(opponent);
+    if (hs) hs.dmgDealt += dmg;
+    if (ds) ds.dmgTaken += dmg;
+    if (opponent.hp <= 0) {
+      setFighterAnim(opponent, 'dead');
+      playDeathAnimation(opponent);
+      sfxDeath();
+    }
+    updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+    await sleep(260);
+  } else if (pc.kind === 'heal') {
+    const amt = Math.min(pc.val, hero.maxHp - hero.hp);
+    if (amt > 0) {
+      hero.hp += amt;
+      appendLog(log, `<span class="log-effect">${hero.petName || 'Pet'} heals you ${amt} HP.</span>`);
+      spawnFloater(hero, '+' + amt, 'heal');
+      const hs = statsBucket(hero);
+      if (hs) hs.healed += amt;
+      sfxHeal();
+      updateCombatBars(_currentFighters.hero, _currentFighters.foe);
+      await sleep(260);
+    }
+  } else if (pc.kind === 'mana') {
+    const amt = Math.min(pc.val, (hero.maxMp || 0) - (hero.mp || 0));
+    if (amt > 0) {
+      hero.mp = (hero.mp || 0) + amt;
+      appendLog(log, `<span class="log-effect">${hero.petName || 'Pet'} restores ${amt} MP.</span>`);
+      spawnFloater(hero, '+' + amt + ' MP', 'mana');
+      await sleep(260);
+    }
+  }
 }
 
 // ============ COMBAT ANIMATIONS ============
