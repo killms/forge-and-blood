@@ -186,6 +186,28 @@
     to   { opacity: 0; transform: translateY(-8px); }
   }
 
+  /* Pet / companion panel */
+  .pet-card {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 12px; cursor: pointer; transition: all 0.2s;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .pet-card:hover { border-color: var(--gold); background: rgba(201,165,87,0.05); }
+  .pet-card.empty { color: var(--text-dim); font-style: italic; justify-content: center; padding: 18px; }
+  .pet-card.empty:hover { border-color: var(--border); background: var(--bg-deep); }
+  .pet-icon {
+    font-size: 32px; line-height: 1; flex-shrink: 0;
+    width: 48px; text-align: center;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  .pet-info { flex: 1; min-width: 0; }
+  .pet-name {
+    font-family: 'Cinzel', serif; font-size: 14px;
+    color: var(--gold-bright); margin-bottom: 4px;
+  }
+  .pet-stats { font-size: 12px; color: var(--text); }
+  .pet-effect { font-size: 12px; color: var(--epic); font-style: italic; margin-top: 4px; }
+
   /* Active item sets in Hero/Equipment panel */
   .active-sets { margin-top: 10px; }
   .active-set-row {
@@ -1506,6 +1528,11 @@
       </div>
 
       <div class="panel">
+        <div class="section-title">Companion</div>
+        <div id="pet-panel"></div>
+      </div>
+
+      <div class="panel">
         <div class="section-title">Achievements <span class="ach-count" id="ach-count"></span></div>
         <div class="ach-list" id="ach-list"></div>
       </div>
@@ -1662,14 +1689,17 @@ const SLOT_LABELS = {
   pants: 'Pants',
   boots: 'Boots',
   ring1: 'Ring I',
-  ring2: 'Ring II'
+  ring2: 'Ring II',
+  pet: 'Companion'
 };
-// Display order in the equipment grid (3 columns × 3 rows).
+// Display order in the equipment grid (3 columns × 3 rows). Pet has its own
+// panel and is not in the wearable grid.
 const SLOT_ORDER = ['weapon', 'helm', 'amulet', 'armor', 'vest', 'pants', 'boots', 'ring1', 'ring2'];
 // Empty equipment template — used on hero creation and to migrate older saves.
 function emptyEquipment() {
   return { weapon: null, armor: null, helm: null, boots: null,
-           ring1: null, ring2: null, amulet: null, vest: null, pants: null };
+           ring1: null, ring2: null, amulet: null, vest: null, pants: null,
+           pet: null };
 }
 
 // ============ RACES ============
@@ -2392,7 +2422,26 @@ const ITEM_POOL = [
   { slot: 'pants', name: 'Spellcaster Leggings', rarity: 'uncommon', stats: { def: 2, int: 4 } },
   { slot: 'pants', name: 'Leggings of the Mind', rarity: 'rare', stats: { def: 3, int: 6 } },
   { slot: 'pants', name: 'Leggings of the Magi', rarity: 'epic', stats: { def: 5, int: 9, vit: 3 }, effect: { type: 'regen', val: 3, desc: 'Regenerates 3 HP/turn' } },
-  { slot: 'pants', name: 'Pants of the Archmage', rarity: 'legendary', stats: { def: 7, int: 13, vit: 5 }, effect: { type: 'crit', val: 0.08, desc: '+8% crit' } }
+  { slot: 'pants', name: 'Pants of the Archmage', rarity: 'legendary', stats: { def: 7, int: 13, vit: 5 }, effect: { type: 'crit', val: 0.08, desc: '+8% crit' } },
+
+  // ============ PETS / COMPANIONS ============
+  // Passive companions equipped in the dedicated 'pet' slot. They give stat
+  // bonuses and may carry an effect (lifesteal, crit, regen, etc.) that
+  // composes with everything else via the existing equipment effect path.
+  { slot: 'pet', name: 'Stray Cat',         rarity: 'common',    stats: { vit: 2, agi: 1 } },
+  { slot: 'pet', name: 'Carrier Pigeon',    rarity: 'common',    stats: { agi: 2 } },
+  { slot: 'pet', name: 'Wolf Cub',          rarity: 'uncommon',  stats: { atk: 4, agi: 2 } },
+  { slot: 'pet', name: 'Owl',               rarity: 'uncommon',  stats: { int: 3, vit: 2 } },
+  { slot: 'pet', name: 'Spider',            rarity: 'uncommon',  stats: { agi: 2, atk: 2 }, effect: { type: 'crit', val: 0.05, desc: '+5% crit' } },
+  { slot: 'pet', name: 'Bear Cub',          rarity: 'rare',      stats: { vit: 8, def: 3 } },
+  { slot: 'pet', name: 'Salamander',        rarity: 'rare',      stats: { atk: 5, int: 3 }, effect: { type: 'burn', val: 3, desc: 'Burn: 3 damage/turn' } },
+  { slot: 'pet', name: 'Phantom',           rarity: 'rare',      stats: { int: 5, vit: 2 }, effect: { type: 'regen', val: 2, desc: 'Regenerates 2 HP/turn' } },
+  { slot: 'pet', name: 'Direwolf',          rarity: 'epic',      stats: { atk: 10, agi: 5, vit: 3 } },
+  { slot: 'pet', name: 'Iron Golem',        rarity: 'epic',      stats: { def: 12, vit: 5 }, effect: { type: 'thorns', val: 4, desc: 'Thorns: returns 4 damage' } },
+  { slot: 'pet', name: 'Arcane Eye',        rarity: 'epic',      stats: { int: 10, vit: 3 }, effect: { type: 'regen', val: 3, desc: 'Regenerates 3 HP/turn' } },
+  { slot: 'pet', name: 'Dragon Hatchling',  rarity: 'legendary', stats: { atk: 8, def: 8, vit: 8, agi: 8, int: 8 } },
+  { slot: 'pet', name: 'Phoenix',           rarity: 'legendary', stats: { vit: 10, int: 5 }, effect: { type: 'regen', val: 8, desc: 'Regenerates 8 HP/turn' } },
+  { slot: 'pet', name: 'Lich Familiar',     rarity: 'legendary', stats: { int: 15, atk: 5 }, effect: { type: 'lifesteal', val: 0.12, desc: '12% lifesteal' } }
 ];
 
 // Monsters define a "tier" (relative difficulty) and base stats at tier level.
@@ -2801,6 +2850,69 @@ const EXPEDITION_EVENTS = [
           return `A small kindness. +${xp} XP.`;
         }, xp: 80 },
       { key: 'ignore', label: 'Pretend not to hear', effect: () => 'You walk past.' }
+    ]
+  },
+  // Pet-themed events
+  {
+    key: 'lost-pup',
+    title: 'A whimpering pup',
+    text: 'A wolf pup, alone, hurt. Its mother is nowhere to be seen.',
+    choices: [
+      { key: 'adopt', label: 'Carry it with you',
+        effect: (h) => {
+          const pet = generateItem('common', 'pet') || generateItem('common');
+          if (pet && pet.slot === 'pet') {
+            h.inventory.push(pet);
+            return `The pup limps along. You found: ${pet.name}.`;
+          }
+          return 'The pup follows for a while, then vanishes.';
+        } },
+      { key: 'leave', label: 'Leave it', effect: () => 'You walk on. The whimpering follows you a while.' }
+    ]
+  },
+  {
+    key: 'mysterious-egg',
+    title: 'A warm egg',
+    text: 'A speckled egg, still warm, in a nest of charred twigs.',
+    choices: [
+      { key: 'take', label: 'Take the egg (gamble)',
+        effect: (h) => {
+          const r = Math.random();
+          let rarity = 'uncommon';
+          if (r < 0.05) rarity = 'legendary';
+          else if (r < 0.20) rarity = 'epic';
+          else if (r < 0.55) rarity = 'rare';
+          const pet = generateItem(rarity, 'pet');
+          if (pet && pet.slot === 'pet') {
+            h.inventory.push(pet);
+            return `Something stirs. You found: ${pet.name}.`;
+          }
+          return 'The egg crumbles to ash.';
+        } },
+      { key: 'leave', label: 'Leave it', effect: () => 'You leave it untouched.' }
+    ]
+  },
+  {
+    key: 'tame-beast',
+    title: 'A wounded beast',
+    text: 'A beast nurses an old wound. You could buy it food and earn its trust.',
+    choices: [
+      { key: 'tame', label: 'Buy provisions (60 ◊)',
+        cost: 60,
+        effect: (h) => {
+          if (h.gold < 60) return 'Not enough coin.';
+          h.gold -= 60;
+          if (Math.random() < 0.7) {
+            const rarity = Math.random() < 0.3 ? 'epic' : 'rare';
+            const pet = generateItem(rarity, 'pet');
+            if (pet && pet.slot === 'pet') {
+              h.inventory.push(pet);
+              return `It accepts you. You earned a companion: ${pet.name}.`;
+            }
+          }
+          return 'It eats but bolts at first chance.';
+        } },
+      { key: 'pass', label: 'Leave it alone', effect: () => 'You move on.' }
     ]
   }
 ];
@@ -3275,6 +3387,10 @@ document.getElementById('step-back').addEventListener('click', () => {
 // could raise this, or paragon levels could kick in.
 const MAX_LEVEL = 100;
 
+// Test-mode XP multiplier. 1 = normal pace, 5 = quick testing.
+// Bumped to 5 while we iterate on content; drop to 1 (or 2) before "release".
+const XP_MULT = 5;
+
 // XP needed to go from `level` to `level + 1`. Polynomial curve so the early
 // game is fast and the late game gets meaningfully slower without becoming
 // an impossible exponential like the old `xpNext *= 1.5`.
@@ -3526,6 +3642,44 @@ function renderAll() {
   renderPve();
   renderPvp();
   renderAchievements();
+  renderPet();
+}
+
+// ============ PET PANEL ============
+const PET_GLYPHS = {
+  'Stray Cat': '🐈', 'Carrier Pigeon': '🕊', 'Wolf Cub': '🐺', 'Owl': '🦉',
+  'Spider': '🕷', 'Bear Cub': '🐻', 'Salamander': '🦎', 'Phantom': '👻',
+  'Direwolf': '🐺', 'Iron Golem': '🗿', 'Arcane Eye': '👁',
+  'Dragon Hatchling': '🐉', 'Phoenix': '🔥', 'Lich Familiar': '☠'
+};
+const PET_TINTS = {
+  common: '#b0a890', uncommon: '#5fa85f', rare: '#4a8fd6', epic: '#a85fd6', legendary: '#e89530'
+};
+
+function renderPet() {
+  const el = document.getElementById('pet-panel');
+  if (!el || !state.hero) return;
+  const pet = state.hero.equipment.pet;
+  if (!pet) {
+    el.innerHTML = `<div class="pet-card empty" data-pet-slot="pet">
+      Tap to equip a companion — find them as loot from monsters or in the shop.
+    </div>`;
+  } else {
+    const glyph = PET_GLYPHS[pet.name] || '🐾';
+    const tint = PET_TINTS[pet.rarity] || 'var(--gold)';
+    const statStr = Object.entries(pet.stats).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
+    el.innerHTML = `<div class="pet-card rarity-${pet.rarity}" data-pet-slot="pet" style="border-color: ${tint};">
+      <div class="pet-icon" style="color: ${tint};">${glyph}</div>
+      <div class="pet-info">
+        <div class="pet-name r-${pet.rarity}">${pet.name}</div>
+        <div class="pet-stats">${statStr}</div>
+        ${pet.effect ? `<div class="pet-effect">✦ ${pet.effect.desc}</div>` : ''}
+      </div>
+    </div>`;
+  }
+  el.querySelectorAll('[data-pet-slot]').forEach(card => {
+    card.addEventListener('click', () => openSlotPicker('pet'));
+  });
 }
 
 // ============ PERSISTENT HEADER ============
@@ -4436,8 +4590,9 @@ function expeditionResolveEvent(choiceKey) {
   }
   if (choice.xp) {
     if (state.hero.level < MAX_LEVEL) {
-      state.hero.xp += choice.xp;
-      exp.xp += choice.xp;
+      const xpGain = Math.floor(choice.xp * XP_MULT);
+      state.hero.xp += xpGain;
+      exp.xp += xpGain;
       while (state.hero.level < MAX_LEVEL && state.hero.xp >= state.hero.xpNext) {
         state.hero.xp -= state.hero.xpNext;
         state.hero.level++;
@@ -5674,6 +5829,8 @@ function finishVictory(enemy, mode, log, heroFighter) {
   let xp = enemy.xp;
   // Human passive: +10% XP
   if (state.hero.race === 'human') xp = Math.floor(xp * 1.1);
+  // Global XP multiplier (test mode)
+  xp = Math.floor(xp * XP_MULT);
   state.hero.gold += gold;
 
   // XP is capped at MAX_LEVEL — no point accruing past the level cap.

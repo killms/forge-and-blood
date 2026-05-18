@@ -6,6 +6,48 @@
 
 ---
 
+## Session 21 — 2026-05-18 — XP boost + Pet companion system + pet events
+
+### Test-mode XP multiplier
+- New global `XP_MULT = 5` constant near the level config.
+- Applied to monster XP drops (in `finishVictory`) and to event XP rewards (in `expeditionResolveEvent`).
+- L1 → L100 now takes ~1/5 the kills/expeditions, fast enough to test specs and tier-3 talents without grinding.
+- Drop back to `1` (or `2`) before any "release".
+
+### Pet / Companion system
+A 10th equipment slot with its own panel. Pets are passive — they grant stat bonuses (and optionally an `effect`) that compose with everything else.
+
+**Data**
+- `SLOT_LABELS.pet = 'Companion'`. Pet is NOT in `SLOT_ORDER` (kept the 3×3 wearable grid) — it gets a dedicated panel.
+- `emptyEquipment()` now includes `pet: null`. `migrateHero` backfills it automatically (handled via the existing per-key loop).
+- 14 pet templates in `ITEM_POOL` with `slot: 'pet'`:
+  - **Common**: Stray Cat, Carrier Pigeon
+  - **Uncommon**: Wolf Cub, Owl, Spider (+5% crit)
+  - **Rare**: Bear Cub, Salamander (burn 3/turn), Phantom (regen 2)
+  - **Epic**: Direwolf, Iron Golem (thorns 4), Arcane Eye (regen 3)
+  - **Legendary**: Dragon Hatchling (+8 to all), Phoenix (regen 8), Lich Familiar (+15 INT, 12% lifesteal)
+- Pets drop via the normal `rollLootByLevel` flow — no special routing.
+
+**UI**
+- New **Companion** panel on the Hero tab between Equipment and Achievements.
+- Empty state: "Tap to equip a companion — find them as loot from monsters or in the shop."
+- Filled: emoji glyph (per-pet, e.g. 🐺 Wolf Cub, 🐉 Dragon Hatchling) + rarity-tinted border + stat line + effect line.
+- Tap the card → opens the existing slot picker for the pet slot. Same compare modal flow as any other gear.
+
+**Combat**
+- Pets stay passive — they don't appear as a third fighter; their stats and `equipEffects` plug into `buildFighter` exactly like a ring or amulet, because they're in `hero.equipment` and the existing loop iterates all slots.
+- Future: could promote pets to active participants (like an Engineer's turret) — infrastructure is there.
+
+### Three new pet-themed events
+- **A whimpering pup** (`lost-pup`) — adopt → common pet, or leave.
+- **A warm egg** (`mysterious-egg`) — gamble → random rarity pet (5% legendary, 15% epic, 35% rare, rest uncommon), or leave.
+- **A wounded beast** (`tame-beast`) — 60 ◊ cost; 70% chance you get a rare/epic pet, 30% it bolts.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 20 — 2026-05-18 — Button polish + combat readability
 
 ### Button polish (depth + gold accent + tactile feedback)
