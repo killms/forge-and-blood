@@ -6,6 +6,45 @@
 
 ---
 
+## Session 20 — 2026-05-18 — Button polish + combat readability
+
+### Button polish (depth + gold accent + tactile feedback)
+- **Primary `.btn`** now uses a red gradient (`#a02323 → var(--blood)`), gold-bright text on a **gold border** (matching the persistent header / panels), with inset highlight on top + inset shadow on bottom + drop shadow. Hover lifts by 1px and intensifies the drop shadow. Active state presses down with an inset shadow.
+- **`.btn-cancel`** gets a subtle dark gradient and clearer hover state. Uses `!important` to override the primary `.btn` shadow when both classes are present.
+- **`.btn-sell`** and **`.btn-sell-all`** get the same depth treatment with a gold gradient on hover that flips the colours (gold fill, dark text).
+- Removed an orphan duplicate `.btn-sell-all` rule that overrode the polished one.
+- `-webkit-tap-highlight-color: transparent` on `.btn` removes the default blue mobile tap flash.
+
+### Combat readability
+
+**Active effect chips on each fighter**
+- New `.combat-effects` row under each HP bar showing every buff / debuff / DoT as a small chip with glyph + remaining turns.
+- Colour-coded: **green** (buff), **red** (debuff), **orange** (DoT — burn / curse / hex), **gold pulsing** (stun), **blue** (utility — turret, mimic).
+- Tooltip on hover shows the full effect name + remaining duration.
+- Updates after every action and at the end of each turn.
+
+**Hero ability cooldowns + mana costs**
+- New `.combat-abilities` panel between the arena and the log.
+- One chip per hero active ability showing the name and current state:
+  - **READY** (green border, glow) — usable now.
+  - **READY · 10 MP** — ready but costs mana; shows the cost.
+  - **CD 3** (dim) — on cooldown, can't fire.
+  - **10 MP** (very dim) — not enough mana.
+- Magical abilities show a ✦ suffix.
+- Foe abilities are intentionally hidden (fog of war on enemy intent).
+
+**Compact log**
+- Tighter padding between log entries (4px → 3px) and softer separator lines.
+- Multi-hit abilities (Flurry, Volley, Storm of Arrows, etc.) get a **summary line** after the hits resolve: `Flurry → 3 hits, 42 total`, with a gold left-border for emphasis.
+
+### Hook points
+- `refreshCombatUI()` (a tiny wrapper around the new render functions) fires at: start of combat, after each ability cast, and after each turn's status/cooldown decay.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 19 — 2026-05-18 — Mobile UX pack (persistent header + bottom nav + tutorial)
 
 ### Persistent header — always visible during gameplay

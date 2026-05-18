@@ -534,13 +534,36 @@
   }
   input[type="text"]:focus { outline: none; border-color: var(--gold); }
   .btn {
-    width: 100%; padding: 14px; background: var(--blood);
-    color: var(--gold-bright); border: 1px solid var(--blood-bright);
+    width: 100%; padding: 13px 16px;
+    background: linear-gradient(180deg, #a02323 0%, var(--blood) 100%);
+    color: var(--gold-bright);
+    border: 1px solid var(--gold);
     font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 3px;
-    cursor: pointer; transition: all 0.2s; margin-top: 12px;
+    font-weight: 700;
+    cursor: pointer; margin-top: 12px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,210,170,0.18),
+      inset 0 -2px 0 rgba(0,0,0,0.35),
+      0 3px 6px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 0 rgba(0,0,0,0.5);
+    transition: transform 0.12s, box-shadow 0.12s, background 0.18s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .btn:hover:not(:disabled) { background: var(--blood-bright); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--blood-bright) 0%, #9c1f1f 100%);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,210,170,0.22),
+      inset 0 -2px 0 rgba(0,0,0,0.35),
+      0 5px 10px rgba(0,0,0,0.6);
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 4px rgba(0,0,0,0.5),
+      0 1px 2px rgba(0,0,0,0.3);
+  }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
   .btn-small {
     padding: 6px 12px; font-size: 11px; letter-spacing: 1.5px;
     margin-top: 0; width: auto;
@@ -903,13 +926,75 @@
     50%      { filter: brightness(1.6) drop-shadow(0 0 6px var(--blood-bright)); }
   }
   .vs { font-family: 'Cinzel', serif; color: var(--blood-bright); font-size: 14px; font-weight: 900; }
+  /* Active effect chips below each fighter (buffs, debuffs, dots, stuns) */
+  .combat-effects {
+    display: flex; flex-wrap: wrap; gap: 3px;
+    justify-content: center;
+    margin-top: 4px; min-height: 18px;
+  }
+  .fx-chip {
+    display: inline-flex; align-items: center; gap: 2px;
+    padding: 2px 5px; font-size: 10px;
+    font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+    border: 1px solid; border-radius: 2px;
+    background: var(--bg-deep);
+  }
+  .fx-chip .fx-glyph { font-size: 11px; line-height: 1; }
+  .fx-chip .fx-num { opacity: 0.85; }
+  .fx-chip.buff   { color: var(--uncommon); border-color: var(--uncommon); }
+  .fx-chip.debuff { color: var(--blood-bright); border-color: var(--blood); }
+  .fx-chip.dot    { color: #e89530; border-color: #c97520; }
+  .fx-chip.stun   { color: var(--legendary); border-color: var(--legendary); animation: pulse-stun 1s ease-in-out infinite; }
+  .fx-chip.util   { color: var(--rare); border-color: var(--rare); }
+  @keyframes pulse-stun {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  /* Hero's ability cooldown / mana panel under the arena */
+  .combat-abilities {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-top: 10px; min-height: 0;
+  }
+  .ability-cd {
+    flex: 1; min-width: 90px;
+    background: var(--bg-deep); border: 1px solid var(--rare);
+    padding: 4px 6px; font-size: 11px;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    border-radius: 3px;
+    transition: opacity 0.2s, border-color 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .ability-cd-name {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--rare); letter-spacing: 0.5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .ability-cd-status { font-size: 9px; color: var(--text-dim); letter-spacing: 0.5px; }
+  .ability-cd.ready { border-color: var(--uncommon); box-shadow: 0 0 6px rgba(95,168,95,0.25); }
+  .ability-cd.ready .ability-cd-name { color: var(--uncommon); }
+  .ability-cd.ready .ability-cd-status { color: var(--uncommon); }
+  .ability-cd.cooling { opacity: 0.55; }
+  .ability-cd.cooling .ability-cd-name { color: var(--text-dim); }
+  .ability-cd.nomana { opacity: 0.45; border-color: #4a3826; }
+  .ability-cd.nomana .ability-cd-name { color: var(--text-dim); }
+  .ability-cd.magical .ability-cd-name::after { content: ' ✦'; color: var(--rare); }
+
   .combat-log {
     background: var(--bg-deep); border: 1px solid var(--border);
-    padding: 12px; max-height: 300px; overflow-y: auto; font-size: 14px;
+    padding: 12px; max-height: 280px; overflow-y: auto; font-size: 13px;
   }
   .log-entry {
-    padding: 4px 0; border-bottom: 1px dashed rgba(74,56,38,0.3);
+    padding: 3px 0; border-bottom: 1px dashed rgba(74,56,38,0.2);
     animation: appear 0.3s;
+  }
+  .log-entry.log-summary {
+    padding: 5px 4px; margin-top: 2px;
+    background: rgba(201,165,87,0.06);
+    border-left: 2px solid var(--gold);
+    border-bottom: none;
+    font-weight: 600;
   }
   @keyframes appear {
     from { opacity: 0; transform: translateY(-4px); }
@@ -1021,26 +1106,52 @@
   .modal-actions.two { grid-template-columns: 1fr 1fr; }
   .modal-actions.three { grid-template-columns: 1fr; }
   .btn-cancel {
-    background: var(--bg-deep); border-color: var(--border);
-    color: var(--text-dim);
+    background: linear-gradient(180deg, #1a120c 0%, var(--bg-deep) 100%) !important;
+    border-color: var(--border) !important;
+    color: var(--text-dim) !important;
+    text-shadow: none !important;
   }
-  .btn-cancel:hover { background: var(--border); color: var(--text); }
+  .btn-cancel:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--border) 0%, #2a1f15 100%) !important;
+    color: var(--text) !important;
+  }
   .btn-sell {
-    background: var(--bg-deep); border-color: var(--gold);
-    color: var(--gold);
+    background: linear-gradient(180deg, #2a1f0e 0%, var(--bg-deep) 100%) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.4) !important;
   }
-  .btn-sell:hover { background: var(--gold); color: var(--bg); }
+  .btn-sell:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--gold) 0%, #b08a3e 100%) !important;
+    color: var(--bg) !important;
+    text-shadow: none !important;
+  }
   .btn-sell-all {
     display: block; width: 100%;
-    padding: 10px 12px; margin-bottom: 10px;
-    background: var(--bg-deep);
+    padding: 12px 14px; margin-bottom: 10px;
+    background: linear-gradient(180deg, #2a1f0e 0%, var(--bg-deep) 100%);
     border: 1px solid var(--gold);
     color: var(--gold);
-    font-family: 'Cinzel', serif; font-size: 12px;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
     letter-spacing: 2px; cursor: pointer;
-    transition: all 0.18s;
+    box-shadow:
+      inset 0 1px 0 rgba(255,210,170,0.12),
+      inset 0 -2px 0 rgba(0,0,0,0.3),
+      0 3px 6px rgba(0,0,0,0.45);
+    transition: transform 0.12s, box-shadow 0.12s;
   }
-  .btn-sell-all:hover { background: var(--gold); color: var(--bg); }
+  .btn-sell-all:hover {
+    background: linear-gradient(180deg, var(--gold) 0%, #b08a3e 100%);
+    color: var(--bg);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,220,180,0.3),
+      0 5px 10px rgba(0,0,0,0.55);
+  }
+  .btn-sell-all:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  }
   /* Combat summary panel — shown when a fight ends, no auto-close */
   .combat-summary {
     margin-top: 12px; padding-top: 12px;
@@ -1502,6 +1613,7 @@
               <div class="bar-fill hp" id="f1-hp"></div>
               <div class="bar-text" id="f1-hp-text"></div>
             </div>
+            <div class="combat-effects" id="f1-effects"></div>
             <div class="float-stage" id="f1-floats"></div>
           </div>
           <div class="vs">VS</div>
@@ -1512,9 +1624,11 @@
               <div class="bar-fill hp" id="f2-hp"></div>
               <div class="bar-text" id="f2-hp-text"></div>
             </div>
+            <div class="combat-effects" id="f2-effects"></div>
             <div class="float-stage" id="f2-floats"></div>
           </div>
         </div>
+        <div class="combat-abilities" id="combat-abilities"></div>
         <div class="combat-log" id="combat-log"></div>
         <div class="combat-summary hidden" id="combat-summary"></div>
       </div>
@@ -4864,6 +4978,7 @@ async function resolveCombat(enemy, mode, log, token) {
   _combatResult = null;
 
   updateCombatBars(hero, foe);
+  refreshCombatUI();
 
   let heroFirst = hero.agi >= foe.agi;
   if (checkFirstStrike(hero)) heroFirst = true;
@@ -4916,6 +5031,7 @@ async function resolveCombat(enemy, mode, log, token) {
     decayStatuses(foe);
     decayCooldowns(hero);
     decayCooldowns(foe);
+    refreshCombatUI();
 
     turn++;
   }
@@ -5158,6 +5274,7 @@ async function executeAbility(attacker, defender, talent, log) {
   }
   const tag = magical ? ' ✦' : '';
   appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}${tag}!</span>`);
+  refreshCombatUI();
   // Magical abilities get a wind-up glow on the caster
   if (magical) playCastAnimation(attacker);
   await sleep(380);
@@ -5178,6 +5295,9 @@ async function executeAbility(attacker, defender, talent, log) {
   if (a.dmgMult !== undefined || a.multiHit) {
     const hits = a.multiHit || 1;
     const isMagical = magical;
+    const sb2 = statsBucket(attacker);
+    const dmgBefore = sb2 ? sb2.dmgDealt : 0;
+    let hitsLanded = 0;
     for (let i = 0; i < hits; i++) {
       await doDamage(attacker, defender, log, {
         mult: Array.isArray(a.dmgMult) ? randRange(a.dmgMult[0], a.dmgMult[1]) : (a.dmgMult || 1),
@@ -5192,7 +5312,18 @@ async function executeAbility(attacker, defender, talent, log) {
         magical: isMagical, // scales damage from INT instead of ATK
         abilityLabel: talent.name
       });
+      hitsLanded++;
       if (defender.hp <= 0 || attacker.hp <= 0) break;
+    }
+    // Multi-hit summary line — gives the player a clean total when an
+    // ability fired more than one hit. Skipped for single-hit abilities.
+    if (hits > 1 && sb2) {
+      const totalDmg = sb2.dmgDealt - dmgBefore;
+      const entry = document.createElement('div');
+      entry.className = 'log-entry log-summary';
+      entry.innerHTML = `<span class="log-ability">${talent.name}</span> → <span class="log-hit">${hitsLanded} hit${hitsLanded === 1 ? '' : 's'}, ${totalDmg} total</span>`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
     }
   }
 
@@ -5732,6 +5863,89 @@ function updateCombatBars(hero, foe) {
   document.getElementById('f2-hp-text').textContent = Math.max(0, Math.floor(foe.hp));
   hpHero.classList.toggle('hp-low', hPct > 0 && hPct < 25);
   hpFoe.classList.toggle('hp-low',  ePct > 0 && ePct < 25);
+}
+
+// ============ COMBAT READABILITY: EFFECTS + ABILITIES ============
+// Maps a statusBuff.type to a chip { glyph, label, kind }. `kind` drives
+// the CSS colour band: buff / debuff / dot / stun / util.
+function effectMeta(type) {
+  switch (type) {
+    case 'buffAtk':    return { glyph: '⬆⚔', label: 'ATK',    kind: 'buff' };
+    case 'buffDef':    return { glyph: '⬆🛡', label: 'DEF',    kind: 'buff' };
+    case 'regenBuff':  return { glyph: '♥+',  label: 'Regen',  kind: 'buff' };
+    case 'dodgeBuff':  return { glyph: '~',   label: 'Dodge',  kind: 'buff' };
+    case 'thorns':     return { glyph: '⟀',   label: 'Thorns', kind: 'buff' };
+    case 'turret':     return { glyph: '⚙',   label: 'Turret', kind: 'util' };
+    case 'mimic':      return { glyph: '⧗',   label: 'Mimic',  kind: 'util' };
+    case 'debuffAtk':  return { glyph: '⬇⚔', label: 'ATK',    kind: 'debuff' };
+    case 'debuffAgi':  return { glyph: '⬇~',  label: 'AGI',    kind: 'debuff' };
+    case 'stun':       return { glyph: '⚡',   label: 'STUN',   kind: 'stun' };
+    default: return null;
+  }
+}
+
+function renderCombatEffects(fighter, slotId) {
+  const el = document.getElementById(slotId);
+  if (!el) return;
+  if (!fighter) { el.innerHTML = ''; return; }
+  const chips = [];
+  // Status buffs / debuffs
+  (fighter.statusBuffs || []).forEach(b => {
+    const meta = effectMeta(b.type);
+    if (!meta) return;
+    chips.push(`<span class="fx-chip ${meta.kind}" title="${meta.label} · ${b.remaining} turn${b.remaining === 1 ? '' : 's'} left">
+      <span class="fx-glyph">${meta.glyph}</span><span class="fx-num">${b.remaining}</span>
+    </span>`);
+  });
+  // DoTs (burn, curse, hex)
+  (fighter.dots || []).forEach(dot => {
+    if (dot.remaining <= 0) return;
+    chips.push(`<span class="fx-chip dot" title="${dot.label}: ${dot.dmg} dmg/turn · ${dot.remaining} turn${dot.remaining === 1 ? '' : 's'} left">
+      <span class="fx-glyph">🔥</span><span class="fx-num">${dot.remaining}</span>
+    </span>`);
+  });
+  el.innerHTML = chips.join('');
+}
+
+// Render the hero's abilities as cooldown / mana chips below the arena.
+// Foe abilities are hidden (intentional — keeps the player focused on their
+// own kit and adds a bit of fog-of-war on enemy intentions).
+function renderCombatAbilities(hero) {
+  const el = document.getElementById('combat-abilities');
+  if (!el) return;
+  if (!hero || !hero.abilities || hero.abilities.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = hero.abilities.map(a => {
+    const cd = hero.cooldowns[a.key] || 0;
+    const mpCost = abilityMpCost(a, hero.class);
+    const magical = isTalentMagical(a, hero.class);
+    let status, cssClass;
+    if (cd > 0) {
+      status = `CD ${cd}`;
+      cssClass = 'cooling';
+    } else if (mpCost > 0 && (hero.mp || 0) < mpCost) {
+      status = `${mpCost} MP`;
+      cssClass = 'nomana';
+    } else {
+      status = mpCost > 0 ? `READY · ${mpCost} MP` : 'READY';
+      cssClass = 'ready';
+    }
+    return `<div class="ability-cd ${cssClass} ${magical ? 'magical' : ''}">
+      <div class="ability-cd-name">${a.name}</div>
+      <div class="ability-cd-status">${status}</div>
+    </div>`;
+  }).join('');
+}
+
+function refreshCombatUI() {
+  const hero = _currentFighters.hero;
+  const foe = _currentFighters.foe;
+  if (!hero || !foe) return;
+  renderCombatEffects(hero, 'f1-effects');
+  renderCombatEffects(foe,  'f2-effects');
+  renderCombatAbilities(hero);
 }
 
 // ============ COMBAT ANIMATIONS ============
