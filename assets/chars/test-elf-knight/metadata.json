@@ -1,0 +1,57 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "871dd7b9-74ac-4ad6-a311-3acffbc49d37",
+        "name": "I want a elf knight",
+        "prompt": "I want a elf knight",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-18T17:09:37.163617+00:00"
+      },
+      "folder": "I_want_a_elf_knight",
+      "frames": {
+        "rotations": {
+          "south": "I_want_a_elf_knight/rotations/south.png",
+          "west": "I_want_a_elf_knight/rotations/west.png",
+          "east": "I_want_a_elf_knight/rotations/east.png",
+          "north": "I_want_a_elf_knight/rotations/north.png"
+        },
+        "animations": {
+          "The_character_pulls_their_right_arm_back_to_wind_u-e827c969": {
+            "west": [
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_000.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_001.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_002.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_003.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_004.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_005.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_006.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_007.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/west/frame_008.png"
+            ],
+            "east": [
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_000.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_001.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_002.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_003.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_004.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_005.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_006.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_007.png",
+              "I_want_a_elf_knight/animations/The_character_pulls_their_right_arm_back_to_wind_u-e827c969/east/frame_008.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-18T17:27:56.615108"
+}
