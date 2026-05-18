@@ -23,8 +23,87 @@
     color: var(--text); font-family: 'EB Garamond', serif;
     min-height: 100vh; padding: 16px; font-size: 16px; line-height: 1.5;
   }
-  .app { max-width: 480px; margin: 0 auto; }
+  .app { max-width: 480px; margin: 0 auto; padding-bottom: 78px; /* room for fixed bottom nav */ }
+  /* When game is active, fade out the big "FORGE & BLOOD" title — the
+     persistent header replaces it. The title still shows on auth / creation. */
+  .app.in-game > header { display: none; }
   header { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+
+  /* Persistent header — always visible during gameplay */
+  .persistent-header {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(180deg, #110b06 0%, var(--bg-deep) 100%);
+    border-bottom: 1px solid var(--gold);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+    padding: 10px 12px;
+    margin: 0 -16px 12px;  /* extend to viewport edges within the app's padding */
+    display: grid; gap: 6px;
+  }
+  .ph-top { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+  .ph-identity {
+    font-family: 'Cinzel', serif; color: var(--gold-bright);
+    font-size: 13px; letter-spacing: 1px;
+    display: inline-flex; gap: 6px; align-items: center;
+  }
+  .ph-identity .icon { color: var(--gold-bright); width: 14px; height: 14px; }
+  .ph-identity .ph-level { font-weight: 700; }
+  .ph-identity .ph-class { color: var(--text-dim); font-size: 12px; }
+  .ph-gold {
+    font-family: 'Cinzel', serif; color: var(--gold-bright);
+    font-size: 14px; font-weight: 700;
+    display: inline-flex; gap: 4px; align-items: center;
+  }
+  .ph-logout {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); padding: 4px 8px;
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s;
+    min-height: 28px;
+  }
+  .ph-logout:hover { border-color: var(--blood-bright); color: var(--blood-bright); }
+  .ph-bars { display: grid; gap: 3px; }
+  .ph-bar-row { display: grid; grid-template-columns: 18px 1fr 70px; gap: 6px; align-items: center; font-size: 11px; }
+  .ph-bar-row .icon { width: 13px; height: 13px; }
+  .ph-bar-row.hp-row .icon { color: var(--blood-bright); }
+  .ph-bar-row.mp-row .icon { color: #4a7bce; }
+  .ph-bar-mini {
+    height: 6px; background: var(--bg); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .ph-bar-fill {
+    height: 100%; transition: width 0.4s;
+  }
+  .ph-bar-fill.hp { background: linear-gradient(90deg, #6b1010, var(--blood-bright)); }
+  .ph-bar-fill.mp { background: linear-gradient(90deg, #1f3a78, #4a7bce); }
+  .ph-bar-text { text-align: right; color: var(--text); font-weight: 700; font-family: 'Cinzel', serif; letter-spacing: 0.5px; }
+
+  /* Bottom nav — fixed to viewport, centered to match .app width */
+  .tabs {
+    position: fixed; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    max-width: 480px; width: 100%;
+    z-index: 90;
+    background: linear-gradient(180deg, var(--bg-panel) 0%, #110b07 100%);
+    border: none; border-top: 1px solid var(--gold);
+    box-shadow: 0 -6px 18px rgba(0,0,0,0.7);
+    margin: 0; padding: 4px 4px env(safe-area-inset-bottom, 4px);
+  }
+
+  /* Tutorial body */
+  .tutorial-body p { margin: 8px 0 12px; font-size: 13px; line-height: 1.5; }
+  .tutorial-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .tutorial-list li {
+    background: var(--bg-deep); border: 1px solid var(--border);
+    padding: 10px 12px; font-size: 13px;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .tutorial-list li .icon { color: var(--gold-bright); flex-shrink: 0; }
+  .tutorial-list li strong { color: var(--gold-bright); margin-right: 4px; font-family: 'Cinzel', serif; letter-spacing: 1px; }
+  .tutorial-tip {
+    font-style: italic; color: var(--text-dim);
+    border-left: 3px solid var(--gold); padding-left: 10px;
+    margin-top: 12px !important;
+  }
   h1 {
     font-family: 'Cinzel', serif; font-weight: 900; font-size: 28px;
     letter-spacing: 4px; color: var(--gold-bright);
@@ -579,8 +658,8 @@
     background: var(--bg-deep);
     border: 1px solid var(--uncommon);
     color: var(--uncommon);
-    font-family: 'Cinzel', serif; font-weight: 900; font-size: 13px;
-    width: 22px; height: 22px; line-height: 1;
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 16px;
+    min-width: 32px; min-height: 32px; line-height: 1;
     cursor: pointer; padding: 0;
     box-shadow: 0 0 6px rgba(95,168,95,0.25);
     transition: background 0.15s, color 0.15s;
@@ -1251,6 +1330,7 @@
   </div>
 
   <div id="game" class="hidden">
+    <div id="persistent-header" class="persistent-header"></div>
     <div class="tabs">
       <button class="tab active" data-tab="hero"><svg class="tab-icon"><use href="#i-shield"/></svg><span>HERO</span></button>
       <button class="tab" data-tab="talents"><svg class="tab-icon"><use href="#i-star"/></svg><span>TALENTS</span></button>
@@ -1365,6 +1445,27 @@
         <div class="section-title">Blood Arena</div>
         <div class="pvp-info">Other heroes await. Each victory brings glory; each defeat, shame.</div>
         <div id="pvp-list"></div>
+      </div>
+    </div>
+
+    <div id="tutorial-modal" class="modal-overlay hidden">
+      <div class="modal-panel">
+        <div class="section-title">Welcome, hero</div>
+        <div class="tutorial-body">
+          <p>A quick tour of your new life:</p>
+          <ul class="tutorial-list">
+            <li><svg class="icon icon-lg"><use href="#i-shield"/></svg> <strong>HERO</strong> — your stats, gear, set bonuses, achievements.</li>
+            <li><svg class="icon icon-lg"><use href="#i-star"/></svg> <strong>TALENTS</strong> — your specialisation (at lv 15) and 10 tiers of talent picks.</li>
+            <li><svg class="icon icon-lg"><use href="#i-bag"/></svg> <strong>BAG</strong> — manage your inventory. Tap any equipped slot to swap gear.</li>
+            <li><svg class="icon icon-lg"><use href="#i-coin"/></svg> <strong>SHOP</strong> — buy sealed crates with the gold you earn.</li>
+            <li><svg class="icon icon-lg"><use href="#i-map"/></svg> <strong>HUNT</strong> — pick an expedition and navigate a map of encounters: combat, treasure, choices, boss at the end.</li>
+            <li><svg class="icon icon-lg"><use href="#i-sword"/></svg> <strong>ARENA</strong> — duel other heroes.</li>
+          </ul>
+          <p class="tutorial-tip">Combat resolves itself — make your decisions <em>outside</em> the fight. HP and MP fully restore between every encounter.</p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="tutorial-done">GOT IT — START PLAYING</button>
+        </div>
       </div>
     </div>
 
@@ -2732,6 +2833,7 @@ function showAuthScreen() {
   document.getElementById('creation').classList.add('hidden');
   document.getElementById('game').classList.add('hidden');
   document.getElementById('session-strip').classList.add('hidden');
+  document.querySelector('.app').classList.remove('in-game');
   // Reset form
   document.getElementById('auth-username').value = '';
   document.getElementById('auth-password').value = '';
@@ -2741,6 +2843,7 @@ function showCreationScreen() {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('creation').classList.remove('hidden');
   document.getElementById('game').classList.add('hidden');
+  document.querySelector('.app').classList.remove('in-game');
   showSessionStrip();
   state.step = 0;
   state.pendingHero = { race: null, class: null, name: '' };
@@ -2750,8 +2853,10 @@ function showGameScreen() {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('creation').classList.add('hidden');
   document.getElementById('game').classList.remove('hidden');
+  document.querySelector('.app').classList.add('in-game');
   showSessionStrip();
   renderAll();
+  maybeShowTutorial();
 }
 function showSessionStrip() {
   const user = getActiveUser();
@@ -3299,6 +3404,7 @@ function getAllPassiveBonuses() {
 
 // ============ RENDERING ============
 function renderAll() {
+  renderPersistentHeader();
   renderHero();
   renderTalents();
   renderInventory();
@@ -3306,6 +3412,69 @@ function renderAll() {
   renderPve();
   renderPvp();
   renderAchievements();
+}
+
+// ============ PERSISTENT HEADER ============
+function renderPersistentHeader() {
+  const el = document.getElementById('persistent-header');
+  if (!el || !state.hero) return;
+  const h = state.hero;
+  const hpPct = (h.hp / h.maxHp) * 100;
+  const mpPct = h.maxMp > 0 ? (h.mp / h.maxMp) * 100 : 0;
+  const className = CLASSES[h.class] ? CLASSES[h.class].name : '';
+  const user = getActiveUser();
+  el.innerHTML = `
+    <div class="ph-top">
+      <div class="ph-identity">
+        <svg class="icon"><use href="#i-star"/></svg>
+        <span class="ph-level">Lv ${h.level}</span>
+        <span class="ph-class">· ${className}</span>
+      </div>
+      <div class="ph-gold">
+        <svg class="icon"><use href="#i-coin"/></svg>${h.gold}
+      </div>
+      ${user ? `<button class="ph-logout" id="ph-logout-btn">${user}</button>` : ''}
+    </div>
+    <div class="ph-bars">
+      <div class="ph-bar-row hp-row">
+        <svg class="icon"><use href="#i-heart"/></svg>
+        <div class="ph-bar-mini"><div class="ph-bar-fill hp" style="width: ${hpPct}%"></div></div>
+        <div class="ph-bar-text">${h.hp}/${h.maxHp}</div>
+      </div>
+      ${h.maxMp > 0 ? `
+      <div class="ph-bar-row mp-row">
+        <svg class="icon"><use href="#i-droplet"/></svg>
+        <div class="ph-bar-mini"><div class="ph-bar-fill mp" style="width: ${mpPct}%"></div></div>
+        <div class="ph-bar-text">${h.mp}/${h.maxMp}</div>
+      </div>` : ''}
+    </div>
+  `;
+  const logoutBtn = document.getElementById('ph-logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', () => {
+    if (confirm('Log out? Your progress is saved.')) logout();
+  });
+}
+
+// ============ TUTORIAL ============
+const TUTORIAL_FLAG = 'forgeBlood.v1.tutorialSeen';
+function shouldShowTutorial() {
+  try { return !localStorage.getItem(TUTORIAL_FLAG); } catch (e) { return false; }
+}
+function showTutorial() {
+  const modal = document.getElementById('tutorial-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+}
+function closeTutorial() {
+  const modal = document.getElementById('tutorial-modal');
+  if (modal) modal.classList.add('hidden');
+  try { localStorage.setItem(TUTORIAL_FLAG, '1'); } catch (e) {}
+}
+function maybeShowTutorial() {
+  if (shouldShowTutorial()) {
+    // Defer to next tick so the game screen renders first
+    setTimeout(showTutorial, 250);
+  }
 }
 
 // ============ TOAST NOTIFICATIONS ============
@@ -4512,6 +4681,7 @@ function startCombat(enemy, mode) {
   _previousTab = mode === 'pvp' ? 'pvp' : 'pve';
   document.getElementById('combat').classList.remove('hidden');
   document.querySelector('#game .tabs').classList.add('hidden');
+  document.getElementById('persistent-header').classList.add('hidden');
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   const summary = document.getElementById('combat-summary');
   if (summary) summary.classList.add('hidden');
@@ -4534,6 +4704,7 @@ function startCombat(enemy, mode) {
 function closeCombat() {
   document.getElementById('combat').classList.add('hidden');
   document.querySelector('#game .tabs').classList.remove('hidden');
+  document.getElementById('persistent-header').classList.remove('hidden');
   switchTab(_previousTab || 'hero');
   // If a combat was part of an active expedition, advance the expedition.
   if (state.expedition && state.expedition._awaitingCombat) {
@@ -5801,6 +5972,7 @@ document.getElementById('auth-username').addEventListener('keydown', e => {
 document.getElementById('session-logout').addEventListener('click', () => {
   if (confirm('Log out? Your progress is saved.')) logout();
 });
+document.getElementById('tutorial-done').addEventListener('click', closeTutorial);
 
 // ============ INIT ============
 function init() {

@@ -6,6 +6,39 @@
 
 ---
 
+## Session 19 — 2026-05-18 — Mobile UX pack (persistent header + bottom nav + tutorial)
+
+### Persistent header — always visible during gameplay
+- Sticky to the top of the viewport, replacing the giant `FORGE & BLOOD` title (which now only shows on auth / character creation, via the new `.app.in-game > header { display: none }` rule).
+- Shows: ★ Lv X · class name · 🪙 gold · LOG OUT button (with the username as the label).
+- Two thin bars below: ♥ HP / total + 💧 MP / total (MP row only renders if the hero has any mana pool).
+- Compact (~80px tall) so it doesn't steal much space.
+- Hidden during combat — the combat panel has its own bigger HP bars + portraits, no need to duplicate.
+
+### Bottom nav bar
+- The 6-tab nav (HERO / TALENTS / BAG / SHOP / HUNT / ARENA) is now **fixed to the bottom of the viewport**, centered to the 480px app width, with safe-area-inset padding for notched phones.
+- Stays visible across all tabs. Thumb-friendly on mobile.
+- Hidden during combat alongside the persistent header.
+- The icon-on-top + label-below layout (from S17) was already mobile-friendly; just changed position.
+
+### Tap targets
+- `.stat-add-btn` bumped from 22×22 → 32×32 minimum (now reachable on mobile without misclicks).
+- Logout button in the persistent header has min-height 28px and clear padding.
+- All major buttons (`.btn`, `.btn-cancel`, `.btn-sell`, etc.) were already ≥40px tall via padding.
+
+### First-time tutorial
+- Modal shown on the user's first game session (after character creation OR on first login if no tutorial flag).
+- Lists each tab with its icon and a one-line description plus a "Combat resolves itself — decisions happen between fights" tip.
+- Single GOT IT button dismisses; `localStorage` flag `forgeBlood.v1.tutorialSeen` prevents it from showing again.
+
+### Bottom padding
+- The `.app` container got `padding-bottom: 78px` so the last items in a scrolling tab don't get hidden behind the fixed bottom nav.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 18 — 2026-05-18 — Sub-classes / Specs (build depth)
 
 ### What's new
