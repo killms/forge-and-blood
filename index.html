@@ -405,6 +405,40 @@
     font-size: 12px; line-height: 1;
     padding: 2px 0;
   }
+  /* S24 — when an encounter is pending, the map collapses so the encounter
+     becomes the focus. Player can still click "🗺" to toggle full view. */
+  .exp-active.compact .exp-map {
+    max-height: 96px; overflow: hidden; padding: 6px;
+    margin-bottom: 8px; opacity: 0.55;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .exp-active.compact .exp-map::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 28px;
+    background: linear-gradient(180deg, transparent, var(--bg)); pointer-events: none;
+  }
+  .exp-active.compact .exp-map-node {
+    min-height: 36px; padding: 4px;
+  }
+  .exp-active.compact .exp-map-node-icon { font-size: 16px; margin-bottom: 0; }
+  .exp-active.compact .exp-map-node-label { display: none; }
+  .exp-active.compact .exp-map-arrow { padding: 0; }
+  .exp-active.compact .exp-encounter {
+    animation: encounter-pop 0.35s ease-out;
+    box-shadow: 0 0 24px rgba(201,165,87,0.25);
+  }
+  @keyframes encounter-pop {
+    from { opacity: 0; transform: scale(0.96) translateY(4px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .exp-map-toggle {
+    margin-left: auto;
+    background: var(--bg); border: 1px solid var(--gold);
+    color: var(--gold-bright); font-size: 16px;
+    width: 32px; height: 32px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .exp-map-toggle:hover { background: var(--gold); color: var(--bg); }
   .exp-pick-hint {
     text-align: center; padding: 14px;
     font-style: italic; color: var(--text-dim);
@@ -906,6 +940,14 @@
   .inv-item-slot {
     font-size: 10px; color: var(--text-dim);
     letter-spacing: 1px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  /* S24 — level requirement tag on items */
+  .item-lvl-tag {
+    display: inline-block;
+    padding: 1px 6px;
+    background: rgba(74,143,214,0.18); border: 1px solid rgba(74,143,214,0.45);
+    color: #8ab8e8; font-size: 10px; letter-spacing: 0.5px;
   }
   .inv-item-stats { font-size: 12px; color: var(--text); margin-top: 4px; }
   .inv-item-effect { font-size: 12px; color: var(--epic); font-style: italic; margin-top: 2px; }
@@ -2631,6 +2673,227 @@ const ITEM_POOL = [
     combat: { kind: 'attack', mult: 0.55, school: 'magical', lifesteal: 0.4, desc: '55% Magic + 40% lifesteal' } }
 ];
 
+// ============ PROCEDURAL ITEM POOL (S24) ============
+// 10 items per gear slot per 10-level tier → 900 generated items across the 9
+// wearable slots. The existing hand-crafted items above are kept as "flagship"
+// drops — they're given minLevel based on their rarity so they slot into the
+// same level-gated loot table.
+//
+// Tier 1 = level 1-10, Tier 2 = 11-20, ..., Tier 10 = 91-100.
+// Each (slot, tier) produces 10 items distributed across rarities, with names
+// built from `{tierPrefix} {slotNoun}` and effects attached by rarity.
+
+const TIER_PREFIX = [
+  'Rusty',      // T1  · lv 1-10
+  'Worn',       // T2  · lv 11-20
+  'Iron',       // T3  · lv 21-30
+  'Steel',      // T4  · lv 31-40
+  'Mithril',    // T5  · lv 41-50
+  'Adamant',    // T6  · lv 51-60
+  'Runic',      // T7  · lv 61-70
+  'Dragonsteel',// T8  · lv 71-80
+  'Astral',     // T9  · lv 81-90
+  'Mythic'      // T10 · lv 91-100
+];
+
+// Stat patterns per slot. Each entry produces an item line; pat values are
+// coefficients × tier × rarity multiplier. 10 nouns per slot → 10 items
+// per (slot, tier).
+const SLOT_BASES = {
+  weapon: [
+    { noun: 'Sword',     pat: { atk: 1.0 } },
+    { noun: 'Axe',       pat: { atk: 1.1, vit: 0.2 } },
+    { noun: 'Dagger',    pat: { atk: 0.7, agi: 0.5 } },
+    { noun: 'Hammer',    pat: { atk: 1.2, def: 0.2 } },
+    { noun: 'Spear',     pat: { atk: 0.9, agi: 0.4 } },
+    { noun: 'Mace',      pat: { atk: 1.0, def: 0.3 } },
+    { noun: 'Bow',       pat: { atk: 0.8, agi: 0.6 } },
+    { noun: 'Staff',     pat: { atk: 0.4, int: 1.1 } },
+    { noun: 'Wand',      pat: { atk: 0.2, int: 1.3 } },
+    { noun: 'Scythe',    pat: { atk: 1.0, int: 0.5 } }
+  ],
+  helm: [
+    { noun: 'Cap',       pat: { def: 0.6 } },
+    { noun: 'Helm',      pat: { def: 1.0 } },
+    { noun: 'Hood',      pat: { def: 0.5, int: 0.5 } },
+    { noun: 'Visor',     pat: { def: 0.8, agi: 0.3 } },
+    { noun: 'Coif',      pat: { def: 0.7, vit: 0.4 } },
+    { noun: 'Circlet',   pat: { def: 0.4, int: 0.8 } },
+    { noun: 'Crown',     pat: { def: 0.6, int: 0.7, atk: 0.3 } },
+    { noun: 'Tiara',     pat: { def: 0.3, int: 1.0 } },
+    { noun: 'Greathelm', pat: { def: 1.2, vit: 0.4 } },
+    { noun: 'Mask',      pat: { def: 0.7, agi: 0.4, atk: 0.3 } }
+  ],
+  amulet: [
+    { noun: 'Pendant',   pat: { vit: 0.8 } },
+    { noun: 'Talisman',  pat: { vit: 0.6, def: 0.4 } },
+    { noun: 'Locket',    pat: { vit: 0.5, atk: 0.4 } },
+    { noun: 'Charm',     pat: { agi: 0.7 } },
+    { noun: 'Choker',    pat: { atk: 0.6, vit: 0.4 } },
+    { noun: 'Necklace',  pat: { int: 0.8 } },
+    { noun: 'Brooch',    pat: { def: 0.5, vit: 0.4, atk: 0.2 } },
+    { noun: 'Beads',     pat: { int: 0.6, vit: 0.4 } },
+    { noun: 'Reliquary', pat: { vit: 0.6, int: 0.5 } },
+    { noun: 'Phylactery',pat: { int: 1.0, atk: 0.3 } }
+  ],
+  armor: [
+    { noun: 'Tunic',     pat: { def: 0.7 } },
+    { noun: 'Mail',      pat: { def: 1.1, vit: 0.3 } },
+    { noun: 'Cuirass',   pat: { def: 1.2, vit: 0.4 } },
+    { noun: 'Brigandine',pat: { def: 1.0, agi: 0.3 } },
+    { noun: 'Plate',     pat: { def: 1.4, vit: 0.5 } },
+    { noun: 'Robe',      pat: { def: 0.6, int: 0.8 } },
+    { noun: 'Vestment',  pat: { def: 0.5, int: 0.9, vit: 0.3 } },
+    { noun: 'Hauberk',   pat: { def: 1.1, vit: 0.6 } },
+    { noun: 'Battleplate',pat:{ def: 1.3, atk: 0.4, vit: 0.4 } },
+    { noun: 'Vestige',   pat: { def: 0.8, int: 0.6, atk: 0.3 } }
+  ],
+  vest: [
+    { noun: 'Vest',      pat: { def: 0.5, agi: 0.3 } },
+    { noun: 'Jerkin',    pat: { def: 0.7, agi: 0.3 } },
+    { noun: 'Doublet',   pat: { def: 0.5, vit: 0.4 } },
+    { noun: 'Cloak',     pat: { def: 0.4, agi: 0.5 } },
+    { noun: 'Mantle',    pat: { def: 0.5, int: 0.4, atk: 0.3 } },
+    { noun: 'Sash',      pat: { agi: 0.6, atk: 0.3 } },
+    { noun: 'Surcoat',   pat: { def: 0.7, vit: 0.3 } },
+    { noun: 'Shroud',    pat: { def: 0.4, agi: 0.4, int: 0.4 } },
+    { noun: 'Tabard',    pat: { def: 0.6, vit: 0.4, atk: 0.2 } },
+    { noun: 'Mantling',  pat: { def: 0.5, int: 0.7 } }
+  ],
+  pants: [
+    { noun: 'Breeches',  pat: { def: 0.5 } },
+    { noun: 'Trousers',  pat: { def: 0.5, agi: 0.4 } },
+    { noun: 'Greaves',   pat: { def: 1.0 } },
+    { noun: 'Leggings',  pat: { def: 0.7, agi: 0.4 } },
+    { noun: 'Cuisses',   pat: { def: 1.1, vit: 0.3 } },
+    { noun: 'Tassets',   pat: { def: 0.9, vit: 0.4 } },
+    { noun: 'Chausses',  pat: { def: 0.8, agi: 0.3 } },
+    { noun: 'Wraps',     pat: { def: 0.4, int: 0.6 } },
+    { noun: 'Plates',    pat: { def: 1.2, vit: 0.5 } },
+    { noun: 'Skirt',     pat: { def: 0.6, int: 0.5 } }
+  ],
+  boots: [
+    { noun: 'Sandals',   pat: { agi: 0.5 } },
+    { noun: 'Boots',     pat: { agi: 0.6, def: 0.3 } },
+    { noun: 'Sabatons',  pat: { def: 0.8, agi: 0.3 } },
+    { noun: 'Treads',    pat: { agi: 0.7 } },
+    { noun: 'Greaves',   pat: { def: 0.6, agi: 0.5 } },
+    { noun: 'Striders',  pat: { agi: 0.9 } },
+    { noun: 'Stompers',  pat: { def: 0.9, vit: 0.3 } },
+    { noun: 'Slippers',  pat: { agi: 0.5, int: 0.5 } },
+    { noun: 'Greatboots',pat: { def: 1.0, vit: 0.4 } },
+    { noun: 'Shadowsteps',pat:{ agi: 0.8, atk: 0.3 } }
+  ],
+  ring: [
+    { noun: 'Band',      pat: { atk: 0.3 } },
+    { noun: 'Loop',      pat: { atk: 0.3, agi: 0.2 } },
+    { noun: 'Signet',    pat: { def: 0.3, vit: 0.2 } },
+    { noun: 'Coil',      pat: { atk: 0.3, int: 0.3 } },
+    { noun: 'Ring',      pat: { vit: 0.4 } },
+    { noun: 'Circlet',   pat: { int: 0.5 } },
+    { noun: 'Hoop',      pat: { agi: 0.4 } },
+    { noun: 'Wraith Ring',pat:{ atk: 0.3, int: 0.3, vit: 0.2 } },
+    { noun: 'Seal',      pat: { def: 0.4, vit: 0.3 } },
+    { noun: 'Crown Ring',pat: { atk: 0.4, def: 0.2, vit: 0.2 } }
+  ]
+};
+
+const RARITY_MULT = { common: 1.0, uncommon: 1.4, rare: 1.9, epic: 2.6, legendary: 3.6 };
+
+// Rarity distribution per tier — index 0..9 = the 10 items rolled for each
+// (slot, tier). Earlier tiers lean common, later tiers lean legendary.
+const TIER_RARITY_DIST = {
+  1:  ['common','common','common','common','common','uncommon','uncommon','uncommon','rare','rare'],
+  2:  ['common','common','common','uncommon','uncommon','uncommon','rare','rare','rare','epic'],
+  3:  ['common','common','uncommon','uncommon','uncommon','rare','rare','rare','epic','epic'],
+  4:  ['common','uncommon','uncommon','uncommon','rare','rare','rare','epic','epic','legendary'],
+  5:  ['uncommon','uncommon','rare','rare','rare','epic','epic','epic','legendary','legendary'],
+  6:  ['uncommon','rare','rare','rare','epic','epic','epic','legendary','legendary','legendary'],
+  7:  ['rare','rare','rare','epic','epic','epic','epic','legendary','legendary','legendary'],
+  8:  ['rare','rare','epic','epic','epic','epic','legendary','legendary','legendary','legendary'],
+  9:  ['rare','epic','epic','epic','epic','legendary','legendary','legendary','legendary','legendary'],
+  10: ['epic','epic','epic','epic','legendary','legendary','legendary','legendary','legendary','legendary']
+};
+
+// Effect catalog used when attaching effects to generated items.
+const EFFECT_POOL = [
+  { type: 'lifesteal', baseVal: 0.06, scale: 0.02, desc: v => `${Math.round(v*100)}% lifesteal` },
+  { type: 'crit',      baseVal: 0.05, scale: 0.02, desc: v => `+${Math.round(v*100)}% crit chance` },
+  { type: 'thorns',    baseVal: 2,    scale: 1,    desc: v => `Thorns: returns ${v} damage` },
+  { type: 'burn',      baseVal: 2,    scale: 1,    desc: v => `Burn: ${v} damage/turn` },
+  { type: 'regen',     baseVal: 1,    scale: 1,    desc: v => `Regenerates ${v} HP/turn` },
+  { type: 'dodge',     baseVal: 0.04, scale: 0.015,desc: v => `${Math.round(v*100)}% dodge` }
+];
+
+// Probability of attaching an effect, by rarity.
+const EFFECT_CHANCE = { common: 0, uncommon: 0.25, rare: 1.0, epic: 1.0, legendary: 1.0 };
+
+function pickEffectFor(rarity, tier) {
+  if (Math.random() > (EFFECT_CHANCE[rarity] || 0)) return null;
+  const tpl = EFFECT_POOL[Math.floor(Math.random() * EFFECT_POOL.length)];
+  // Effect value scales with both tier (1-10) and rarity.
+  const rMult = (RARITY_MULT[rarity] || 1) * 0.7;
+  let v = tpl.baseVal + tpl.scale * (tier - 1) * rMult;
+  if (tpl.type === 'thorns' || tpl.type === 'burn' || tpl.type === 'regen') {
+    v = Math.max(1, Math.round(v));
+  } else {
+    v = Math.min(0.45, Math.round(v * 100) / 100); // cap percent effects at 45%
+  }
+  return { type: tpl.type, val: v, desc: tpl.desc(v) };
+}
+
+function scaleStats(pattern, tier, rarity) {
+  // Linear-ish tier scaling: T1 ≈ 3, T10 ≈ 18 before rarity multiplier
+  const tierMult = 1.5 + tier * 1.6;
+  const rMult = RARITY_MULT[rarity] || 1;
+  const out = {};
+  for (const [k, v] of Object.entries(pattern)) {
+    const s = Math.max(1, Math.round(v * tierMult * rMult));
+    out[k] = s;
+  }
+  return out;
+}
+
+function buildProceduralItems() {
+  const items = [];
+  for (let tier = 1; tier <= 10; tier++) {
+    const minLevel = (tier - 1) * 10 + 1;
+    const prefix = TIER_PREFIX[tier - 1];
+    const dist = TIER_RARITY_DIST[tier];
+    for (const slotKey of Object.keys(SLOT_BASES)) {
+      const bases = SLOT_BASES[slotKey];
+      for (let i = 0; i < 10; i++) {
+        const base = bases[i];
+        const rarity = dist[i];
+        const item = {
+          slot: slotKey,
+          name: `${prefix} ${base.noun}`,
+          rarity,
+          tier,
+          minLevel,
+          stats: scaleStats(base.pat, tier, rarity),
+          generated: true
+        };
+        const effect = pickEffectFor(rarity, tier);
+        if (effect) item.effect = effect;
+        items.push(item);
+      }
+    }
+  }
+  return items;
+}
+
+// Assign minLevel to the hand-crafted flagship items by rarity, so they share
+// the same gating as the generated pool.
+const FLAGSHIP_MIN_LEVEL_BY_RARITY = { common: 1, uncommon: 5, rare: 15, epic: 35, legendary: 60 };
+ITEM_POOL.forEach(it => {
+  if (typeof it.minLevel !== 'number') {
+    it.minLevel = FLAGSHIP_MIN_LEVEL_BY_RARITY[it.rarity] || 1;
+  }
+});
+// Append the procedural pool
+ITEM_POOL.push(...buildProceduralItems());
+
 // Monsters define a "tier" (relative difficulty) and base stats at tier level.
 // Their actual stats scale with the hero's level so they remain a challenge
 // all the way to level 100. See scaleMonster(template, heroLevel).
@@ -3710,11 +3973,17 @@ function spendStatPoint(stat) {
 }
 
 // ============ ITEMS ============
-function generateItem(rarityHint, slotHint) {
+function generateItem(rarityHint, slotHint, levelCap) {
   let pool = ITEM_POOL;
   // ring1 / ring2 both pull from the 'ring' pool
   const effectiveSlot = (slotHint === 'ring1' || slotHint === 'ring2') ? 'ring' : slotHint;
   if (effectiveSlot) pool = pool.filter(i => i.slot === effectiveSlot);
+  // S24 — gate by level: only items whose minLevel ≤ levelCap are eligible.
+  // Falls back to the full pool if the filter would empty it.
+  if (typeof levelCap === 'number') {
+    const lvlFiltered = pool.filter(i => (i.minLevel || 1) <= levelCap);
+    if (lvlFiltered.length) pool = lvlFiltered;
+  }
   if (rarityHint) {
     const filtered = pool.filter(i => i.rarity === rarityHint);
     if (filtered.length) pool = filtered;
@@ -3736,7 +4005,7 @@ function rollLootByLevel(monsterLevel) {
   else if (roll < 0.10 + lvlBonus) rarity = 'epic';
   else if (roll < 0.30 + lvlBonus) rarity = 'rare';
   else if (roll < 0.60) rarity = 'uncommon';
-  return generateItem(rarity);
+  return generateItem(rarity, null, monsterLevel);
 }
 
 // S23 — gem drops (separate from item loot). Returns the gem if dropped, else null.
@@ -4866,10 +5135,13 @@ function renderInventory() {
     const eff = effectiveItemStats(item);
     const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
     const slotLabel = item.slot === 'ring' ? 'Ring' : (SLOT_LABELS[item.slot] || item.slot);
+    const lvlTag = item.minLevel && item.minLevel > 1
+      ? `<span class="item-lvl-tag">Lv ${item.minLevel}+</span>`
+      : '';
     return `<div class="inv-item rarity-${item.rarity}" data-idx="${idx}">
       <div class="inv-item-header">
         <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
-        <span class="inv-item-slot">${slotLabel}</span>
+        <span class="inv-item-slot">${lvlTag}${slotLabel}</span>
       </div>
       <div class="inv-item-stats">${statStr}</div>
       ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
@@ -5597,14 +5869,18 @@ function renderPve() {
     nodeHtml = `<div class="exp-pick-hint">Tap a node above to take that path.</div>`;
   }
 
+  // S24 — when an encounter is pending, collapse the map to a compact strip so
+  // the encounter is the visual focus. The user can still see progress at a glance.
+  const isCompact = !!exp.pending && !exp.finished;
   list.innerHTML = `
-    <div class="exp-active" style="border-color: ${exp.tint};">
+    <div class="exp-active${isCompact ? ' compact' : ''}" style="border-color: ${exp.tint};">
       <div class="exp-active-header">
         <div class="exp-active-icon" style="color: ${exp.tint};">${exp.glyph}</div>
         <div>
           <div class="exp-active-name">${exp.name}</div>
           <div class="exp-active-progress">Layer ${Math.min(exp.currentLayer + 1, totalLayers)} of ${totalLayers}</div>
         </div>
+        ${isCompact ? '<button class="exp-map-toggle" id="exp-map-toggle" title="Show full map">🗺</button>' : ''}
       </div>
       <div class="exp-progress-bar"><div class="exp-progress-fill" style="width: ${progressPct}%; background: ${exp.tint};"></div></div>
       <div class="exp-map">${mapHtml}</div>
@@ -5626,6 +5902,11 @@ function renderPve() {
   wire('exp-leave', leaveExpedition);
   wire('exp-treasure', expeditionOpenTreasure);
   wire('exp-continue', expeditionAdvance);
+  // S24 — toggle full-map preview while encounter is pending
+  wire('exp-map-toggle', () => {
+    const active = document.querySelector('.exp-active');
+    if (active) active.classList.toggle('compact');
+  });
   list.querySelectorAll('[data-event-choice]').forEach(el => {
     el.addEventListener('click', () => expeditionResolveEvent(el.dataset.eventChoice));
   });

@@ -6,6 +6,62 @@
 
 ---
 
+## Session 24 — 2026-05-18 — Procedural item pool (900 new items) + compact map UX
+
+User pediu 3 coisas: (1) "10 itens para cada gear slot por cada 10 levels", (2) PvE map a minimizar quando entras num nó, (3) recomendação de IA para gerar GIFs de personagens (apenas pergunta — sugeri **PixelLab.ai** para sprite art).
+
+### Procedural item pool — 900 new items
+
+Em vez de escrever 900 items à mão, criei um **gerador procedural** que produz exactamente "10 items por slot por cada 10 levels":
+
+**Tiers**
+- 10 tiers, cada um cobrindo 10 levels: T1=lv 1-10, T2=lv 11-20, …, T10=lv 91-100.
+- Cada tier tem um prefixo de tema: Rusty → Worn → Iron → Steel → **Mithril** → Adamant → Runic → Dragonsteel → Astral → **Mythic**.
+
+**Slot bases**
+- Cada um dos 9 slots tem 10 "nouns" com stat patterns próprios:
+  - **Weapon**: Sword, Axe, Dagger, Hammer, Spear, Mace, Bow, Staff, Wand, Scythe.
+  - **Helm**: Cap, Helm, Hood, Visor, Coif, Circlet, Crown, Tiara, Greathelm, Mask.
+  - **Amulet**: Pendant, Talisman, Locket, Charm, Choker, Necklace, Brooch, Beads, Reliquary, Phylactery.
+  - **Armor / Vest / Pants / Boots / Ring** — listas similares.
+- Cada noun tem um `pat` (pattern de stats), tipo Sword `{atk: 1.0}`, Wand `{atk: 0.2, int: 1.3}`, Bow `{atk: 0.8, agi: 0.6}`. Stats finais = `pat × tierMult × rarityMult`.
+
+**Stat scaling**
+- `tierMult = 1.5 + tier × 1.6` → T1 = 3.1, T10 = 17.5.
+- `rarityMult` (common→legendary) = 1.0 / 1.4 / 1.9 / 2.6 / 3.6.
+- Resultado: Sword T1 common = +3 ATK. Sword T10 legendary = +63 ATK (com Forge +5 ≈ +123 ATK).
+
+**Rarity distribution por tier**
+Cada (slot, tier) produz exactamente 10 items, com raridade distribuída para encaixar no progress curve. T1 = mostly common, T5 = mistura uncommon-epic, T10 = mostly legendary.
+
+**Efeitos automáticos**
+- Common: 0% chance de efeito.
+- Uncommon: 25% chance.
+- Rare/Epic/Legendary: 100% chance.
+- Efeito escolhido do pool: `lifesteal · crit · thorns · burn · regen · dodge`. Valor escala com tier × rarity.
+
+**Total: 10 × 10 × 9 = 900 items novos**, somados aos ~73 hand-crafted "flagship" items existentes (que ganham agora `minLevel` baseado na raridade).
+
+### minLevel + drop gating
+
+- Todos os items têm agora um campo `minLevel`. Procedurais herdam o do tier, flagships ganham um valor por raridade (common 1, uncommon 5, rare 15, epic 35, legendary 60).
+- `generateItem(rarity, slot, levelCap)` agora aceita um terceiro parâmetro e filtra a pool por `minLevel ≤ levelCap`. Fallback para a pool inteira se ficar vazia.
+- `rollLootByLevel(monsterLevel)` passa o level do monstro como cap — items demasiado altos não caem cedo.
+- **UI**: items com `minLevel > 1` mostram uma tag azul `Lv N+` ao lado do slot na bag.
+
+### Compact map UX durante encontros
+
+Quando estás no meio de uma expedição e escolhes um nó:
+- O mapa **colapsa para uma faixa pequena** (~96px max-height) com os ícones reduzidos e sem labels. Fade no fundo.
+- O **encontro fica em destaque** com `animation: encounter-pop` e box-shadow dourada.
+- Botão **🗺** no canto do header permite voltar a expandir o mapa se quiseres rever os caminhos.
+- Quando resolves o encontro (combate ganho, treasure aberto, etc.) e voltas ao `pick-a-path` state, o mapa expande automaticamente outra vez.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 23 — 2026-05-18 — Build depth pack: Forge (enhancement + gems), talent respec, loadouts
 
 User asked "o que posso melhorar?" and picked **Build depth pack (crafting + respec + loadouts)** from the menu. Three systems land together — none of them touch combat, all add depth between fights.
