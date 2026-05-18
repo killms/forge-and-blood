@@ -6,6 +6,42 @@
 
 ---
 
+## Session 17 — 2026-05-18 — Visual polish pack (SVG icons, card depth, typography, tab animations)
+
+### Inline SVG icon library
+- 14 hand-drawn SVG symbols in a single `<svg>` block at the top of `<body>`: coin, heart, droplet, star, sword, magic, shield, boot, bag, skull, map, crown, flame, trophy.
+- All use `currentColor` so they inherit the surrounding text colour — gold next to a gold number, blue next to MP, etc.
+- New `.icon` utility class (14×14px, vertically centred). Variants: `.icon-lg` (18px), `.icon-xl` (24px).
+- Icons applied:
+  - **Gold display** (hero header): coin icon next to the number.
+  - **HP bar text**: heart icon.
+  - **MP bar text**: droplet icon.
+  - **Level badge** (XP panel): star icon.
+  - **Tabs** (HERO/TALENTS/BAG/SHOP/HUNT/ARENA): each tab now stacks an icon above its label (shield/star/bag/coin/map/sword).
+- Active tab pulses its icon slightly and adds a gold drop shadow underneath.
+
+### Card depth
+- All `.panel` elements get:
+  - Subtle vertical gradient (lighter on top, deeper on bottom).
+  - Inset highlight on the top edge (gold tinge) + inset shadow on the bottom edge (black).
+  - Drop shadow (`0 4px 10px rgba(0,0,0,0.45)`) — panels visibly sit above the background.
+  - Bottom-edge gold sparkle line (`::after` rule) matching the existing top-edge gold line.
+- Net effect: panels feel like raised wood-and-iron boards instead of flat rectangles.
+
+### Typography hierarchy
+- **Hero name** bumped 18px → 22px, weight 700, with gold text-shadow.
+- **Gold display** bumped to 17px bold with gold glow.
+- **Bar texts** (HP / MP) bumped to 13px / weight 700 — much more legible against the bar fill.
+- Hero meta line gets a small top margin to breathe.
+
+### Tab transitions
+- When a tab becomes visible, its child panels animate `panel-slide-in` (10px translate + opacity fade) over 320ms with staggered delays per panel (40ms increments). The tab feels alive instead of snapping into place.
+
+### Files touched
+- `index.html` only.
+
+---
+
 ## Session 16 — 2026-05-18 — Big content pass: monsters, biomes, events, sets, achievements, toasts, tooltips
 
 ### New content

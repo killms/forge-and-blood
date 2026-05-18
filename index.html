@@ -36,12 +36,23 @@
     background: var(--bg-deep); padding: 4px; border: 1px solid var(--border);
   }
   .tab {
-    flex: 1; padding: 10px 4px; background: transparent;
+    flex: 1; padding: 8px 2px; background: transparent;
     color: var(--text-dim); border: none;
-    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px;
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.2px;
     cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
   }
-  .tab.active { background: var(--border); color: var(--gold-bright); }
+  .tab-icon {
+    width: 18px; height: 18px;
+    fill: currentColor; stroke: currentColor;
+    transition: transform 0.18s;
+  }
+  .tab.active {
+    background: var(--border); color: var(--gold-bright);
+    box-shadow: inset 0 -2px 0 var(--gold);
+  }
+  .tab.active .tab-icon { transform: scale(1.08); filter: drop-shadow(0 0 4px var(--gold)); }
+  .tab:hover:not(.active) { color: var(--text); }
 
   /* Decorative vista images (Kenney 3D renders used as flat backgrounds).
      Treated with a vignette + gradient so they blend with the dark theme. */
@@ -375,12 +386,47 @@
     text-align: center; font-family: 'Cinzel', serif; font-size: 14px;
   }
   .panel {
-    background: var(--bg-panel); border: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--bg-panel) 0%, #1c1410 100%);
+    border: 1px solid var(--border);
     padding: 16px; margin-bottom: 12px; position: relative;
+    box-shadow:
+      inset 0 1px 0 rgba(201,165,87,0.08),      /* top edge highlight */
+      inset 0 -1px 0 rgba(0,0,0,0.5),            /* bottom edge shadow */
+      0 4px 10px rgba(0,0,0,0.45);               /* drop shadow */
   }
   .panel::before {
     content: ''; position: absolute; top: -1px; left: -1px; right: -1px;
     height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .panel::after {
+    content: ''; position: absolute; bottom: -1px; left: -1px; right: -1px;
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(201,165,87,0.15), transparent);
+    pointer-events: none;
+  }
+
+  /* SVG icon utility — inherits text colour via currentColor */
+  .icon {
+    width: 14px; height: 14px;
+    fill: currentColor; stroke: currentColor;
+    vertical-align: -2px; flex-shrink: 0;
+  }
+  .icon-lg { width: 18px; height: 18px; vertical-align: -3px; }
+  .icon-xl { width: 24px; height: 24px; }
+  .icon-stat-row { color: currentColor; }
+
+  /* Tab content panels slide-in when the tab opens */
+  .tab-content:not(.hidden) > .panel,
+  .tab-content:not(.hidden) > .vista,
+  .tab-content:not(.hidden) > div > .panel {
+    animation: panel-slide-in 0.32s ease both;
+  }
+  .tab-content:not(.hidden) > .panel:nth-child(2)  { animation-delay: 0.04s; }
+  .tab-content:not(.hidden) > .panel:nth-child(3)  { animation-delay: 0.08s; }
+  .tab-content:not(.hidden) > .panel:nth-child(4)  { animation-delay: 0.12s; }
+  .tab-content:not(.hidden) > .panel:nth-child(5)  { animation-delay: 0.16s; }
+  @keyframes panel-slide-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
   .section-title {
     font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 3px;
@@ -474,9 +520,22 @@
   .session-logout:hover {
     border-color: var(--blood-bright); color: var(--blood-bright);
   }
-  .hero-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .hero-name { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-bright); }
-  .hero-meta { font-size: 12px; color: var(--text-dim); font-style: italic; }
+  .hero-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 12px; }
+  .hero-name {
+    font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 1.2px;
+    text-shadow: 0 0 14px rgba(201,165,87,0.25);
+  }
+  .hero-meta { font-size: 12px; color: var(--text-dim); font-style: italic; margin-top: 2px; }
+  .gold-display {
+    color: var(--gold-bright); font-family: 'Cinzel', serif;
+    font-size: 17px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 5px;
+    text-shadow: 0 0 10px rgba(201,165,87,0.3);
+  }
+  .gold-display .icon { width: 16px; height: 16px; color: var(--gold-bright); }
+  .bar-text { font-weight: 700; font-size: 13px; }
+  .bar-text .icon { width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; }
   .xp-panel {
     background: linear-gradient(180deg, rgba(74,143,214,0.08), rgba(0,0,0,0)),
                 var(--bg-panel);
@@ -1034,6 +1093,67 @@
 </style>
 </head>
 <body>
+<!-- SVG icon library — currentColor lets them inherit the parent text colour -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-coin" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="8" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      <path d="M5 8 L11 8" stroke="currentColor" stroke-width="1"/>
+    </symbol>
+    <symbol id="i-heart" viewBox="0 0 16 16">
+      <path d="M8 13.5 C 8 13.5 2 9.5 2 5.5 A 3.5 3.5 0 0 1 8 4 A 3.5 3.5 0 0 1 14 5.5 C 14 9.5 8 13.5 8 13.5 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-droplet" viewBox="0 0 16 16">
+      <path d="M8 1.5 C 8 1.5 3 7 3 10.5 A 5 5 0 0 0 13 10.5 C 13 7 8 1.5 8 1.5 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 16 16">
+      <path d="M8 1.5 L9.8 6.2 L14.8 6.5 L10.9 9.7 L12.3 14.5 L8 11.7 L3.7 14.5 L5.1 9.7 L1.2 6.5 L6.2 6.2 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-sword" viewBox="0 0 16 16">
+      <path d="M11 2 L14 2 L14 5 L7 12 L4 12 L4 9 Z" fill="currentColor"/>
+      <path d="M2 13 L5 13 L5 14 L4 15 L3 15 L2 14 Z" fill="currentColor"/>
+      <path d="M3 11 L5 13" stroke="currentColor" stroke-width="0.6"/>
+    </symbol>
+    <symbol id="i-magic" viewBox="0 0 16 16">
+      <path d="M8 1 L9 6 L14 7 L9 8 L8 13 L7 8 L2 7 L7 6 Z" fill="currentColor"/>
+      <circle cx="13" cy="2.5" r="0.7" fill="currentColor"/>
+      <circle cx="3" cy="13" r="0.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 16 16">
+      <path d="M8 1.5 L13.5 3.5 V8 C 13.5 11 11 13.5 8 14.5 C 5 13.5 2.5 11 2.5 8 V3.5 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-boot" viewBox="0 0 16 16">
+      <path d="M4 2 L7 2 L7 9 L13 9 L13 12 L8 12 L8 13.5 L4 13.5 L4 12 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-bag" viewBox="0 0 16 16">
+      <path d="M4 5 L12 5 L13 14 L3 14 Z" fill="currentColor"/>
+      <path d="M6 5 V3.5 A 2 2 0 0 1 10 3.5 V5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </symbol>
+    <symbol id="i-skull" viewBox="0 0 16 16">
+      <path d="M3 7 A 5 5 0 0 1 13 7 V10 L11.5 11.5 L11.5 13.5 L10 13.5 L10 12 L9 12 L9 13.5 L7 13.5 L7 12 L6 12 L6 13.5 L4.5 13.5 L4.5 11.5 L3 10 Z" fill="currentColor"/>
+      <circle cx="6" cy="9" r="1" fill="#0f0a07"/>
+      <circle cx="10" cy="9" r="1" fill="#0f0a07"/>
+    </symbol>
+    <symbol id="i-map" viewBox="0 0 16 16">
+      <path d="M1 3 L5 2 L10 4 L15 3 V13 L10 14 L5 12 L1 13 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M5 2 V12" stroke="currentColor" stroke-width="0.8"/>
+      <path d="M10 4 V14" stroke="currentColor" stroke-width="0.8"/>
+    </symbol>
+    <symbol id="i-crown" viewBox="0 0 16 16">
+      <path d="M2 11 L3 5 L6 8 L8 4 L10 8 L13 5 L14 11 Z" fill="currentColor"/>
+      <path d="M2.5 12.5 L13.5 12.5" stroke="currentColor" stroke-width="1.2"/>
+    </symbol>
+    <symbol id="i-flame" viewBox="0 0 16 16">
+      <path d="M8 1 C 8 5 12 6 12 10 A 4 4 0 0 1 4 10 C 4 8 6 7 6 5 C 6 7 8 8 8 1 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-trophy" viewBox="0 0 16 16">
+      <path d="M5 2 L11 2 L11 7 A 3 3 0 0 1 5 7 Z" fill="currentColor"/>
+      <path d="M3 3 L5 3 V6 A 2 2 0 0 1 3 4 Z M11 3 L13 3 V4 A 2 2 0 0 1 11 6 Z" fill="currentColor"/>
+      <path d="M7 9 H9 V11 H10 V13 H6 V11 H7 Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
 <div class="app">
   <header>
     <h1>FORGE &amp; BLOOD</h1>
@@ -1074,12 +1194,12 @@
 
   <div id="game" class="hidden">
     <div class="tabs">
-      <button class="tab active" data-tab="hero">HERO</button>
-      <button class="tab" data-tab="talents">TALENTS</button>
-      <button class="tab" data-tab="inventory">BAG</button>
-      <button class="tab" data-tab="shop">SHOP</button>
-      <button class="tab" data-tab="pve">HUNT</button>
-      <button class="tab" data-tab="pvp">ARENA</button>
+      <button class="tab active" data-tab="hero"><svg class="tab-icon"><use href="#i-shield"/></svg><span>HERO</span></button>
+      <button class="tab" data-tab="talents"><svg class="tab-icon"><use href="#i-star"/></svg><span>TALENTS</span></button>
+      <button class="tab" data-tab="inventory"><svg class="tab-icon"><use href="#i-bag"/></svg><span>BAG</span></button>
+      <button class="tab" data-tab="shop"><svg class="tab-icon"><use href="#i-coin"/></svg><span>SHOP</span></button>
+      <button class="tab" data-tab="pve"><svg class="tab-icon"><use href="#i-map"/></svg><span>HUNT</span></button>
+      <button class="tab" data-tab="pvp"><svg class="tab-icon"><use href="#i-sword"/></svg><span>ARENA</span></button>
     </div>
 
     <div id="tab-hero" class="tab-content">
@@ -3060,10 +3180,10 @@ function renderHero() {
   const h = state.hero;
   document.getElementById('hero-name').textContent = h.name;
   document.getElementById('hero-meta').textContent = `${RACES[h.race].name} · ${CLASSES[h.class].name} · Level ${h.level}`;
-  document.getElementById('hero-gold').innerHTML = `${h.gold} ◊`;
+  document.getElementById('hero-gold').innerHTML = `<svg class="icon"><use href="#i-coin"/></svg>${h.gold}`;
   const hpPct = (h.hp / h.maxHp) * 100;
   document.getElementById('hp-bar').style.width = hpPct + '%';
-  document.getElementById('hp-text').textContent = `${h.hp} / ${h.maxHp} HP`;
+  document.getElementById('hp-text').innerHTML = `<svg class="icon"><use href="#i-heart"/></svg>${h.hp} / ${h.maxHp}`;
 
   // Mana bar: only shown if the hero actually has any (INT > 0 grants mana).
   const mpWrap = document.getElementById('mp-bar-wrap');
@@ -3072,7 +3192,7 @@ function renderHero() {
       mpWrap.classList.remove('hidden');
       const mpPct = (h.mp / h.maxMp) * 100;
       document.getElementById('mp-bar').style.width = mpPct + '%';
-      document.getElementById('mp-text').textContent = `${h.mp} / ${h.maxMp} MP`;
+      document.getElementById('mp-text').innerHTML = `<svg class="icon"><use href="#i-droplet"/></svg>${h.mp} / ${h.maxMp}`;
     } else {
       mpWrap.classList.add('hidden');
     }
@@ -3082,7 +3202,7 @@ function renderHero() {
   const xpPct = atCap ? 100 : (h.xpNext > 0 ? (h.xp / h.xpNext) * 100 : 0);
   document.getElementById('xp-bar').style.width = xpPct + '%';
   document.getElementById('xp-text').textContent = atCap ? 'MAX' : `${h.xp} / ${h.xpNext} XP`;
-  document.getElementById('xp-level-badge').textContent = `Lv ${h.level}`;
+  document.getElementById('xp-level-badge').innerHTML = `<svg class="icon" style="width:14px;height:14px;color:var(--gold-bright);margin-right:3px;vertical-align:-2px"><use href="#i-star"/></svg>Lv ${h.level}`;
   document.getElementById('xp-next-value').textContent = atCap ? 'Max level reached' : `${h.xp} / ${h.xpNext}`;
 
   const grid = document.getElementById('stats-grid');
