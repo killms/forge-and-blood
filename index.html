@@ -998,7 +998,17 @@
       linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 25%, transparent 65%, rgba(0,0,0,0.5) 100%);
     pointer-events: none;
   }
-  .bg-foreground { z-index: 9; }
+  /* S28 fix: foreground PNGs from PixelLab fill the whole frame, so constrain
+     them to a thin bottom strip — gives the "grass/rocks at feet" depth effect
+     without covering the fighters' bodies. */
+  .bg-foreground {
+    z-index: 9;
+    top: auto;
+    bottom: -8px;
+    height: 32%;
+    background-position: bottom center;
+    background-size: cover;
+  }
   @keyframes sky-drift {
     0%, 100% { transform: translateX(-8px); }
     50%      { transform: translateX(8px); }
