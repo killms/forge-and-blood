@@ -972,7 +972,8 @@
   .combat-scene {
     position: relative;
     aspect-ratio: 16 / 9;
-    max-height: 380px;
+    max-height: 520px;
+    min-height: 360px;
     overflow: hidden;
     margin-bottom: 12px;
     border: 1px solid var(--gold);
@@ -998,21 +999,19 @@
       linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 25%, transparent 65%, rgba(0,0,0,0.5) 100%);
     pointer-events: none;
   }
-  /* S28 fix: foreground PNGs from PixelLab fill the whole frame, so constrain
-     them to a thin bottom strip — gives the "grass/rocks at feet" depth effect
-     without covering the fighters' bodies. The mask-image fades the top edge
-     so the foreground blends naturally with the floor layer instead of showing
-     a hard horizontal seam. */
+  /* S28: foreground PNG moved BEHIND fighters to eliminate the visible "bar"
+     issue. It now blends into the back scene as additional floor/decoration.
+     Loss of depth-of-field "grass at feet" effect, but the scene reads clean. */
   .bg-foreground {
-    z-index: 9;
+    z-index: 4;  /* behind fighters (6) and overlay (5) — pure backdrop now */
     top: auto;
     bottom: -8px;
-    height: 18%;
+    height: 28%;
     background-position: bottom center;
     background-size: cover;
-    opacity: 0.75;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(0,0,0,0.5) 60%, black 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(0,0,0,0.5) 60%, black 100%);
+    opacity: 0.85;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 35%, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 35%, black 100%);
   }
   @keyframes sky-drift {
     0%, 100% { transform: translateX(-8px); }
@@ -1049,14 +1048,14 @@
   /* Fighters — absolute positioned, full body, no portrait box */
   .fighter {
     position: absolute;
-    bottom: 16%;
-    width: 140px;
+    bottom: 14%;
+    width: 180px;
     text-align: center;
     z-index: 6;
     transition: transform 0.18s ease;
   }
-  .fighter.hero  { left: 6%; }
-  .fighter.enemy { right: 6%; }
+  .fighter.hero  { left: 5%; }
+  .fighter.enemy { right: 5%; }
 
   /* Lunge: heroes lunge right (toward enemy), enemies lunge left (toward hero) */
   .fighter.lunge-l { transform: translateX(14px) scale(1.06); }
@@ -1107,10 +1106,10 @@
   }
 
   .fighter-portrait {
-    width: 140px; height: 140px;
+    width: 180px; height: 180px;
     margin: 0 auto;
     display: flex; align-items: center; justify-content: center;
-    font-size: 70px; line-height: 1;
+    font-size: 90px; line-height: 1;
     user-select: none;
     position: relative;
     animation: idle-bob 2.6s ease-in-out infinite;
@@ -1129,7 +1128,7 @@
     content: '';
     position: absolute;
     bottom: -6px; left: 50%;
-    width: 95px; height: 14px;
+    width: 125px; height: 17px;
     background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
     transform: translateX(-50%);
     z-index: -1;
@@ -1148,18 +1147,18 @@
   /* HUD above each fighter — name + HP bar floats above the sprite */
   .fighter-hud {
     position: absolute;
-    bottom: 150px;
+    bottom: 192px;
     left: 50%;
     transform: translateX(-50%);
-    width: 180px;
+    width: 200px;
     text-align: center;
     pointer-events: none;
     text-shadow: 0 2px 4px rgba(0,0,0,0.95);
     z-index: 7;
   }
   .fighter-hud .bar {
-    width: 160px;
-    height: 8px;
+    width: 180px;
+    height: 9px;
     background: rgba(0,0,0,0.78);
     border: 1px solid rgba(255,255,255,0.22);
     margin: 0 auto;
@@ -1191,19 +1190,21 @@
 
   /* Small phones — shrink everything proportionally */
   @media (max-width: 600px) {
-    .fighter, .fighter-portrait { width: 110px; }
-    .fighter-portrait { height: 110px; font-size: 54px; }
-    .fighter-hud { bottom: 118px; width: 150px; }
-    .fighter-hud .bar { width: 130px; height: 7px; }
+    .combat-scene { max-height: 360px; }
+    .fighter, .fighter-portrait { width: 130px; }
+    .fighter-portrait { height: 130px; font-size: 65px; }
+    .fighter-hud { bottom: 140px; width: 170px; }
+    .fighter-hud .bar { width: 150px; height: 8px; }
     .fighter-hud .bar-text { font-size: 8px; }
-    .fighter-portrait::after { width: 80px; height: 12px; }
-    .vs-indicator { font-size: 18px; }
+    .fighter-portrait::after { width: 92px; height: 13px; }
+    .vs-indicator { font-size: 19px; }
   }
   @media (max-width: 380px) {
-    .fighter, .fighter-portrait { width: 90px; }
-    .fighter-portrait { height: 90px; font-size: 44px; }
-    .fighter-hud { bottom: 96px; width: 130px; }
-    .fighter-hud .bar { width: 110px; }
+    .combat-scene { max-height: 280px; }
+    .fighter, .fighter-portrait { width: 105px; }
+    .fighter-portrait { height: 105px; font-size: 52px; }
+    .fighter-hud { bottom: 115px; width: 145px; }
+    .fighter-hud .bar { width: 125px; height: 7px; }
     .fighter.hero  { left: 3%; }
     .fighter.enemy { right: 3%; }
   }
