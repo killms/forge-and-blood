@@ -965,30 +965,98 @@
     font-family: 'Cinzel', serif; color: var(--blood-bright);
     font-size: 16px; text-align: right;
   }
-  .combat-arena {
-    display: grid; grid-template-columns: 1fr auto 1fr;
-    gap: 8px; align-items: center; margin-bottom: 12px;
+  /* ============ S28 Phase E1: Full 2.5D combat scene ============ */
+  /* Combat is now a cinematic 16:9 scene with parallax biome layers.
+     Fighters are full-body sprites on the ground plane (no portrait box).
+     Enemy faces left via scaleX(-1) on its sprite. */
+  .combat-scene {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-height: 380px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 20px rgba(201,165,87,0.25);
+    background: #0a0808;
   }
+  .bg-layer {
+    position: absolute; inset: -8px;
+    background-size: cover; background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .bg-sky        { z-index: 1; filter: blur(0.8px) brightness(0.95); animation: sky-drift 90s linear infinite; }
+  .bg-mountains  { z-index: 2; filter: blur(0.4px); }
+  .bg-trees      { z-index: 3; }
+  .bg-floor      { z-index: 4; }
+  .combat-overlay {
+    position: absolute; inset: 0; z-index: 5;
+    background:
+      radial-gradient(ellipse at center 75%, transparent 30%, rgba(0,0,0,0.4) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 25%, transparent 65%, rgba(0,0,0,0.5) 100%);
+    pointer-events: none;
+  }
+  .bg-foreground { z-index: 9; }
+  @keyframes sky-drift {
+    0%, 100% { transform: translateX(-8px); }
+    50%      { transform: translateX(8px); }
+  }
+
+  /* Biome backdrops — generated via PixelLab (assets/biomes/*.png) */
+  .combat-scene.b-forest .bg-sky        { background-image: url('assets/biomes/forest-sky.png'); }
+  .combat-scene.b-forest .bg-mountains  { background-image: url('assets/biomes/forest-mountains.png'); }
+  .combat-scene.b-forest .bg-trees      { background-image: url('assets/biomes/forest-trees.png'); }
+  .combat-scene.b-forest .bg-floor      { background-image: url('assets/biomes/forest-floor.png'); }
+  .combat-scene.b-forest .bg-foreground { background-image: url('assets/biomes/forest-grass.png'); }
+  .combat-scene.b-crypt .bg-sky        { background-image: url('assets/biomes/crypt-sky.png'); }
+  .combat-scene.b-crypt .bg-mountains  { background-image: url('assets/biomes/crypt-mountains.png'); }
+  .combat-scene.b-crypt .bg-trees      { background-image: url('assets/biomes/crypt-trees.png'); }
+  .combat-scene.b-crypt .bg-floor      { background-image: url('assets/biomes/crypt-floor.png'); }
+  .combat-scene.b-crypt .bg-foreground { background-image: url('assets/biomes/crypt-grass.png'); }
+  .combat-scene.b-lava .bg-sky        { background-image: url('assets/biomes/lava-sky.png'); }
+  .combat-scene.b-lava .bg-mountains  { background-image: url('assets/biomes/lava-mountains.png'); }
+  .combat-scene.b-lava .bg-trees      { background-image: url('assets/biomes/lava-trees.png'); }
+  .combat-scene.b-lava .bg-floor      { background-image: url('assets/biomes/lava-floor.png'); }
+  .combat-scene.b-lava .bg-foreground { background-image: url('assets/biomes/lava-grass.png'); }
+  .combat-scene.b-frost .bg-sky        { background-image: url('assets/biomes/frost-sky.png'); }
+  .combat-scene.b-frost .bg-mountains  { background-image: url('assets/biomes/frost-mountains.png'); }
+  .combat-scene.b-frost .bg-trees      { background-image: url('assets/biomes/frost-trees.png'); }
+  .combat-scene.b-frost .bg-floor      { background-image: url('assets/biomes/frost-floor.png'); }
+  .combat-scene.b-frost .bg-foreground { background-image: url('assets/biomes/frost-grass.png'); }
+  .combat-scene.b-arena .bg-sky        { background-image: url('assets/biomes/arena-sky.png'); }
+  .combat-scene.b-arena .bg-mountains  { background-image: url('assets/biomes/arena-mountains.png'); }
+  .combat-scene.b-arena .bg-trees      { background-image: url('assets/biomes/arena-trees.png'); }
+  .combat-scene.b-arena .bg-floor      { background-image: url('assets/biomes/arena-floor.png'); }
+  .combat-scene.b-arena .bg-foreground { background-image: url('assets/biomes/arena-grass.png'); }
+
+  /* Fighters — absolute positioned, full body, no portrait box */
   .fighter {
-    text-align: center; position: relative;
+    position: absolute;
+    bottom: 12%;
+    width: 180px;
+    text-align: center;
+    z-index: 6;
     transition: transform 0.18s ease;
   }
+  .fighter.hero  { left: 6%; }
+  .fighter.enemy { right: 6%; }
+
+  /* Lunge: heroes lunge right (toward enemy), enemies lunge left (toward hero) */
   .fighter.lunge-l { transform: translateX(14px) scale(1.06); }
   .fighter.lunge-r { transform: translateX(-14px) scale(1.06); }
   .fighter.shake { animation: shake-hit 0.34s ease; }
   .fighter.shake-crit { animation: shake-crit 0.5s ease; }
   .fighter.shake .fighter-portrait,
-  .fighter.shake-crit .fighter-portrait {
-    animation: hit-flash 0.34s ease;
-  }
+  .fighter.shake-crit .fighter-portrait { animation: hit-flash 0.34s ease; }
   .fighter.heal-flash .fighter-portrait { animation: heal-pulse 0.6s ease; }
   @keyframes shake-hit {
-    0%   { transform: translateX(0); }
+    0%, 100% { transform: translateX(0); }
     18%  { transform: translateX(-9px) rotate(-3deg); }
     36%  { transform: translateX(8px) rotate(3deg); }
     54%  { transform: translateX(-5px) rotate(-2deg); }
     72%  { transform: translateX(3px); }
-    100% { transform: translateX(0); }
   }
   @keyframes shake-crit {
     0%, 100% { transform: translateX(0); }
@@ -998,60 +1066,130 @@
     62% { transform: translateX(6px) rotate(2deg); }
     80% { transform: translateX(-3px); }
   }
+  /* Hit flash — red filter on the SPRITE (was background on the old box) */
   @keyframes hit-flash {
-    0%, 100% { background: var(--bg-deep); filter: none; }
-    35% { background: rgba(201, 48, 48, 0.55); filter: brightness(1.4); }
+    0%, 100% { filter: none; }
+    35% { filter: brightness(1.4) sepia(0.9) hue-rotate(-50deg) saturate(3); }
   }
   @keyframes heal-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(95,168,95,0.7); transform: scale(1); }
-    50%  { transform: scale(1.12); }
-    100% { box-shadow: 0 0 0 22px rgba(95,168,95,0); transform: scale(1); }
+    0%   { filter: brightness(1); transform: scale(1); }
+    50%  { filter: brightness(1.25) drop-shadow(0 0 12px rgba(95,168,95,0.85)); transform: scale(1.1); }
+    100% { filter: brightness(1); transform: scale(1); }
   }
-  .fighter-portrait {
-    width: 128px; height: 128px;
-    margin: 0 auto 6px;
-    background: var(--bg-deep);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 64px; line-height: 1;
-    user-select: none;
-    overflow: hidden;
-    box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
-    transition: box-shadow 0.2s, border-color 0.2s;
-    animation: idle-bob 2.6s ease-in-out infinite;
-  }
-  /* On narrow phones, shrink so two portraits + VS still fit comfortably */
-  @media (max-width: 380px) {
-    .fighter-portrait { width: 104px; height: 104px; font-size: 52px; }
-  }
-  .fighter-portrait img {
-    width: 100%; height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated; /* keeps pixel-art crisp on retina */
-    user-select: none; pointer-events: none;
-  }
-  @keyframes idle-bob {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-4px); }
-  }
-  /* Cast / spell glow before a magical ability resolves */
-  .fighter.casting .fighter-portrait {
-    animation: cast-glow 0.7s ease;
-  }
+  /* Cast glow */
+  .fighter.casting .fighter-portrait { animation: cast-glow 0.7s ease; }
   @keyframes cast-glow {
-    0%   { transform: scale(1); box-shadow: inset 0 0 12px rgba(0,0,0,0.6); }
-    50%  { transform: scale(1.22); box-shadow: inset 0 0 12px rgba(0,0,0,0.4), 0 0 36px rgba(74,143,214,0.95); filter: brightness(1.3); }
-    100% { transform: scale(1); box-shadow: inset 0 0 12px rgba(0,0,0,0.6); }
+    0%   { transform: scale(1); filter: none; }
+    50%  { transform: scale(1.22); filter: brightness(1.3) drop-shadow(0 0 18px rgba(74,143,214,0.85)); }
+    100% { transform: scale(1); filter: none; }
   }
-  /* Death animation — when a fighter hits 0 HP */
-  .fighter.dead .fighter-portrait {
-    animation: death-fall 1s ease forwards;
-  }
+  /* Death */
+  .fighter.dead .fighter-portrait { animation: death-fall 1s ease forwards; }
   @keyframes death-fall {
     0%   { transform: rotate(0) scale(1); opacity: 1; }
     35%  { transform: rotate(-15deg) translateY(-4px) scale(1.06); opacity: 1; }
     100% { transform: rotate(-90deg) translateY(20px) scale(0.7); opacity: 0.25; filter: grayscale(1) brightness(0.5); }
+  }
+
+  .fighter-portrait {
+    width: 180px; height: 180px;
+    margin: 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 90px; line-height: 1;
+    user-select: none;
+    position: relative;
+    animation: idle-bob 2.6s ease-in-out infinite;
+  }
+  .fighter-portrait img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    user-select: none; pointer-events: none;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.55));
+  }
+  /* Mirror enemy sprite so it faces LEFT (toward the hero on left side) */
+  .fighter.enemy .fighter-portrait img { transform: scaleX(-1); }
+  /* Drop shadow on the ground beneath the sprite */
+  .fighter-portrait::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    width: 120px; height: 16px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
+    transform: translateX(-50%);
+    z-index: -1;
+    animation: shadow-bob 2.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes idle-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+  }
+  @keyframes shadow-bob {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+    50%      { transform: translateX(-50%) scale(0.85); opacity: 0.8; }
+  }
+
+  /* HUD above each fighter — name + HP bar floats above the sprite */
+  .fighter-hud {
+    position: absolute;
+    bottom: 195px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    text-align: center;
+    pointer-events: none;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.95);
+    z-index: 7;
+  }
+  .fighter-hud .bar {
+    width: 140px;
+    height: 9px;
+    background: rgba(0,0,0,0.78);
+    border: 1px solid rgba(255,255,255,0.22);
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  }
+  .fighter-hud .bar-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: var(--text); letter-spacing: 0.8px;
+  }
+  /* Hero HP bar = green, Enemy HP bar = red */
+  .fighter.hero  .fighter-hud .bar-fill { background: linear-gradient(180deg, #6fcc6f, #2e8a2e); box-shadow: 0 0 4px rgba(95,168,95,0.6); }
+  .fighter.enemy .fighter-hud .bar-fill { background: linear-gradient(180deg, var(--blood-bright), var(--blood)); box-shadow: 0 0 4px rgba(204,40,40,0.5); }
+
+  /* VS indicator — center of the scene */
+  .vs-indicator {
+    position: absolute;
+    top: 42%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: 22px; color: var(--blood-bright);
+    letter-spacing: 4px;
+    text-shadow: 0 0 12px rgba(204,40,40,0.8), 0 2px 4px rgba(0,0,0,0.9);
+    z-index: 7;
+    pointer-events: none;
+  }
+
+  /* Small phones — shrink everything proportionally */
+  @media (max-width: 600px) {
+    .fighter, .fighter-portrait { width: 130px; }
+    .fighter-portrait { height: 130px; font-size: 65px; }
+    .fighter-hud { bottom: 145px; width: 130px; }
+    .fighter-hud .bar { width: 110px; height: 7px; }
+    .fighter-hud .bar-text { font-size: 8px; }
+    .fighter-portrait::after { width: 95px; height: 12px; }
+    .vs-indicator { font-size: 18px; }
+  }
+  @media (max-width: 380px) {
+    .fighter, .fighter-portrait { width: 110px; }
+    .fighter-portrait { height: 110px; font-size: 54px; }
+    .fighter-hud { bottom: 125px; }
+    .fighter.hero  { left: 3%; }
+    .fighter.enemy { right: 3%; }
   }
   /* Slash effect — short diagonal flash over the defender */
   .slash-fx {
@@ -1849,29 +1987,39 @@
     <div id="combat" class="hidden">
       <div class="panel">
         <div class="section-title" id="combat-title">Combat</div>
-        <div class="combat-arena">
-          <div class="fighter" id="f1">
+        <div class="combat-scene b-forest" id="combat-scene">
+          <div class="bg-layer bg-sky"></div>
+          <div class="bg-layer bg-mountains"></div>
+          <div class="bg-layer bg-trees"></div>
+          <div class="bg-layer bg-floor"></div>
+          <div class="combat-overlay"></div>
+          <div class="fighter hero" id="f1">
+            <div class="fighter-hud">
+              <div class="fighter-name" id="f1-name"></div>
+              <div class="bar">
+                <div class="bar-fill hp" id="f1-hp"></div>
+                <div class="bar-text" id="f1-hp-text"></div>
+              </div>
+            </div>
             <div class="fighter-portrait" id="f1-portrait"></div>
             <div class="pet-badge hidden" id="f1-pet" title="Companion"></div>
-            <div class="fighter-name" id="f1-name"></div>
-            <div class="bar">
-              <div class="bar-fill hp" id="f1-hp"></div>
-              <div class="bar-text" id="f1-hp-text"></div>
-            </div>
             <div class="combat-effects" id="f1-effects"></div>
             <div class="float-stage" id="f1-floats"></div>
           </div>
-          <div class="vs">VS</div>
-          <div class="fighter" id="f2">
-            <div class="fighter-portrait" id="f2-portrait"></div>
-            <div class="fighter-name" id="f2-name"></div>
-            <div class="bar">
-              <div class="bar-fill hp" id="f2-hp"></div>
-              <div class="bar-text" id="f2-hp-text"></div>
+          <div class="vs-indicator">VS</div>
+          <div class="fighter enemy" id="f2">
+            <div class="fighter-hud">
+              <div class="fighter-name" id="f2-name"></div>
+              <div class="bar">
+                <div class="bar-fill hp" id="f2-hp"></div>
+                <div class="bar-text" id="f2-hp-text"></div>
+              </div>
             </div>
+            <div class="fighter-portrait" id="f2-portrait"></div>
             <div class="combat-effects" id="f2-effects"></div>
             <div class="float-stage" id="f2-floats"></div>
           </div>
+          <div class="bg-layer bg-foreground"></div>
         </div>
         <div class="combat-abilities" id="combat-abilities"></div>
         <div class="combat-log" id="combat-log"></div>
@@ -5778,6 +5926,44 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// S28 Phase E1 — biome mapping for combat backdrops.
+// Maps monster names → biome key. Default fallback is 'forest'.
+const MONSTER_BIOME = {
+  // Forest creatures
+  'Giant Rat': 'forest', 'Goblin Raider': 'forest', 'Ash Wolf': 'forest',
+  // Crypt
+  'Skeleton Warrior': 'crypt', 'Cave Ogre': 'crypt', 'Awakened Lich': 'crypt',
+  // Lava / volcanic
+  'Young Dragon': 'lava', 'Fire Imp': 'lava', 'Lava Hound': 'lava', 'Salamander King': 'lava',
+  // Frost (if monsters exist for it)
+  'Frost Wolf': 'frost', 'Ice Troll': 'frost', 'Yeti': 'frost'
+};
+// Maps expedition.key → biome (overrides monster bias when an expedition is active)
+const EXPEDITION_BIOME = {
+  'whispering-woods': 'forest',
+  'cursed-crypt':     'crypt',
+  'dragons-lair':     'lava',
+  'burning-wastes':   'lava',
+  'frostfell-pass':   'frost'
+};
+function resolveBiomeForCombat(enemy, mode) {
+  // PvP always uses the Arena
+  if (mode === 'pvp') return 'arena';
+  // If we're inside an expedition, that biome wins
+  const exp = state.expedition;
+  if (exp && EXPEDITION_BIOME[exp.key]) return EXPEDITION_BIOME[exp.key];
+  // Else fall back to monster biome map
+  if (enemy && enemy.name && MONSTER_BIOME[enemy.name]) return MONSTER_BIOME[enemy.name];
+  return 'forest';
+}
+function setCombatBiome(biomeKey) {
+  const scene = document.getElementById('combat-scene');
+  if (!scene) return;
+  // Strip any previous b-* class and add the new one
+  scene.classList.forEach(cls => { if (cls.startsWith('b-')) scene.classList.remove(cls); });
+  scene.classList.add('b-' + biomeKey);
+}
+
 function startCombat(enemy, mode) {
   const h = state.hero;
   if (h.hp <= 0) {
@@ -5791,6 +5977,8 @@ function startCombat(enemy, mode) {
   const summary = document.getElementById('combat-summary');
   if (summary) summary.classList.add('hidden');
   document.getElementById('combat-title').textContent = mode === 'pvp' ? 'ARENA DUEL' : 'HUNT';
+  // S28 — pick biome backdrop based on mode / expedition / monster
+  setCombatBiome(resolveBiomeForCombat(enemy, mode));
   document.getElementById('f1-name').textContent = h.name;
   document.getElementById('f2-name').textContent = enemy.name;
   setPortrait('f1-portrait', h, true);
@@ -7233,9 +7421,10 @@ function setPortrait(slotId, source, isHero) {
   } else {
     el.textContent = portrait.glyph;
   }
-  el.style.borderColor = portrait.tint;
+  // S28 — no portrait box anymore; just colour the glyph (if no sprite)
   el.style.color = portrait.tint;
-  el.style.boxShadow = `inset 0 0 12px rgba(0,0,0,0.6), 0 0 14px ${portrait.tint}44`;
+  el.style.borderColor = '';
+  el.style.boxShadow = '';
 }
 
 // Swap the running sprite to a different state (idle/attack/hurt/dead).
