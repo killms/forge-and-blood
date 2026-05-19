@@ -1,0 +1,30 @@
+{
+  "crypt": {
+    "sky": "ac94c3f2-3615-4e09-b7b0-463a3192fe1e",
+    "mountains": "3fa08b75-229d-4a14-a470-74759836ff4f",
+    "trees": "ef3ef23b-6e8d-4d5e-983d-e78850da1643",
+    "floor": "ae92da5d-c3bd-421c-a3e5-c81f78686844",
+    "grass": "76a5289e-be0f-4a83-b957-78879a4239ca"
+  },
+  "lava": {
+    "sky": "71ee48e5-3a07-42f3-ab4f-a46a237ae9fd",
+    "mountains": "d1c3a1bf-cef8-4c82-b7c4-79a69d52d877",
+    "trees": "496e1d45-3da9-4445-bb5d-ffbe9cb593a5",
+    "floor": "9c0ccd0c-086c-427f-b8c8-77e0cacf999f",
+    "grass": "4129e119-7069-46e0-8d49-f4de7f13cc91"
+  },
+  "frost": {
+    "sky": "98fc6840-f641-4be7-89d2-b3c2607d1d18",
+    "mountains": "c8d0bcca-a6f1-44c7-a90f-097863c6e5e4",
+    "trees": "97bdfe4b-44ea-44c7-a73a-3e75ce9b2c0e",
+    "floor": "bd837678-0f9e-4e1f-bec5-86b6560bbc6d",
+    "grass": "8403be6a-28c9-4a28-8473-184d08e6ac88"
+  },
+  "arena": {
+    "sky": "4ff38ab0-8f0b-4103-83b9-021707a0dd10",
+    "mountains": "5f6f556a-a4bd-4ad0-b98b-b24553d5fa17",
+    "trees": "29f82ecc-cdb6-4265-b525-6bc409ba1be2",
+    "floor": "0484d006-4439-4965-88f0-6bbc9a9181be",
+    "grass": "be7605de-1ff5-4092-a500-c6db44d763dd"
+  }
+}
