@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "29aa91c6-d5bc-48a3-969f-40b729a3491e",
+        "name": "Fire Imp",
+        "prompt": "small red devil imp with horns, leathery wings, sharp claws, fiery aura, mischievous creature",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.254024+00:00"
+      },
+      "folder": "Fire_Imp",
+      "frames": {
+        "rotations": {
+          "south": "Fire_Imp/rotations/south.png",
+          "west": "Fire_Imp/rotations/west.png",
+          "east": "Fire_Imp/rotations/east.png",
+          "north": "Fire_Imp/rotations/north.png"
+        },
+        "animations": {
+          "casting_a_fireball-c1543b41": {
+            "east": [
+              "Fire_Imp/animations/casting_a_fireball-c1543b41/east/frame_000.png",
+              "Fire_Imp/animations/casting_a_fireball-c1543b41/east/frame_001.png",
+              "Fire_Imp/animations/casting_a_fireball-c1543b41/east/frame_002.png",
+              "Fire_Imp/animations/casting_a_fireball-c1543b41/east/frame_003.png",
+              "Fire_Imp/animations/casting_a_fireball-c1543b41/east/frame_004.png",
+              "Fire_Imp/animations/casting_a_fireball-c1543b41/east/frame_005.png"
+            ]
+          },
+          "animating-3eccccd5": {
+            "east": [
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_000.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_001.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_002.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_003.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_004.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_005.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_006.png",
+              "Fire_Imp/animations/animating-3eccccd5/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:16:21.947314"
+}

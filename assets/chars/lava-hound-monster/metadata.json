@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "d0985453-faf3-4794-8d13-9942a0440998",
+        "name": "Lava Hound",
+        "prompt": "demonic dog made of magma and obsidian rock, lava cracks on body, glowing red eyes, fire creature",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "dog",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.15639+00:00"
+      },
+      "folder": "Lava_Hound",
+      "frames": {
+        "rotations": {
+          "south": "Lava_Hound/rotations/south.png",
+          "west": "Lava_Hound/rotations/west.png",
+          "east": "Lava_Hound/rotations/east.png",
+          "north": "Lava_Hound/rotations/north.png"
+        },
+        "animations": {
+          "animation-5c33a963": {
+            "east": [
+              "Lava_Hound/animations/animation-5c33a963/east/frame_000.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_001.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_002.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_003.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_004.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_005.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_006.png",
+              "Lava_Hound/animations/animation-5c33a963/east/frame_007.png"
+            ]
+          },
+          "barking-3a0fda16": {
+            "east": [
+              "Lava_Hound/animations/barking-3a0fda16/east/frame_000.png",
+              "Lava_Hound/animations/barking-3a0fda16/east/frame_001.png",
+              "Lava_Hound/animations/barking-3a0fda16/east/frame_002.png",
+              "Lava_Hound/animations/barking-3a0fda16/east/frame_003.png",
+              "Lava_Hound/animations/barking-3a0fda16/east/frame_004.png",
+              "Lava_Hound/animations/barking-3a0fda16/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:13:50.246289"
+}

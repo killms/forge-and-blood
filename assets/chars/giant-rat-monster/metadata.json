@@ -1,0 +1,56 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "5e623828-0fe1-4275-8f79-aa8fa5600a9e",
+        "name": "Giant Rat",
+        "prompt": "giant brown rat with red eyes, mangy fur, sharp claws, dungeon vermin creature",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "cat",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.13122+00:00"
+      },
+      "folder": "Giant_Rat",
+      "frames": {
+        "rotations": {
+          "south": "Giant_Rat/rotations/south.png",
+          "west": "Giant_Rat/rotations/west.png",
+          "east": "Giant_Rat/rotations/east.png",
+          "north": "Giant_Rat/rotations/north.png"
+        },
+        "animations": {
+          "animation-3c513124": {
+            "east": [
+              "Giant_Rat/animations/animation-3c513124/east/frame_000.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_001.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_002.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_003.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_004.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_005.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_006.png",
+              "Giant_Rat/animations/animation-3c513124/east/frame_007.png"
+            ]
+          },
+          "acting_angry-4e6129e6": {
+            "east": [
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_000.png",
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_001.png",
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_002.png",
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_003.png",
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_004.png",
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_005.png",
+              "Giant_Rat/animations/acting_angry-4e6129e6/east/frame_006.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:13:50.903134"
+}

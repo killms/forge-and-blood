@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "8e762124-8ddb-46cc-85ee-b2a18f628404",
+        "name": "Awakened Lich",
+        "prompt": "tall undead lich with hollow eye sockets, wearing dark tattered robes, holding a bone staff with skull on top, necromancer",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.228713+00:00"
+      },
+      "folder": "Awakened_Lich",
+      "frames": {
+        "rotations": {
+          "south": "Awakened_Lich/rotations/south.png",
+          "west": "Awakened_Lich/rotations/west.png",
+          "east": "Awakened_Lich/rotations/east.png",
+          "north": "Awakened_Lich/rotations/north.png"
+        },
+        "animations": {
+          "animating-54610bce": {
+            "east": [
+              "Awakened_Lich/animations/animating-54610bce/east/frame_000.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_001.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_002.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_003.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_004.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_005.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_006.png",
+              "Awakened_Lich/animations/animating-54610bce/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-2776cb93": {
+            "east": [
+              "Awakened_Lich/animations/casting_a_fireball-2776cb93/east/frame_000.png",
+              "Awakened_Lich/animations/casting_a_fireball-2776cb93/east/frame_001.png",
+              "Awakened_Lich/animations/casting_a_fireball-2776cb93/east/frame_002.png",
+              "Awakened_Lich/animations/casting_a_fireball-2776cb93/east/frame_003.png",
+              "Awakened_Lich/animations/casting_a_fireball-2776cb93/east/frame_004.png",
+              "Awakened_Lich/animations/casting_a_fireball-2776cb93/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:13:50.088777"
+}

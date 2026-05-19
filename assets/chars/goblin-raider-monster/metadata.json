@@ -1,0 +1,52 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "0400f986-2c02-417c-965c-9398fed9f58f",
+        "name": "Goblin Raider",
+        "prompt": "small green goblin with leather armor and rusty short sword, savage tribal raider",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.183221+00:00"
+      },
+      "folder": "Goblin_Raider",
+      "frames": {
+        "rotations": {
+          "south": "Goblin_Raider/rotations/south.png",
+          "west": "Goblin_Raider/rotations/west.png",
+          "east": "Goblin_Raider/rotations/east.png",
+          "north": "Goblin_Raider/rotations/north.png"
+        },
+        "animations": {
+          "animating-6c369dd6": {
+            "east": [
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_000.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_001.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_002.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_003.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_004.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_005.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_006.png",
+              "Goblin_Raider/animations/animating-6c369dd6/east/frame_007.png"
+            ]
+          },
+          "jab_attack-013d5529": {
+            "east": [
+              "Goblin_Raider/animations/jab_attack-013d5529/east/frame_000.png",
+              "Goblin_Raider/animations/jab_attack-013d5529/east/frame_001.png",
+              "Goblin_Raider/animations/jab_attack-013d5529/east/frame_002.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:13:49.625938"
+}

@@ -1,0 +1,59 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "7306561d-b7e9-41e7-af63-cc44b9c7bbdb",
+        "name": "Salamander King",
+        "prompt": "huge red giant salamander with golden crown, lava scales on body, royal demonic lizard creature",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "lion",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.188271+00:00"
+      },
+      "folder": "Salamander_King",
+      "frames": {
+        "rotations": {
+          "south": "Salamander_King/rotations/south.png",
+          "west": "Salamander_King/rotations/west.png",
+          "east": "Salamander_King/rotations/east.png",
+          "north": "Salamander_King/rotations/north.png"
+        },
+        "animations": {
+          "attacking-fcd36f3b": {
+            "east": [
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_000.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_001.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_002.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_003.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_004.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_005.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_006.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_007.png",
+              "Salamander_King/animations/attacking-fcd36f3b/east/frame_008.png"
+            ]
+          },
+          "animation-7f3de7a2": {
+            "east": [
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_000.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_001.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_002.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_003.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_004.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_005.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_006.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_007.png",
+              "Salamander_King/animations/animation-7f3de7a2/east/frame_008.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:14:11.009910"
+}

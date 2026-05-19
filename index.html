@@ -2119,26 +2119,34 @@ const RACES = {
 
 // Portrait glyphs / tints for monsters. Same shape as race portraits.
 // Optional `sprite` field overrides the glyph with an animated GIF/PNG.
+// S28 Phase E2 — all 10 main monsters now have PixelLab sprites.
+// Glyph emoji stays as fallback if sprite fails to load.
 const MONSTER_PORTRAITS = {
-  'Giant Rat':        { glyph: '🐀', tint: '#7a6a55' },
+  // Whispering Woods + base roster
+  'Giant Rat':        { glyph: '🐀', tint: '#7a6a55',
+    sprites: { idle: 'assets/chars/giant-rat-idle.gif',        attack: 'assets/chars/giant-rat-attack.gif' } },
   'Goblin Raider':    { glyph: '👹', tint: '#5fa85f',
-    sprites: {
-      idle:   'assets/sprites/imp-sword-idle.gif',
-      attack: 'assets/sprites/imp-sword-attack.gif',
-      // No hurt frames in LPC walk/attack packs — falls back to idle.
-      // 'dead' could point to a death frame if we add one later.
-    }
-  },
-  'Ash Wolf':         { glyph: '🐺', tint: '#9a9a9a' },
-  'Skeleton Warrior': { glyph: '💀', tint: '#cfc7a8' },
-  'Cave Ogre':        { glyph: '👺', tint: '#8b6a3e' },
-  'Awakened Lich':    { glyph: '☠',  tint: '#7b5fd6' },
-  'Young Dragon':     { glyph: '🐉', tint: '#e89530' },
+    sprites: { idle: 'assets/chars/goblin-raider-idle.gif',    attack: 'assets/chars/goblin-raider-attack.gif' } },
+  'Ash Wolf':         { glyph: '🐺', tint: '#9a9a9a',
+    sprites: { idle: 'assets/chars/ash-wolf-idle.gif',         attack: 'assets/chars/ash-wolf-attack.gif' } },
+  // Cursed Crypt
+  'Skeleton Warrior': { glyph: '💀', tint: '#cfc7a8',
+    sprites: { idle: 'assets/chars/skeleton-warrior-idle.gif', attack: 'assets/chars/skeleton-warrior-attack.gif' } },
+  'Cave Ogre':        { glyph: '👺', tint: '#8b6a3e',
+    sprites: { idle: 'assets/chars/cave-ogre-idle.gif',        attack: 'assets/chars/cave-ogre-attack.gif' } },
+  'Awakened Lich':    { glyph: '☠',  tint: '#7b5fd6',
+    sprites: { idle: 'assets/chars/awakened-lich-idle.gif',    attack: 'assets/chars/awakened-lich-attack.gif' } },
+  // Dragon's Lair
+  'Young Dragon':     { glyph: '🐉', tint: '#e89530',
+    sprites: { idle: 'assets/chars/young-dragon-idle.gif',     attack: 'assets/chars/young-dragon-attack.gif' } },
   // Burning Wastes
-  'Fire Imp':         { glyph: '😈', tint: '#e85a30' },
-  'Lava Hound':       { glyph: '🔥', tint: '#c93030' },
-  'Salamander King':  { glyph: '🦎', tint: '#e89530' },
-  // Frozen Spires
+  'Fire Imp':         { glyph: '😈', tint: '#e85a30',
+    sprites: { idle: 'assets/chars/fire-imp-idle.gif',         attack: 'assets/chars/fire-imp-attack.gif' } },
+  'Lava Hound':       { glyph: '🔥', tint: '#c93030',
+    sprites: { idle: 'assets/chars/lava-hound-idle.gif',       attack: 'assets/chars/lava-hound-attack.gif' } },
+  'Salamander King':  { glyph: '🦎', tint: '#e89530',
+    sprites: { idle: 'assets/chars/salamander-king-idle.gif',  attack: 'assets/chars/salamander-king-attack.gif' } },
+  // Frozen Spires — sprites pending (still emoji)
   'Frost Wolf':       { glyph: '❄️', tint: '#9ec5d8' },
   'Ice Wraith':       { glyph: '👻', tint: '#cfe0ff' },
   'Glacial Golem':    { glyph: '🗿', tint: '#7fa3c8' }

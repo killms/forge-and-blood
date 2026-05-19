@@ -1,0 +1,14 @@
+{
+  "monsters": {
+    "giant-rat":         { "id": "5e623828-0fe1-4275-8f79-aa8fa5600a9e", "kind": "quadruped", "tmpl": "cat",  "name": "Giant Rat" },
+    "ash-wolf":          { "id": "6f7386bc-1852-4e75-8b39-c591344ce8d2", "kind": "quadruped", "tmpl": "dog",  "name": "Ash Wolf" },
+    "lava-hound":        { "id": "d0985453-faf3-4794-8d13-9942a0440998", "kind": "quadruped", "tmpl": "dog",  "name": "Lava Hound" },
+    "salamander-king":   { "id": "7306561d-b7e9-41e7-af63-cc44b9c7bbdb", "kind": "quadruped", "tmpl": "lion", "name": "Salamander King" },
+    "young-dragon":      { "id": "6ff00672-c699-48f3-b75b-2e91a9d1286b", "kind": "quadruped", "tmpl": "lion", "name": "Young Dragon" },
+    "goblin-raider":     { "id": "0400f986-2c02-417c-965c-9398fed9f58f", "kind": "humanoid", "name": "Goblin Raider" },
+    "skeleton-warrior":  { "id": "834a0e2e-1a1c-414d-8f7c-4e874a5c26bb", "kind": "humanoid", "name": "Skeleton Warrior" },
+    "cave-ogre":         { "id": "6b963120-8329-4ba0-a28c-b62612c8b20c", "kind": "humanoid", "name": "Cave Ogre" },
+    "awakened-lich":     { "id": "8e762124-8ddb-46cc-85ee-b2a18f628404", "kind": "humanoid", "name": "Awakened Lich", "caster": true },
+    "fire-imp":          { "id": "29aa91c6-d5bc-48a3-969f-40b729a3491e", "kind": "humanoid", "name": "Fire Imp", "caster": true }
+  }
+}

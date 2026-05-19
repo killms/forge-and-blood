@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "6f7386bc-1852-4e75-8b39-c591344ce8d2",
+        "name": "Ash Wolf",
+        "prompt": "large grey wolf with ashen fur and glowing red eyes, savage forest predator",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "dog",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.121192+00:00"
+      },
+      "folder": "Ash_Wolf",
+      "frames": {
+        "rotations": {
+          "south": "Ash_Wolf/rotations/south.png",
+          "west": "Ash_Wolf/rotations/west.png",
+          "east": "Ash_Wolf/rotations/east.png",
+          "north": "Ash_Wolf/rotations/north.png"
+        },
+        "animations": {
+          "animation-5eb8c18c": {
+            "east": [
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_000.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_001.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_002.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_003.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_004.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_005.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_006.png",
+              "Ash_Wolf/animations/animation-5eb8c18c/east/frame_007.png"
+            ]
+          },
+          "barking-fefb948a": {
+            "east": [
+              "Ash_Wolf/animations/barking-fefb948a/east/frame_000.png",
+              "Ash_Wolf/animations/barking-fefb948a/east/frame_001.png",
+              "Ash_Wolf/animations/barking-fefb948a/east/frame_002.png",
+              "Ash_Wolf/animations/barking-fefb948a/east/frame_003.png",
+              "Ash_Wolf/animations/barking-fefb948a/east/frame_004.png",
+              "Ash_Wolf/animations/barking-fefb948a/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:13:49.822714"
+}

@@ -1,0 +1,52 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "834a0e2e-1a1c-414d-8f7c-4e874a5c26bb",
+        "name": "Skeleton Warrior",
+        "prompt": "undead skeleton in rusted iron armor holding a sword and shield, animated bones with hollow eyes",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T15:23:26.211321+00:00"
+      },
+      "folder": "Skeleton_Warrior",
+      "frames": {
+        "rotations": {
+          "south": "Skeleton_Warrior/rotations/south.png",
+          "west": "Skeleton_Warrior/rotations/west.png",
+          "east": "Skeleton_Warrior/rotations/east.png",
+          "north": "Skeleton_Warrior/rotations/north.png"
+        },
+        "animations": {
+          "animating-8c518143": {
+            "east": [
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_000.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_001.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_002.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_003.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_004.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_005.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_006.png",
+              "Skeleton_Warrior/animations/animating-8c518143/east/frame_007.png"
+            ]
+          },
+          "jab_attack-8e262c62": {
+            "east": [
+              "Skeleton_Warrior/animations/jab_attack-8e262c62/east/frame_000.png",
+              "Skeleton_Warrior/animations/jab_attack-8e262c62/east/frame_001.png",
+              "Skeleton_Warrior/animations/jab_attack-8e262c62/east/frame_002.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T20:13:50.527732"
+}
