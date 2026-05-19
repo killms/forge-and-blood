@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "96469372-d73d-43e7-9ed2-1050cb7b3918",
+        "name": "Elf Druid",
+        "prompt": "female elf druid with long flowing green hair and pointed ears, wearing green leaf-woven robes, holding a wooden staff entwined with vines, nature mage",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:11:39.855145+00:00"
+      },
+      "folder": "Elf_Druid",
+      "frames": {
+        "rotations": {
+          "south": "Elf_Druid/rotations/south.png",
+          "west": "Elf_Druid/rotations/west.png",
+          "east": "Elf_Druid/rotations/east.png",
+          "north": "Elf_Druid/rotations/north.png"
+        },
+        "animations": {
+          "animating-2aff1d42": {
+            "east": [
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_000.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_001.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_002.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_003.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_004.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_005.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_006.png",
+              "Elf_Druid/animations/animating-2aff1d42/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-b9b8db69": {
+            "east": [
+              "Elf_Druid/animations/casting_a_fireball-b9b8db69/east/frame_000.png",
+              "Elf_Druid/animations/casting_a_fireball-b9b8db69/east/frame_001.png",
+              "Elf_Druid/animations/casting_a_fireball-b9b8db69/east/frame_002.png",
+              "Elf_Druid/animations/casting_a_fireball-b9b8db69/east/frame_003.png",
+              "Elf_Druid/animations/casting_a_fireball-b9b8db69/east/frame_004.png",
+              "Elf_Druid/animations/casting_a_fireball-b9b8db69/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T01:24:23.003187"
+}

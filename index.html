@@ -7132,17 +7132,18 @@ function playCastAnimation(attacker) {
 }
 
 // S27 — sprites por (race, class) combo. Mapeia `race-class` para paths.
-// Primeiros gerados via PixelLab (S26 + reused elf-knight test from S25).
+// Gerados via PixelLab Tier 2 — S26 (Human Warrior) + S25 (Elf knight as warrior)
+// + S27 batch B (Orc Shaman, Dwarf Paladin, Shifter Necromancer, Elf Druid).
 const CLASS_SPRITES = {
-  'human-warrior': {
-    idle:   'assets/chars/human-warrior-idle.gif',
-    attack: 'assets/chars/human-warrior-attack.gif'
-  },
-  'elf-warrior': {
-    idle:   'assets/chars/elf-knight-idle.gif',
-    attack: 'assets/chars/elf-knight-attack.gif'
-  }
-  // Restantes 43 combos virão na batch C (sprites em massa via PixelLab MCP)
+  // — Melee/martial heroes —
+  'human-warrior':   { idle: 'assets/chars/human-warrior-idle.gif',  attack: 'assets/chars/human-warrior-attack.gif' },
+  'elf-warrior':     { idle: 'assets/chars/elf-knight-idle.gif',     attack: 'assets/chars/elf-knight-attack.gif' },
+  'dwarf-paladin':   { idle: 'assets/chars/dwarf-paladin-idle.gif',  attack: 'assets/chars/dwarf-paladin-attack.gif' },
+  // — Casters/spell-flingers —
+  'orc-shaman':          { idle: 'assets/chars/orc-shaman-idle.gif',          attack: 'assets/chars/orc-shaman-attack.gif' },
+  'shifter-necromancer': { idle: 'assets/chars/shifter-necromancer-idle.gif', attack: 'assets/chars/shifter-necromancer-attack.gif' },
+  'elf-druid':           { idle: 'assets/chars/elf-druid-idle.gif',           attack: 'assets/chars/elf-druid-attack.gif' }
+  // Restantes 39 combos: batch C (~117 gens)
 };
 
 // Look up the portrait data for any combat source (hero, PvP opponent,

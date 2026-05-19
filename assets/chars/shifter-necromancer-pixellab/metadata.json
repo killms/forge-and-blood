@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "1288c12a-a336-4f41-8787-39c573ad5636",
+        "name": "Shifter Necromancer",
+        "prompt": "tall hooded necromancer with pale ghostly skin, wearing dark tattered robes, holding a skull-topped staff, sinister death mage",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:11:39.870645+00:00"
+      },
+      "folder": "Shifter_Necromancer",
+      "frames": {
+        "rotations": {
+          "south": "Shifter_Necromancer/rotations/south.png",
+          "west": "Shifter_Necromancer/rotations/west.png",
+          "east": "Shifter_Necromancer/rotations/east.png",
+          "north": "Shifter_Necromancer/rotations/north.png"
+        },
+        "animations": {
+          "casting_a_fireball-7ebe8716": {
+            "east": [
+              "Shifter_Necromancer/animations/casting_a_fireball-7ebe8716/east/frame_000.png",
+              "Shifter_Necromancer/animations/casting_a_fireball-7ebe8716/east/frame_001.png",
+              "Shifter_Necromancer/animations/casting_a_fireball-7ebe8716/east/frame_002.png",
+              "Shifter_Necromancer/animations/casting_a_fireball-7ebe8716/east/frame_003.png",
+              "Shifter_Necromancer/animations/casting_a_fireball-7ebe8716/east/frame_004.png",
+              "Shifter_Necromancer/animations/casting_a_fireball-7ebe8716/east/frame_005.png"
+            ]
+          },
+          "animating-1387e29d": {
+            "east": [
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_000.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_001.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_002.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_003.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_004.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_005.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_006.png",
+              "Shifter_Necromancer/animations/animating-1387e29d/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T01:24:28.778802"
+}

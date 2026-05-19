@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "56f3c2ab-259f-479b-987c-7cc21837ef52",
+        "name": "Orc Shaman",
+        "prompt": "male green-skinned orc shaman with tusks, wearing feathered ceremonial robes, holding a wooden totem staff topped with bones and feathers, primal tribal warrior",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:11:39.915768+00:00"
+      },
+      "folder": "Orc_Shaman",
+      "frames": {
+        "rotations": {
+          "south": "Orc_Shaman/rotations/south.png",
+          "west": "Orc_Shaman/rotations/west.png",
+          "east": "Orc_Shaman/rotations/east.png",
+          "north": "Orc_Shaman/rotations/north.png"
+        },
+        "animations": {
+          "animating-9a490b15": {
+            "east": [
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_000.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_001.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_002.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_003.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_004.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_005.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_006.png",
+              "Orc_Shaman/animations/animating-9a490b15/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-35388747": {
+            "east": [
+              "Orc_Shaman/animations/casting_a_fireball-35388747/east/frame_000.png",
+              "Orc_Shaman/animations/casting_a_fireball-35388747/east/frame_001.png",
+              "Orc_Shaman/animations/casting_a_fireball-35388747/east/frame_002.png",
+              "Orc_Shaman/animations/casting_a_fireball-35388747/east/frame_003.png",
+              "Orc_Shaman/animations/casting_a_fireball-35388747/east/frame_004.png",
+              "Orc_Shaman/animations/casting_a_fireball-35388747/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T01:24:28.779292"
+}
