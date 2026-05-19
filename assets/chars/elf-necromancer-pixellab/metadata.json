@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "f36e0290-35b6-4cb5-8952-1ee67aa84236",
+        "name": "elf-necromancer",
+        "prompt": "female elf necromancer in dark green robes with bone jewelry, holding a wooden staff with raven skulls, fallen mystic with pointed ears",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.01421+00:00"
+      },
+      "folder": "elf-necromancer",
+      "frames": {
+        "rotations": {
+          "south": "elf-necromancer/rotations/south.png",
+          "west": "elf-necromancer/rotations/west.png",
+          "east": "elf-necromancer/rotations/east.png",
+          "north": "elf-necromancer/rotations/north.png"
+        },
+        "animations": {
+          "animating-07f3cdeb": {
+            "east": [
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_000.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_001.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_002.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_003.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_004.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_005.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_006.png",
+              "elf-necromancer/animations/animating-07f3cdeb/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-a23c2ffd": {
+            "east": [
+              "elf-necromancer/animations/casting_a_fireball-a23c2ffd/east/frame_000.png",
+              "elf-necromancer/animations/casting_a_fireball-a23c2ffd/east/frame_001.png",
+              "elf-necromancer/animations/casting_a_fireball-a23c2ffd/east/frame_002.png",
+              "elf-necromancer/animations/casting_a_fireball-a23c2ffd/east/frame_003.png",
+              "elf-necromancer/animations/casting_a_fireball-a23c2ffd/east/frame_004.png",
+              "elf-necromancer/animations/casting_a_fireball-a23c2ffd/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:10.267801"
+}

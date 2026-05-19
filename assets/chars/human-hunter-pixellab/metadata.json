@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "d5bda00e-3182-4089-b572-331feca18eb5",
+        "name": "human-hunter",
+        "prompt": "male human ranger in green leather armor and hood, holding a longbow with arrows in a quiver on his back, sharp-eyed tracker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.068796+00:00"
+      },
+      "folder": "human-hunter",
+      "frames": {
+        "rotations": {
+          "south": "human-hunter/rotations/south.png",
+          "west": "human-hunter/rotations/west.png",
+          "east": "human-hunter/rotations/east.png",
+          "north": "human-hunter/rotations/north.png"
+        },
+        "animations": {
+          "animating-b9347f4c": {
+            "east": [
+              "human-hunter/animations/animating-b9347f4c/east/frame_000.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_001.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_002.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_003.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_004.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_005.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_006.png",
+              "human-hunter/animations/animating-b9347f4c/east/frame_007.png"
+            ]
+          },
+          "draws_bow_back_and_releases_arrow_forward-e3714ce5": {
+            "east": [
+              "human-hunter/animations/draws_bow_back_and_releases_arrow_forward-e3714ce5/east/frame_000.png",
+              "human-hunter/animations/draws_bow_back_and_releases_arrow_forward-e3714ce5/east/frame_001.png",
+              "human-hunter/animations/draws_bow_back_and_releases_arrow_forward-e3714ce5/east/frame_002.png",
+              "human-hunter/animations/draws_bow_back_and_releases_arrow_forward-e3714ce5/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:08.532143"
+}

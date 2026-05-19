@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "49bda5ce-d9df-45be-a945-659775cd3c60",
+        "name": "shifter-shaman",
+        "prompt": "tall hooded shifter shaman in primal feathered robes with bone totems, holding a tribal staff, otherworldly spirit-talker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:36.394983+00:00"
+      },
+      "folder": "shifter-shaman",
+      "frames": {
+        "rotations": {
+          "south": "shifter-shaman/rotations/south.png",
+          "west": "shifter-shaman/rotations/west.png",
+          "east": "shifter-shaman/rotations/east.png",
+          "north": "shifter-shaman/rotations/north.png"
+        },
+        "animations": {
+          "animating-1820378a": {
+            "east": [
+              "shifter-shaman/animations/animating-1820378a/east/frame_000.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_001.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_002.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_003.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_004.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_005.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_006.png",
+              "shifter-shaman/animations/animating-1820378a/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-f02358f0": {
+            "east": [
+              "shifter-shaman/animations/casting_a_fireball-f02358f0/east/frame_000.png",
+              "shifter-shaman/animations/casting_a_fireball-f02358f0/east/frame_001.png",
+              "shifter-shaman/animations/casting_a_fireball-f02358f0/east/frame_002.png",
+              "shifter-shaman/animations/casting_a_fireball-f02358f0/east/frame_003.png",
+              "shifter-shaman/animations/casting_a_fireball-f02358f0/east/frame_004.png",
+              "shifter-shaman/animations/casting_a_fireball-f02358f0/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:14.170169"
+}

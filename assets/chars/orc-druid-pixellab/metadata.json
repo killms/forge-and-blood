@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "53016112-9900-4965-81c5-53c37e6f4740",
+        "name": "orc-druid",
+        "prompt": "male green-skinned orc druid with tusks in fur-and-bone robes with wolf-skull headdress, holding a gnarled wooden staff, primal nature spirit",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:56:35.03515+00:00"
+      },
+      "folder": "orc-druid",
+      "frames": {
+        "rotations": {
+          "south": "orc-druid/rotations/south.png",
+          "west": "orc-druid/rotations/west.png",
+          "east": "orc-druid/rotations/east.png",
+          "north": "orc-druid/rotations/north.png"
+        },
+        "animations": {
+          "animating-35971fa3": {
+            "east": [
+              "orc-druid/animations/animating-35971fa3/east/frame_000.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_001.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_002.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_003.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_004.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_005.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_006.png",
+              "orc-druid/animations/animating-35971fa3/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-78960126": {
+            "east": [
+              "orc-druid/animations/casting_a_fireball-78960126/east/frame_000.png",
+              "orc-druid/animations/casting_a_fireball-78960126/east/frame_001.png",
+              "orc-druid/animations/casting_a_fireball-78960126/east/frame_002.png",
+              "orc-druid/animations/casting_a_fireball-78960126/east/frame_003.png",
+              "orc-druid/animations/casting_a_fireball-78960126/east/frame_004.png",
+              "orc-druid/animations/casting_a_fireball-78960126/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:12.107179"
+}

@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "06875388-3d26-4e25-abd7-e4ff79761f1f",
+        "name": "human-paladin",
+        "prompt": "male human paladin in white-and-gold plate armor with cross emblems, holding a massive war hammer in both hands, holy crusader",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:53.983219+00:00"
+      },
+      "folder": "human-paladin",
+      "frames": {
+        "rotations": {
+          "south": "human-paladin/rotations/south.png",
+          "west": "human-paladin/rotations/west.png",
+          "east": "human-paladin/rotations/east.png",
+          "north": "human-paladin/rotations/north.png"
+        },
+        "animations": {
+          "animating-a3c78d4a": {
+            "east": [
+              "human-paladin/animations/animating-a3c78d4a/east/frame_000.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_001.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_002.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_003.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_004.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_005.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_006.png",
+              "human-paladin/animations/animating-a3c78d4a/east/frame_007.png"
+            ]
+          },
+          "raises_weapon_overhead_and_brings_it_down_with_for-11dd8365": {
+            "east": [
+              "human-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-11dd8365/east/frame_000.png",
+              "human-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-11dd8365/east/frame_001.png",
+              "human-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-11dd8365/east/frame_002.png",
+              "human-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-11dd8365/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:09.157444"
+}

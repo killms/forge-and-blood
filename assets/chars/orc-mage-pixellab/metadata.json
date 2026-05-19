@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "5137aef7-55b7-4911-9f95-6048f759786d",
+        "name": "orc-mage",
+        "prompt": "male green-skinned orc mage with tusks in red-and-black robes with bone jewelry, holding a twisted dark staff, primal arcanist",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:48.576381+00:00"
+      },
+      "folder": "orc-mage",
+      "frames": {
+        "rotations": {
+          "south": "orc-mage/rotations/south.png",
+          "west": "orc-mage/rotations/west.png",
+          "east": "orc-mage/rotations/east.png",
+          "north": "orc-mage/rotations/north.png"
+        },
+        "animations": {
+          "animating-a76b32df": {
+            "east": [
+              "orc-mage/animations/animating-a76b32df/east/frame_000.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_001.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_002.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_003.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_004.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_005.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_006.png",
+              "orc-mage/animations/animating-a76b32df/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-3650c864": {
+            "east": [
+              "orc-mage/animations/casting_a_fireball-3650c864/east/frame_000.png",
+              "orc-mage/animations/casting_a_fireball-3650c864/east/frame_001.png",
+              "orc-mage/animations/casting_a_fireball-3650c864/east/frame_002.png",
+              "orc-mage/animations/casting_a_fireball-3650c864/east/frame_003.png",
+              "orc-mage/animations/casting_a_fireball-3650c864/east/frame_004.png",
+              "orc-mage/animations/casting_a_fireball-3650c864/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:10.906993"
+}

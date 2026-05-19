@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "9a614c40-890e-45d2-a312-fe0ccae43e71",
+        "name": "human-warlock",
+        "prompt": "male human warlock in dark purple robes with chains and runes, holding a black grimoire and dark staff, sinister pact",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.142599+00:00"
+      },
+      "folder": "human-warlock",
+      "frames": {
+        "rotations": {
+          "south": "human-warlock/rotations/south.png",
+          "west": "human-warlock/rotations/west.png",
+          "east": "human-warlock/rotations/east.png",
+          "north": "human-warlock/rotations/north.png"
+        },
+        "animations": {
+          "animating-755bc0fa": {
+            "east": [
+              "human-warlock/animations/animating-755bc0fa/east/frame_000.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_001.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_002.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_003.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_004.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_005.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_006.png",
+              "human-warlock/animations/animating-755bc0fa/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-cb230f8c": {
+            "east": [
+              "human-warlock/animations/casting_a_fireball-cb230f8c/east/frame_000.png",
+              "human-warlock/animations/casting_a_fireball-cb230f8c/east/frame_001.png",
+              "human-warlock/animations/casting_a_fireball-cb230f8c/east/frame_002.png",
+              "human-warlock/animations/casting_a_fireball-cb230f8c/east/frame_003.png",
+              "human-warlock/animations/casting_a_fireball-cb230f8c/east/frame_004.png",
+              "human-warlock/animations/casting_a_fireball-cb230f8c/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:09.832499"
+}

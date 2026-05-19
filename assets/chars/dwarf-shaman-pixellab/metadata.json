@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "bc4a01d6-6e71-46a9-bcaf-35946b15458e",
+        "name": "dwarf-shaman",
+        "prompt": "male short bearded dwarf shaman in tribal cave robes with totems, holding a stone-tipped staff, mountain spirit-talker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:07.150987+00:00"
+      },
+      "folder": "dwarf-shaman",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-shaman/rotations/south.png",
+          "west": "dwarf-shaman/rotations/west.png",
+          "east": "dwarf-shaman/rotations/east.png",
+          "north": "dwarf-shaman/rotations/north.png"
+        },
+        "animations": {
+          "animating-3de29599": {
+            "east": [
+              "dwarf-shaman/animations/animating-3de29599/east/frame_000.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_001.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_002.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_003.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_004.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_005.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_006.png",
+              "dwarf-shaman/animations/animating-3de29599/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-7fff73bf": {
+            "east": [
+              "dwarf-shaman/animations/casting_a_fireball-7fff73bf/east/frame_000.png",
+              "dwarf-shaman/animations/casting_a_fireball-7fff73bf/east/frame_001.png",
+              "dwarf-shaman/animations/casting_a_fireball-7fff73bf/east/frame_002.png",
+              "dwarf-shaman/animations/casting_a_fireball-7fff73bf/east/frame_003.png",
+              "dwarf-shaman/animations/casting_a_fireball-7fff73bf/east/frame_004.png",
+              "dwarf-shaman/animations/casting_a_fireball-7fff73bf/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:12.975292"
+}

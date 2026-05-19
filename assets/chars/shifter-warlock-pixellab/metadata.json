@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "44d8cefe-45f0-476a-832b-eae4de97bd2b",
+        "name": "shifter-warlock",
+        "prompt": "tall hooded shifter warlock in pitch-black robes with chains, holding a cursed grimoire and dark staff, demonic pact-bound",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:45:43.30761+00:00"
+      },
+      "folder": "shifter-warlock",
+      "frames": {
+        "rotations": {
+          "south": "shifter-warlock/rotations/south.png",
+          "west": "shifter-warlock/rotations/west.png",
+          "east": "shifter-warlock/rotations/east.png",
+          "north": "shifter-warlock/rotations/north.png"
+        },
+        "animations": {
+          "animating-d47c7081": {
+            "east": [
+              "shifter-warlock/animations/animating-d47c7081/east/frame_000.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_001.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_002.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_003.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_004.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_005.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_006.png",
+              "shifter-warlock/animations/animating-d47c7081/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-f7b1023e": {
+            "east": [
+              "shifter-warlock/animations/casting_a_fireball-f7b1023e/east/frame_000.png",
+              "shifter-warlock/animations/casting_a_fireball-f7b1023e/east/frame_001.png",
+              "shifter-warlock/animations/casting_a_fireball-f7b1023e/east/frame_002.png",
+              "shifter-warlock/animations/casting_a_fireball-f7b1023e/east/frame_003.png",
+              "shifter-warlock/animations/casting_a_fireball-f7b1023e/east/frame_004.png",
+              "shifter-warlock/animations/casting_a_fireball-f7b1023e/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:14.965547"
+}

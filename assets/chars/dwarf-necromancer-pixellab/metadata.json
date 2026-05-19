@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "67f3fb84-c893-4a02-9e0e-a0572bfbe6cd",
+        "name": "dwarf-necromancer",
+        "prompt": "male short bearded dwarf necromancer in dark robes with iron clasps, holding a bone staff with iron skulls, forsaken runesmith",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:56:50.899517+00:00"
+      },
+      "folder": "dwarf-necromancer",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-necromancer/rotations/south.png",
+          "west": "dwarf-necromancer/rotations/west.png",
+          "east": "dwarf-necromancer/rotations/east.png",
+          "north": "dwarf-necromancer/rotations/north.png"
+        },
+        "animations": {
+          "animating-3978d7fa": {
+            "east": [
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_000.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_001.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_002.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_003.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_004.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_005.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_006.png",
+              "dwarf-necromancer/animations/animating-3978d7fa/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-21254cbd": {
+            "east": [
+              "dwarf-necromancer/animations/casting_a_fireball-21254cbd/east/frame_000.png",
+              "dwarf-necromancer/animations/casting_a_fireball-21254cbd/east/frame_001.png",
+              "dwarf-necromancer/animations/casting_a_fireball-21254cbd/east/frame_002.png",
+              "dwarf-necromancer/animations/casting_a_fireball-21254cbd/east/frame_003.png",
+              "dwarf-necromancer/animations/casting_a_fireball-21254cbd/east/frame_004.png",
+              "dwarf-necromancer/animations/casting_a_fireball-21254cbd/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:11.877356"
+}

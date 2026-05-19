@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "13812117-7312-4e40-8c1f-fcac7b45960b",
+        "name": "shifter-thief",
+        "prompt": "tall hooded shifter rogue in shadowy cloak with face obscured, holding curved daggers, phantom assassin",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:36.808269+00:00"
+      },
+      "folder": "shifter-thief",
+      "frames": {
+        "rotations": {
+          "south": "shifter-thief/rotations/south.png",
+          "west": "shifter-thief/rotations/west.png",
+          "east": "shifter-thief/rotations/east.png",
+          "north": "shifter-thief/rotations/north.png"
+        },
+        "animations": {
+          "animating-78740b63": {
+            "east": [
+              "shifter-thief/animations/animating-78740b63/east/frame_000.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_001.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_002.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_003.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_004.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_005.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_006.png",
+              "shifter-thief/animations/animating-78740b63/east/frame_007.png"
+            ]
+          },
+          "lunges_forward_with_a_quick_stab-f8336161": {
+            "east": [
+              "shifter-thief/animations/lunges_forward_with_a_quick_stab-f8336161/east/frame_000.png",
+              "shifter-thief/animations/lunges_forward_with_a_quick_stab-f8336161/east/frame_001.png",
+              "shifter-thief/animations/lunges_forward_with_a_quick_stab-f8336161/east/frame_002.png",
+              "shifter-thief/animations/lunges_forward_with_a_quick_stab-f8336161/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:14.925210"
+}

@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "3efbd8de-5d14-4811-bad0-ddbc30ced7b0",
+        "name": "human-thief",
+        "prompt": "male human rogue in black leather armor with hood pulled up, holding twin daggers, cunning assassin",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.048029+00:00"
+      },
+      "folder": "human-thief",
+      "frames": {
+        "rotations": {
+          "south": "human-thief/rotations/south.png",
+          "west": "human-thief/rotations/west.png",
+          "east": "human-thief/rotations/east.png",
+          "north": "human-thief/rotations/north.png"
+        },
+        "animations": {
+          "animating-6827a6f8": {
+            "east": [
+              "human-thief/animations/animating-6827a6f8/east/frame_000.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_001.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_002.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_003.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_004.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_005.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_006.png",
+              "human-thief/animations/animating-6827a6f8/east/frame_007.png"
+            ]
+          },
+          "lunges_forward_with_a_quick_stab-e4f3f5d1": {
+            "east": [
+              "human-thief/animations/lunges_forward_with_a_quick_stab-e4f3f5d1/east/frame_000.png",
+              "human-thief/animations/lunges_forward_with_a_quick_stab-e4f3f5d1/east/frame_001.png",
+              "human-thief/animations/lunges_forward_with_a_quick_stab-e4f3f5d1/east/frame_002.png",
+              "human-thief/animations/lunges_forward_with_a_quick_stab-e4f3f5d1/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:07.872380"
+}

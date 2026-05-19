@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "a029513e-f01c-4d26-9556-31f110248181",
+        "name": "dwarf-druid",
+        "prompt": "male short bearded dwarf druid in stone-and-moss robes, holding a mossy wooden staff, mountain nature keeper",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:08.004062+00:00"
+      },
+      "folder": "dwarf-druid",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-druid/rotations/south.png",
+          "west": "dwarf-druid/rotations/west.png",
+          "east": "dwarf-druid/rotations/east.png",
+          "north": "dwarf-druid/rotations/north.png"
+        },
+        "animations": {
+          "animating-84225c42": {
+            "east": [
+              "dwarf-druid/animations/animating-84225c42/east/frame_000.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_001.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_002.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_003.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_004.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_005.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_006.png",
+              "dwarf-druid/animations/animating-84225c42/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-cb08999c": {
+            "east": [
+              "dwarf-druid/animations/casting_a_fireball-cb08999c/east/frame_000.png",
+              "dwarf-druid/animations/casting_a_fireball-cb08999c/east/frame_001.png",
+              "dwarf-druid/animations/casting_a_fireball-cb08999c/east/frame_002.png",
+              "dwarf-druid/animations/casting_a_fireball-cb08999c/east/frame_003.png",
+              "dwarf-druid/animations/casting_a_fireball-cb08999c/east/frame_004.png",
+              "dwarf-druid/animations/casting_a_fireball-cb08999c/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:13.385181"
+}

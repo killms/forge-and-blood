@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "afbcb7c2-fe84-4c75-8b2c-13feb43c3eac",
+        "name": "dwarf-mage",
+        "prompt": "male short bearded dwarf mage in royal blue robes with metal trim, holding an iron-bound staff with crystal, runic scholar",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:07:26.066752+00:00"
+      },
+      "folder": "dwarf-mage",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-mage/rotations/south.png",
+          "west": "dwarf-mage/rotations/west.png",
+          "east": "dwarf-mage/rotations/east.png",
+          "north": "dwarf-mage/rotations/north.png"
+        },
+        "animations": {
+          "animating-7978f44c": {
+            "east": [
+              "dwarf-mage/animations/animating-7978f44c/east/frame_000.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_001.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_002.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_003.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_004.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_005.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_006.png",
+              "dwarf-mage/animations/animating-7978f44c/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-7eb8efb4": {
+            "east": [
+              "dwarf-mage/animations/casting_a_fireball-7eb8efb4/east/frame_000.png",
+              "dwarf-mage/animations/casting_a_fireball-7eb8efb4/east/frame_001.png",
+              "dwarf-mage/animations/casting_a_fireball-7eb8efb4/east/frame_002.png",
+              "dwarf-mage/animations/casting_a_fireball-7eb8efb4/east/frame_003.png",
+              "dwarf-mage/animations/casting_a_fireball-7eb8efb4/east/frame_004.png",
+              "dwarf-mage/animations/casting_a_fireball-7eb8efb4/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:12.038782"
+}

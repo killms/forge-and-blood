@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "960e0c24-abcf-4925-b16c-96a37036db60",
+        "name": "orc-thief",
+        "prompt": "female green-skinned orc rogue with small tusks in dark hide armor with hood, holding twin curved daggers, cunning warband stalker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:07:26.048403+00:00"
+      },
+      "folder": "orc-thief",
+      "frames": {
+        "rotations": {
+          "south": "orc-thief/rotations/south.png",
+          "west": "orc-thief/rotations/west.png",
+          "east": "orc-thief/rotations/east.png",
+          "north": "orc-thief/rotations/north.png"
+        },
+        "animations": {
+          "animating-59f5b3f6": {
+            "east": [
+              "orc-thief/animations/animating-59f5b3f6/east/frame_000.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_001.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_002.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_003.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_004.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_005.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_006.png",
+              "orc-thief/animations/animating-59f5b3f6/east/frame_007.png"
+            ]
+          },
+          "lunges_forward_with_a_quick_stab-849dcaff": {
+            "east": [
+              "orc-thief/animations/lunges_forward_with_a_quick_stab-849dcaff/east/frame_000.png",
+              "orc-thief/animations/lunges_forward_with_a_quick_stab-849dcaff/east/frame_001.png",
+              "orc-thief/animations/lunges_forward_with_a_quick_stab-849dcaff/east/frame_002.png",
+              "orc-thief/animations/lunges_forward_with_a_quick_stab-849dcaff/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:11.830787"
+}

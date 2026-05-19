@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "65ac0729-0c2c-4de8-b91a-77f93273e7ec",
+        "name": "shifter-druid",
+        "prompt": "tall hooded shifter druid in wild leaf-and-fur robes with antlers headdress, holding a twisted wooden staff, primal nature spirit",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:45:40.897418+00:00"
+      },
+      "folder": "shifter-druid",
+      "frames": {
+        "rotations": {
+          "south": "shifter-druid/rotations/south.png",
+          "west": "shifter-druid/rotations/west.png",
+          "east": "shifter-druid/rotations/east.png",
+          "north": "shifter-druid/rotations/north.png"
+        },
+        "animations": {
+          "animating-28503412": {
+            "east": [
+              "shifter-druid/animations/animating-28503412/east/frame_000.png",
+              "shifter-druid/animations/animating-28503412/east/frame_001.png",
+              "shifter-druid/animations/animating-28503412/east/frame_002.png",
+              "shifter-druid/animations/animating-28503412/east/frame_003.png",
+              "shifter-druid/animations/animating-28503412/east/frame_004.png",
+              "shifter-druid/animations/animating-28503412/east/frame_005.png",
+              "shifter-druid/animations/animating-28503412/east/frame_006.png",
+              "shifter-druid/animations/animating-28503412/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-2ee19c63": {
+            "east": [
+              "shifter-druid/animations/casting_a_fireball-2ee19c63/east/frame_000.png",
+              "shifter-druid/animations/casting_a_fireball-2ee19c63/east/frame_001.png",
+              "shifter-druid/animations/casting_a_fireball-2ee19c63/east/frame_002.png",
+              "shifter-druid/animations/casting_a_fireball-2ee19c63/east/frame_003.png",
+              "shifter-druid/animations/casting_a_fireball-2ee19c63/east/frame_004.png",
+              "shifter-druid/animations/casting_a_fireball-2ee19c63/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:15.075743"
+}

@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "84aad228-f866-45c3-86b7-b8549897bbfb",
+        "name": "dwarf-warlock",
+        "prompt": "male short bearded dwarf warlock in cursed iron-bound robes, holding a dark rune staff, forbidden runesmith",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:07:25.998905+00:00"
+      },
+      "folder": "dwarf-warlock",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-warlock/rotations/south.png",
+          "west": "dwarf-warlock/rotations/west.png",
+          "east": "dwarf-warlock/rotations/east.png",
+          "north": "dwarf-warlock/rotations/north.png"
+        },
+        "animations": {
+          "animating-0327211a": {
+            "east": [
+              "dwarf-warlock/animations/animating-0327211a/east/frame_000.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_001.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_002.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_003.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_004.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_005.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_006.png",
+              "dwarf-warlock/animations/animating-0327211a/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-7f034df0": {
+            "east": [
+              "dwarf-warlock/animations/casting_a_fireball-7f034df0/east/frame_000.png",
+              "dwarf-warlock/animations/casting_a_fireball-7f034df0/east/frame_001.png",
+              "dwarf-warlock/animations/casting_a_fireball-7f034df0/east/frame_002.png",
+              "dwarf-warlock/animations/casting_a_fireball-7f034df0/east/frame_003.png",
+              "dwarf-warlock/animations/casting_a_fireball-7f034df0/east/frame_004.png",
+              "dwarf-warlock/animations/casting_a_fireball-7f034df0/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:13.560635"
+}

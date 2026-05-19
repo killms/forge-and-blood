@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "42bfc5aa-354b-490a-90b6-02e2135082fd",
+        "name": "shifter-hunter",
+        "prompt": "tall hooded shifter hunter in dark-feathered cloak, holding a longbow, deadly wild stalker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:45:38.46645+00:00"
+      },
+      "folder": "shifter-hunter",
+      "frames": {
+        "rotations": {
+          "south": "shifter-hunter/rotations/south.png",
+          "west": "shifter-hunter/rotations/west.png",
+          "east": "shifter-hunter/rotations/east.png",
+          "north": "shifter-hunter/rotations/north.png"
+        },
+        "animations": {
+          "animating-9a485cd5": {
+            "east": [
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_000.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_001.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_002.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_003.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_004.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_005.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_006.png",
+              "shifter-hunter/animations/animating-9a485cd5/east/frame_007.png"
+            ]
+          },
+          "draws_bow_back_and_releases_arrow_forward-3855d3ac": {
+            "east": [
+              "shifter-hunter/animations/draws_bow_back_and_releases_arrow_forward-3855d3ac/east/frame_000.png",
+              "shifter-hunter/animations/draws_bow_back_and_releases_arrow_forward-3855d3ac/east/frame_001.png",
+              "shifter-hunter/animations/draws_bow_back_and_releases_arrow_forward-3855d3ac/east/frame_002.png",
+              "shifter-hunter/animations/draws_bow_back_and_releases_arrow_forward-3855d3ac/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:14.245516"
+}

@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "c2a2d85c-945e-4758-9487-15d8bf2d6dba",
+        "name": "shifter-warrior",
+        "prompt": "tall hooded shifter warrior with ghostly pale skin, wearing dark plate armor, holding a longsword, wild eerie warrior",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:40.676492+00:00"
+      },
+      "folder": "shifter-warrior",
+      "frames": {
+        "rotations": {
+          "south": "shifter-warrior/rotations/south.png",
+          "west": "shifter-warrior/rotations/west.png",
+          "east": "shifter-warrior/rotations/east.png",
+          "north": "shifter-warrior/rotations/north.png"
+        },
+        "animations": {
+          "animating-d164ba3d": {
+            "east": [
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_000.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_001.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_002.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_003.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_004.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_005.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_006.png",
+              "shifter-warrior/animations/animating-d164ba3d/east/frame_007.png"
+            ]
+          },
+          "swings_weapon_forward_in_a_powerful_arc-b4f9ff7c": {
+            "east": [
+              "shifter-warrior/animations/swings_weapon_forward_in_a_powerful_arc-b4f9ff7c/east/frame_000.png",
+              "shifter-warrior/animations/swings_weapon_forward_in_a_powerful_arc-b4f9ff7c/east/frame_001.png",
+              "shifter-warrior/animations/swings_weapon_forward_in_a_powerful_arc-b4f9ff7c/east/frame_002.png",
+              "shifter-warrior/animations/swings_weapon_forward_in_a_powerful_arc-b4f9ff7c/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:13.860722"
+}

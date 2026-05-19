@@ -1,0 +1,47 @@
+{
+  "combos": [
+    {"slug": "human-paladin",       "race": "human",   "class": "paladin",     "anim": "melee",  "desc": "male human paladin in white-and-gold plate armor with cross emblems, holding a massive war hammer in both hands, holy crusader"},
+    {"slug": "human-mage",          "race": "human",   "class": "mage",        "anim": "caster", "desc": "male human mage in blue robes with arcane sigils, holding a wooden staff with a glowing crystal top, scholarly wizard"},
+    {"slug": "human-necromancer",   "race": "human",   "class": "necromancer", "anim": "caster", "desc": "male human necromancer in tattered dark grey robes, holding a bone staff topped with skulls, pale and sinister"},
+    {"slug": "human-hunter",        "race": "human",   "class": "hunter",      "anim": "melee",  "desc": "male human ranger in green leather armor and hood, holding a longbow with arrows in a quiver on his back, sharp-eyed tracker"},
+    {"slug": "human-shaman",        "race": "human",   "class": "shaman",      "anim": "caster", "desc": "male human shaman in brown tribal robes with bone fetishes, holding a wooden totem staff with feathers, wise elder"},
+    {"slug": "human-thief",         "race": "human",   "class": "thief",       "anim": "melee",  "desc": "male human rogue in black leather armor with hood pulled up, holding twin daggers, cunning assassin"},
+    {"slug": "human-druid",         "race": "human",   "class": "druid",       "anim": "caster", "desc": "male human druid in green-brown robes with leaf motifs, holding a wooden staff entwined with vines and flowers, nature mystic"},
+    {"slug": "human-warlock",       "race": "human",   "class": "warlock",     "anim": "caster", "desc": "male human warlock in dark purple robes with chains and runes, holding a black grimoire and dark staff, sinister pact"},
+
+    {"slug": "elf-paladin",         "race": "elf",     "class": "paladin",     "anim": "melee",  "desc": "female elf paladin in silver-and-blue plate armor with leaf etchings, holding an elven longsword, holy guardian with pointed ears"},
+    {"slug": "elf-mage",            "race": "elf",     "class": "mage",        "anim": "caster", "desc": "female elf mage in flowing blue robes with star patterns, holding a crystal staff with arcane runes, graceful arcanist with pointed ears"},
+    {"slug": "elf-necromancer",     "race": "elf",     "class": "necromancer", "anim": "caster", "desc": "female elf necromancer in dark green robes with bone jewelry, holding a wooden staff with raven skulls, fallen mystic with pointed ears"},
+    {"slug": "elf-hunter",          "race": "elf",     "class": "hunter",      "anim": "melee",  "desc": "male elf ranger with pointed ears in green leaf-leather armor, holding a longbow with arrows, agile woodland tracker"},
+    {"slug": "elf-shaman",          "race": "elf",     "class": "shaman",      "anim": "caster", "desc": "male elf shaman with pointed ears in nature-leaf robes with feathers, holding a wooden totem staff, ancient druid-shaman"},
+    {"slug": "elf-thief",           "race": "elf",     "class": "thief",       "anim": "melee",  "desc": "female elf rogue with pointed ears in dark leather and cloak with hood, holding curved elven daggers, swift assassin"},
+    {"slug": "elf-warlock",         "race": "elf",     "class": "warlock",     "anim": "caster", "desc": "female elf warlock with pointed ears in black-and-purple robes with horn motifs, holding a dark crystal staff, fallen one"},
+
+    {"slug": "orc-warrior",         "race": "orc",     "class": "warrior",     "anim": "melee",  "desc": "male muscular green-skinned orc warrior with tusks, wearing iron plate armor, holding a massive two-handed sword, fierce barbarian"},
+    {"slug": "orc-paladin",         "race": "orc",     "class": "paladin",     "anim": "melee",  "desc": "male green-skinned orc paladin with tusks in copper-and-red plate armor with bone trophies, holding a heavy two-handed war hammer, brutal holy warrior"},
+    {"slug": "orc-mage",            "race": "orc",     "class": "mage",        "anim": "caster", "desc": "male green-skinned orc mage with tusks in red-and-black robes with bone jewelry, holding a twisted dark staff, primal arcanist"},
+    {"slug": "orc-necromancer",     "race": "orc",     "class": "necromancer", "anim": "caster", "desc": "male green-skinned orc necromancer with tusks in tattered dark robes with bone fetishes, holding a staff topped with ribcage, savage death caller"},
+    {"slug": "orc-hunter",          "race": "orc",     "class": "hunter",      "anim": "melee",  "desc": "male green-skinned orc hunter with tusks in fur-and-leather armor, holding a recurve bow with bone arrows, savage tracker"},
+    {"slug": "orc-thief",           "race": "orc",     "class": "thief",       "anim": "melee",  "desc": "female green-skinned orc rogue with small tusks in dark hide armor with hood, holding twin curved daggers, cunning warband stalker"},
+    {"slug": "orc-druid",           "race": "orc",     "class": "druid",       "anim": "caster", "desc": "male green-skinned orc druid with tusks in fur-and-bone robes with wolf-skull headdress, holding a gnarled wooden staff, primal nature spirit"},
+    {"slug": "orc-warlock",         "race": "orc",     "class": "warlock",     "anim": "caster", "desc": "male green-skinned orc warlock with tusks in bloodied dark robes with sigils, holding a fiery skull staff, demonic pact"},
+
+    {"slug": "dwarf-warrior",       "race": "dwarf",   "class": "warrior",     "anim": "melee",  "desc": "male stout bearded dwarf warrior in heavy iron armor with horned helmet, holding a massive two-handed battle axe, hardy mountain warrior"},
+    {"slug": "dwarf-mage",          "race": "dwarf",   "class": "mage",        "anim": "caster", "desc": "male short bearded dwarf mage in royal blue robes with metal trim, holding an iron-bound staff with crystal, runic scholar"},
+    {"slug": "dwarf-necromancer",   "race": "dwarf",   "class": "necromancer", "anim": "caster", "desc": "male short bearded dwarf necromancer in dark robes with iron clasps, holding a bone staff with iron skulls, forsaken runesmith"},
+    {"slug": "dwarf-hunter",        "race": "dwarf",   "class": "hunter",      "anim": "melee",  "desc": "male short bearded dwarf hunter in leather-and-iron armor, holding a heavy crossbow, mountain marksman"},
+    {"slug": "dwarf-shaman",        "race": "dwarf",   "class": "shaman",      "anim": "caster", "desc": "male short bearded dwarf shaman in tribal cave robes with totems, holding a stone-tipped staff, mountain spirit-talker"},
+    {"slug": "dwarf-thief",         "race": "dwarf",   "class": "thief",       "anim": "melee",  "desc": "male short bearded dwarf rogue in dark leather with hood, holding twin short blades, sneaky tunnel runner"},
+    {"slug": "dwarf-druid",         "race": "dwarf",   "class": "druid",       "anim": "caster", "desc": "male short bearded dwarf druid in stone-and-moss robes, holding a mossy wooden staff, mountain nature keeper"},
+    {"slug": "dwarf-warlock",       "race": "dwarf",   "class": "warlock",     "anim": "caster", "desc": "male short bearded dwarf warlock in cursed iron-bound robes, holding a dark rune staff, forbidden runesmith"},
+
+    {"slug": "shifter-warrior",     "race": "shifter", "class": "warrior",     "anim": "melee",  "desc": "tall hooded shifter warrior with ghostly pale skin, wearing dark plate armor, holding a longsword, wild eerie warrior"},
+    {"slug": "shifter-paladin",     "race": "shifter", "class": "paladin",     "anim": "melee",  "desc": "tall hooded shifter paladin in silver-and-shadow armor with eerie aura, holding a holy war hammer, fallen knight"},
+    {"slug": "shifter-mage",        "race": "shifter", "class": "mage",        "anim": "caster", "desc": "tall hooded shifter mage with glowing eyes in shadowy robes, holding a twisted staff with glowing orb, otherworldly caster"},
+    {"slug": "shifter-hunter",      "race": "shifter", "class": "hunter",      "anim": "melee",  "desc": "tall hooded shifter hunter in dark-feathered cloak, holding a longbow, deadly wild stalker"},
+    {"slug": "shifter-shaman",      "race": "shifter", "class": "shaman",      "anim": "caster", "desc": "tall hooded shifter shaman in primal feathered robes with bone totems, holding a tribal staff, otherworldly spirit-talker"},
+    {"slug": "shifter-thief",       "race": "shifter", "class": "thief",       "anim": "melee",  "desc": "tall hooded shifter rogue in shadowy cloak with face obscured, holding curved daggers, phantom assassin"},
+    {"slug": "shifter-druid",       "race": "shifter", "class": "druid",       "anim": "caster", "desc": "tall hooded shifter druid in wild leaf-and-fur robes with antlers headdress, holding a twisted wooden staff, primal nature spirit"},
+    {"slug": "shifter-warlock",     "race": "shifter", "class": "warlock",     "anim": "caster", "desc": "tall hooded shifter warlock in pitch-black robes with chains, holding a cursed grimoire and dark staff, demonic pact-bound"}
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "d328945f-4662-4104-a313-7d4ee6bbeea5",
+        "name": "shifter-paladin",
+        "prompt": "tall hooded shifter paladin in silver-and-shadow armor with eerie aura, holding a holy war hammer, fallen knight",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:20.506726+00:00"
+      },
+      "folder": "shifter-paladin",
+      "frames": {
+        "rotations": {
+          "south": "shifter-paladin/rotations/south.png",
+          "west": "shifter-paladin/rotations/west.png",
+          "east": "shifter-paladin/rotations/east.png",
+          "north": "shifter-paladin/rotations/north.png"
+        },
+        "animations": {
+          "animating-5afc0d9a": {
+            "east": [
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_000.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_001.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_002.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_003.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_004.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_005.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_006.png",
+              "shifter-paladin/animations/animating-5afc0d9a/east/frame_007.png"
+            ]
+          },
+          "raises_weapon_overhead_and_brings_it_down_with_for-98613d22": {
+            "east": [
+              "shifter-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-98613d22/east/frame_000.png",
+              "shifter-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-98613d22/east/frame_001.png",
+              "shifter-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-98613d22/east/frame_002.png",
+              "shifter-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-98613d22/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:14.238779"
+}

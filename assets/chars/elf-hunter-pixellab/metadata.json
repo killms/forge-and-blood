@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "136e44d0-3022-4f74-a520-d5cd0a57800c",
+        "name": "elf-hunter",
+        "prompt": "male elf ranger with pointed ears in green leaf-leather armor, holding a longbow with arrows, agile woodland tracker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:48.044848+00:00"
+      },
+      "folder": "elf-hunter",
+      "frames": {
+        "rotations": {
+          "south": "elf-hunter/rotations/south.png",
+          "west": "elf-hunter/rotations/west.png",
+          "east": "elf-hunter/rotations/east.png",
+          "north": "elf-hunter/rotations/north.png"
+        },
+        "animations": {
+          "animating-a8e91f8f": {
+            "east": [
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_000.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_001.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_002.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_003.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_004.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_005.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_006.png",
+              "elf-hunter/animations/animating-a8e91f8f/east/frame_007.png"
+            ]
+          },
+          "draws_bow_back_and_releases_arrow_forward-a8380d5d": {
+            "east": [
+              "elf-hunter/animations/draws_bow_back_and_releases_arrow_forward-a8380d5d/east/frame_000.png",
+              "elf-hunter/animations/draws_bow_back_and_releases_arrow_forward-a8380d5d/east/frame_001.png",
+              "elf-hunter/animations/draws_bow_back_and_releases_arrow_forward-a8380d5d/east/frame_002.png",
+              "elf-hunter/animations/draws_bow_back_and_releases_arrow_forward-a8380d5d/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:09.022107"
+}

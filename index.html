@@ -7135,15 +7135,54 @@ function playCastAnimation(attacker) {
 // Gerados via PixelLab Tier 2 — S26 (Human Warrior) + S25 (Elf knight as warrior)
 // + S27 batch B (Orc Shaman, Dwarf Paladin, Shifter Necromancer, Elf Druid).
 const CLASS_SPRITES = {
-  // — Melee/martial heroes —
-  'human-warrior':   { idle: 'assets/chars/human-warrior-idle.gif',  attack: 'assets/chars/human-warrior-attack.gif' },
-  'elf-warrior':     { idle: 'assets/chars/elf-knight-idle.gif',     attack: 'assets/chars/elf-knight-attack.gif' },
-  'dwarf-paladin':   { idle: 'assets/chars/dwarf-paladin-idle.gif',  attack: 'assets/chars/dwarf-paladin-attack.gif' },
-  // — Casters/spell-flingers —
-  'orc-shaman':          { idle: 'assets/chars/orc-shaman-idle.gif',          attack: 'assets/chars/orc-shaman-attack.gif' },
+  // ============================================================
+  // 45 of 45 combos generated via PixelLab Tier 2 (S25-S27)
+  // ============================================================
+  'dwarf-druid': { idle: 'assets/chars/dwarf-druid-idle.gif', attack: 'assets/chars/dwarf-druid-attack.gif' },
+  'dwarf-hunter': { idle: 'assets/chars/dwarf-hunter-idle.gif', attack: 'assets/chars/dwarf-hunter-attack.gif' },
+  'dwarf-mage': { idle: 'assets/chars/dwarf-mage-idle.gif', attack: 'assets/chars/dwarf-mage-attack.gif' },
+  'dwarf-necromancer': { idle: 'assets/chars/dwarf-necromancer-idle.gif', attack: 'assets/chars/dwarf-necromancer-attack.gif' },
+  'dwarf-paladin': { idle: 'assets/chars/dwarf-paladin-idle.gif', attack: 'assets/chars/dwarf-paladin-attack.gif' },
+  'dwarf-shaman': { idle: 'assets/chars/dwarf-shaman-idle.gif', attack: 'assets/chars/dwarf-shaman-attack.gif' },
+  'dwarf-thief': { idle: 'assets/chars/dwarf-thief-idle.gif', attack: 'assets/chars/dwarf-thief-attack.gif' },
+  'dwarf-warlock': { idle: 'assets/chars/dwarf-warlock-idle.gif', attack: 'assets/chars/dwarf-warlock-attack.gif' },
+  'dwarf-warrior': { idle: 'assets/chars/dwarf-warrior-idle.gif', attack: 'assets/chars/dwarf-warrior-attack.gif' },
+  'elf-druid': { idle: 'assets/chars/elf-druid-idle.gif', attack: 'assets/chars/elf-druid-attack.gif' },
+  'elf-hunter': { idle: 'assets/chars/elf-hunter-idle.gif', attack: 'assets/chars/elf-hunter-attack.gif' },
+  'elf-mage': { idle: 'assets/chars/elf-mage-idle.gif', attack: 'assets/chars/elf-mage-attack.gif' },
+  'elf-necromancer': { idle: 'assets/chars/elf-necromancer-idle.gif', attack: 'assets/chars/elf-necromancer-attack.gif' },
+  'elf-paladin': { idle: 'assets/chars/elf-paladin-idle.gif', attack: 'assets/chars/elf-paladin-attack.gif' },
+  'elf-shaman': { idle: 'assets/chars/elf-shaman-idle.gif', attack: 'assets/chars/elf-shaman-attack.gif' },
+  'elf-thief': { idle: 'assets/chars/elf-thief-idle.gif', attack: 'assets/chars/elf-thief-attack.gif' },
+  'elf-warlock': { idle: 'assets/chars/elf-warlock-idle.gif', attack: 'assets/chars/elf-warlock-attack.gif' },
+  'elf-warrior': { idle: 'assets/chars/elf-knight-idle.gif', attack: 'assets/chars/elf-knight-attack.gif' },
+  'human-druid': { idle: 'assets/chars/human-druid-idle.gif', attack: 'assets/chars/human-druid-attack.gif' },
+  'human-hunter': { idle: 'assets/chars/human-hunter-idle.gif', attack: 'assets/chars/human-hunter-attack.gif' },
+  'human-mage': { idle: 'assets/chars/human-mage-idle.gif', attack: 'assets/chars/human-mage-attack.gif' },
+  'human-necromancer': { idle: 'assets/chars/human-necromancer-idle.gif', attack: 'assets/chars/human-necromancer-attack.gif' },
+  'human-paladin': { idle: 'assets/chars/human-paladin-idle.gif', attack: 'assets/chars/human-paladin-attack.gif' },
+  'human-shaman': { idle: 'assets/chars/human-shaman-idle.gif', attack: 'assets/chars/human-shaman-attack.gif' },
+  'human-thief': { idle: 'assets/chars/human-thief-idle.gif', attack: 'assets/chars/human-thief-attack.gif' },
+  'human-warlock': { idle: 'assets/chars/human-warlock-idle.gif', attack: 'assets/chars/human-warlock-attack.gif' },
+  'human-warrior': { idle: 'assets/chars/human-warrior-idle.gif', attack: 'assets/chars/human-warrior-attack.gif' },
+  'orc-druid': { idle: 'assets/chars/orc-druid-idle.gif', attack: 'assets/chars/orc-druid-attack.gif' },
+  'orc-hunter': { idle: 'assets/chars/orc-hunter-idle.gif', attack: 'assets/chars/orc-hunter-attack.gif' },
+  'orc-mage': { idle: 'assets/chars/orc-mage-idle.gif', attack: 'assets/chars/orc-mage-attack.gif' },
+  'orc-necromancer': { idle: 'assets/chars/orc-necromancer-idle.gif', attack: 'assets/chars/orc-necromancer-attack.gif' },
+  'orc-paladin': { idle: 'assets/chars/orc-paladin-idle.gif', attack: 'assets/chars/orc-paladin-attack.gif' },
+  'orc-shaman': { idle: 'assets/chars/orc-shaman-idle.gif', attack: 'assets/chars/orc-shaman-attack.gif' },
+  'orc-thief': { idle: 'assets/chars/orc-thief-idle.gif', attack: 'assets/chars/orc-thief-attack.gif' },
+  'orc-warlock': { idle: 'assets/chars/orc-warlock-idle.gif', attack: 'assets/chars/orc-warlock-attack.gif' },
+  'orc-warrior': { idle: 'assets/chars/orc-warrior-idle.gif', attack: 'assets/chars/orc-warrior-attack.gif' },
+  'shifter-druid': { idle: 'assets/chars/shifter-druid-idle.gif', attack: 'assets/chars/shifter-druid-attack.gif' },
+  'shifter-hunter': { idle: 'assets/chars/shifter-hunter-idle.gif', attack: 'assets/chars/shifter-hunter-attack.gif' },
+  'shifter-mage': { idle: 'assets/chars/shifter-mage-idle.gif', attack: 'assets/chars/shifter-mage-attack.gif' },
   'shifter-necromancer': { idle: 'assets/chars/shifter-necromancer-idle.gif', attack: 'assets/chars/shifter-necromancer-attack.gif' },
-  'elf-druid':           { idle: 'assets/chars/elf-druid-idle.gif',           attack: 'assets/chars/elf-druid-attack.gif' }
-  // Restantes 39 combos: batch C (~117 gens)
+  'shifter-paladin': { idle: 'assets/chars/shifter-paladin-idle.gif', attack: 'assets/chars/shifter-paladin-attack.gif' },
+  'shifter-shaman': { idle: 'assets/chars/shifter-shaman-idle.gif', attack: 'assets/chars/shifter-shaman-attack.gif' },
+  'shifter-thief': { idle: 'assets/chars/shifter-thief-idle.gif', attack: 'assets/chars/shifter-thief-attack.gif' },
+  'shifter-warlock': { idle: 'assets/chars/shifter-warlock-idle.gif', attack: 'assets/chars/shifter-warlock-attack.gif' },
+  'shifter-warrior': { idle: 'assets/chars/shifter-warrior-idle.gif', attack: 'assets/chars/shifter-warrior-attack.gif' }
 };
 
 // Look up the portrait data for any combat source (hero, PvP opponent,

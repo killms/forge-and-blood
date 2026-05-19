@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "3ada2c91-b6ee-480f-842c-822ee01f71a5",
+        "name": "human-druid",
+        "prompt": "male human druid in green-brown robes with leaf motifs, holding a wooden staff entwined with vines and flowers, nature mystic",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.123146+00:00"
+      },
+      "folder": "human-druid",
+      "frames": {
+        "rotations": {
+          "south": "human-druid/rotations/south.png",
+          "west": "human-druid/rotations/west.png",
+          "east": "human-druid/rotations/east.png",
+          "north": "human-druid/rotations/north.png"
+        },
+        "animations": {
+          "animating-cacb3013": {
+            "east": [
+              "human-druid/animations/animating-cacb3013/east/frame_000.png",
+              "human-druid/animations/animating-cacb3013/east/frame_001.png",
+              "human-druid/animations/animating-cacb3013/east/frame_002.png",
+              "human-druid/animations/animating-cacb3013/east/frame_003.png",
+              "human-druid/animations/animating-cacb3013/east/frame_004.png",
+              "human-druid/animations/animating-cacb3013/east/frame_005.png",
+              "human-druid/animations/animating-cacb3013/east/frame_006.png",
+              "human-druid/animations/animating-cacb3013/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-4eed3615": {
+            "east": [
+              "human-druid/animations/casting_a_fireball-4eed3615/east/frame_000.png",
+              "human-druid/animations/casting_a_fireball-4eed3615/east/frame_001.png",
+              "human-druid/animations/casting_a_fireball-4eed3615/east/frame_002.png",
+              "human-druid/animations/casting_a_fireball-4eed3615/east/frame_003.png",
+              "human-druid/animations/casting_a_fireball-4eed3615/east/frame_004.png",
+              "human-druid/animations/casting_a_fireball-4eed3615/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:07.600550"
+}

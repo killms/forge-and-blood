@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "8ad00101-1de7-4b34-b709-a71adad7e354",
+        "name": "elf-warlock",
+        "prompt": "female elf warlock with pointed ears in black-and-purple robes with horn motifs, holding a dark crystal staff, fallen one",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:48.127892+00:00"
+      },
+      "folder": "elf-warlock",
+      "frames": {
+        "rotations": {
+          "south": "elf-warlock/rotations/south.png",
+          "west": "elf-warlock/rotations/west.png",
+          "east": "elf-warlock/rotations/east.png",
+          "north": "elf-warlock/rotations/north.png"
+        },
+        "animations": {
+          "animating-4c4715a7": {
+            "east": [
+              "elf-warlock/animations/animating-4c4715a7/east/frame_000.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_001.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_002.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_003.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_004.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_005.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_006.png",
+              "elf-warlock/animations/animating-4c4715a7/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-4d8705b3": {
+            "east": [
+              "elf-warlock/animations/casting_a_fireball-4d8705b3/east/frame_000.png",
+              "elf-warlock/animations/casting_a_fireball-4d8705b3/east/frame_001.png",
+              "elf-warlock/animations/casting_a_fireball-4d8705b3/east/frame_002.png",
+              "elf-warlock/animations/casting_a_fireball-4d8705b3/east/frame_003.png",
+              "elf-warlock/animations/casting_a_fireball-4d8705b3/east/frame_004.png",
+              "elf-warlock/animations/casting_a_fireball-4d8705b3/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:10.271779"
+}

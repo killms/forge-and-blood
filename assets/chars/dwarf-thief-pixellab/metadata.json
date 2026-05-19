@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "1622da03-4027-4e7d-8b2d-63cbcc5b3f92",
+        "name": "dwarf-thief",
+        "prompt": "male short bearded dwarf rogue in dark leather with hood, holding twin short blades, sneaky tunnel runner",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:07.590454+00:00"
+      },
+      "folder": "dwarf-thief",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-thief/rotations/south.png",
+          "west": "dwarf-thief/rotations/west.png",
+          "east": "dwarf-thief/rotations/east.png",
+          "north": "dwarf-thief/rotations/north.png"
+        },
+        "animations": {
+          "animating-dd63eb46": {
+            "east": [
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_000.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_001.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_002.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_003.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_004.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_005.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_006.png",
+              "dwarf-thief/animations/animating-dd63eb46/east/frame_007.png"
+            ]
+          },
+          "lunges_forward_with_a_quick_stab-00cfe9ad": {
+            "east": [
+              "dwarf-thief/animations/lunges_forward_with_a_quick_stab-00cfe9ad/east/frame_000.png",
+              "dwarf-thief/animations/lunges_forward_with_a_quick_stab-00cfe9ad/east/frame_001.png",
+              "dwarf-thief/animations/lunges_forward_with_a_quick_stab-00cfe9ad/east/frame_002.png",
+              "dwarf-thief/animations/lunges_forward_with_a_quick_stab-00cfe9ad/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:13.363277"
+}

@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "031c5e5f-7964-4fa0-8b8d-73f66b2048f2",
+        "name": "orc-warrior",
+        "prompt": "male muscular green-skinned orc warrior with tusks, wearing iron plate armor, holding a massive two-handed sword, fierce barbarian",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:48.559707+00:00"
+      },
+      "folder": "orc-warrior",
+      "frames": {
+        "rotations": {
+          "south": "orc-warrior/rotations/south.png",
+          "west": "orc-warrior/rotations/west.png",
+          "east": "orc-warrior/rotations/east.png",
+          "north": "orc-warrior/rotations/north.png"
+        },
+        "animations": {
+          "animating-c45aea3e": {
+            "east": [
+              "orc-warrior/animations/animating-c45aea3e/east/frame_000.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_001.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_002.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_003.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_004.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_005.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_006.png",
+              "orc-warrior/animations/animating-c45aea3e/east/frame_007.png"
+            ]
+          },
+          "swings_weapon_forward_in_a_powerful_arc-c498519e": {
+            "east": [
+              "orc-warrior/animations/swings_weapon_forward_in_a_powerful_arc-c498519e/east/frame_000.png",
+              "orc-warrior/animations/swings_weapon_forward_in_a_powerful_arc-c498519e/east/frame_001.png",
+              "orc-warrior/animations/swings_weapon_forward_in_a_powerful_arc-c498519e/east/frame_002.png",
+              "orc-warrior/animations/swings_weapon_forward_in_a_powerful_arc-c498519e/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:10.379197"
+}

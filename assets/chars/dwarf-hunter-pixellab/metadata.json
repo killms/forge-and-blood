@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "5c72d2ea-100f-4c8e-bc7a-eedd9a2d0e46",
+        "name": "dwarf-hunter",
+        "prompt": "male short bearded dwarf hunter in leather-and-iron armor, holding a heavy crossbow, mountain marksman",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:56:51.328231+00:00"
+      },
+      "folder": "dwarf-hunter",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-hunter/rotations/south.png",
+          "west": "dwarf-hunter/rotations/west.png",
+          "east": "dwarf-hunter/rotations/east.png",
+          "north": "dwarf-hunter/rotations/north.png"
+        },
+        "animations": {
+          "animating-ade3d7a5": {
+            "east": [
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_000.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_001.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_002.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_003.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_004.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_005.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_006.png",
+              "dwarf-hunter/animations/animating-ade3d7a5/east/frame_007.png"
+            ]
+          },
+          "draws_bow_back_and_releases_arrow_forward-64fa84c6": {
+            "east": [
+              "dwarf-hunter/animations/draws_bow_back_and_releases_arrow_forward-64fa84c6/east/frame_000.png",
+              "dwarf-hunter/animations/draws_bow_back_and_releases_arrow_forward-64fa84c6/east/frame_001.png",
+              "dwarf-hunter/animations/draws_bow_back_and_releases_arrow_forward-64fa84c6/east/frame_002.png",
+              "dwarf-hunter/animations/draws_bow_back_and_releases_arrow_forward-64fa84c6/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:12.374527"
+}

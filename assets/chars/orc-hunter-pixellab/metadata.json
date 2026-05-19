@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "583dcb3c-7705-4a8d-a92f-88c1177b673d",
+        "name": "orc-hunter",
+        "prompt": "male green-skinned orc hunter with tusks in fur-and-leather armor, holding a recurve bow with bone arrows, savage tracker",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:49.118988+00:00"
+      },
+      "folder": "orc-hunter",
+      "frames": {
+        "rotations": {
+          "south": "orc-hunter/rotations/south.png",
+          "west": "orc-hunter/rotations/west.png",
+          "east": "orc-hunter/rotations/east.png",
+          "north": "orc-hunter/rotations/north.png"
+        },
+        "animations": {
+          "animating-84daa4d1": {
+            "east": [
+              "orc-hunter/animations/animating-84daa4d1/east/frame_000.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_001.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_002.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_003.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_004.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_005.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_006.png",
+              "orc-hunter/animations/animating-84daa4d1/east/frame_007.png"
+            ]
+          },
+          "draws_bow_back_and_releases_arrow_forward-cd6b42c0": {
+            "east": [
+              "orc-hunter/animations/draws_bow_back_and_releases_arrow_forward-cd6b42c0/east/frame_000.png",
+              "orc-hunter/animations/draws_bow_back_and_releases_arrow_forward-cd6b42c0/east/frame_001.png",
+              "orc-hunter/animations/draws_bow_back_and_releases_arrow_forward-cd6b42c0/east/frame_002.png",
+              "orc-hunter/animations/draws_bow_back_and_releases_arrow_forward-cd6b42c0/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:11.269829"
+}

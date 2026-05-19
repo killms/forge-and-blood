@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "26a924eb-cc56-4390-9ee9-bf5d4756bc43",
+        "name": "elf-shaman",
+        "prompt": "male elf shaman with pointed ears in nature-leaf robes with feathers, holding a wooden totem staff, ancient druid-shaman",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.105263+00:00"
+      },
+      "folder": "elf-shaman",
+      "frames": {
+        "rotations": {
+          "south": "elf-shaman/rotations/south.png",
+          "west": "elf-shaman/rotations/west.png",
+          "east": "elf-shaman/rotations/east.png",
+          "north": "elf-shaman/rotations/north.png"
+        },
+        "animations": {
+          "animating-5d747d98": {
+            "east": [
+              "elf-shaman/animations/animating-5d747d98/east/frame_000.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_001.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_002.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_003.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_004.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_005.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_006.png",
+              "elf-shaman/animations/animating-5d747d98/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-53feafec": {
+            "east": [
+              "elf-shaman/animations/casting_a_fireball-53feafec/east/frame_000.png",
+              "elf-shaman/animations/casting_a_fireball-53feafec/east/frame_001.png",
+              "elf-shaman/animations/casting_a_fireball-53feafec/east/frame_002.png",
+              "elf-shaman/animations/casting_a_fireball-53feafec/east/frame_003.png",
+              "elf-shaman/animations/casting_a_fireball-53feafec/east/frame_004.png",
+              "elf-shaman/animations/casting_a_fireball-53feafec/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:09.265308"
+}

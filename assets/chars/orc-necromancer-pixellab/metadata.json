@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "bd1f2cc1-b4e5-4e08-ac42-2559f1e61a71",
+        "name": "orc-necromancer",
+        "prompt": "male green-skinned orc necromancer with tusks in tattered dark robes with bone fetishes, holding a staff topped with ribcage, savage death caller",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:48.594213+00:00"
+      },
+      "folder": "orc-necromancer",
+      "frames": {
+        "rotations": {
+          "south": "orc-necromancer/rotations/south.png",
+          "west": "orc-necromancer/rotations/west.png",
+          "east": "orc-necromancer/rotations/east.png",
+          "north": "orc-necromancer/rotations/north.png"
+        },
+        "animations": {
+          "animating-c593e254": {
+            "east": [
+              "orc-necromancer/animations/animating-c593e254/east/frame_000.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_001.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_002.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_003.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_004.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_005.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_006.png",
+              "orc-necromancer/animations/animating-c593e254/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-2371cc2e": {
+            "east": [
+              "orc-necromancer/animations/casting_a_fireball-2371cc2e/east/frame_000.png",
+              "orc-necromancer/animations/casting_a_fireball-2371cc2e/east/frame_001.png",
+              "orc-necromancer/animations/casting_a_fireball-2371cc2e/east/frame_002.png",
+              "orc-necromancer/animations/casting_a_fireball-2371cc2e/east/frame_003.png",
+              "orc-necromancer/animations/casting_a_fireball-2371cc2e/east/frame_004.png",
+              "orc-necromancer/animations/casting_a_fireball-2371cc2e/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:10.560070"
+}

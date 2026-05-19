@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "1d2b32c1-dbc1-4292-b1c2-bd02354e32a2",
+        "name": "orc-paladin",
+        "prompt": "male green-skinned orc paladin with tusks in copper-and-red plate armor with bone trophies, holding a heavy two-handed war hammer, brutal holy warrior",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:55:48.588383+00:00"
+      },
+      "folder": "orc-paladin",
+      "frames": {
+        "rotations": {
+          "south": "orc-paladin/rotations/south.png",
+          "west": "orc-paladin/rotations/west.png",
+          "east": "orc-paladin/rotations/east.png",
+          "north": "orc-paladin/rotations/north.png"
+        },
+        "animations": {
+          "animating-9adc4cd5": {
+            "east": [
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_000.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_001.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_002.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_003.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_004.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_005.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_006.png",
+              "orc-paladin/animations/animating-9adc4cd5/east/frame_007.png"
+            ]
+          },
+          "raises_weapon_overhead_and_brings_it_down_with_for-4de98432": {
+            "east": [
+              "orc-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-4de98432/east/frame_000.png",
+              "orc-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-4de98432/east/frame_001.png",
+              "orc-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-4de98432/east/frame_002.png",
+              "orc-paladin/animations/raises_weapon_overhead_and_brings_it_down_with_for-4de98432/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:10.499820"
+}

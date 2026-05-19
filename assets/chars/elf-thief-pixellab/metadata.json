@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "036941c3-c861-4822-9056-01059a725e19",
+        "name": "elf-thief",
+        "prompt": "female elf rogue with pointed ears in dark leather and cloak with hood, holding curved elven daggers, swift assassin",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.080259+00:00"
+      },
+      "folder": "elf-thief",
+      "frames": {
+        "rotations": {
+          "south": "elf-thief/rotations/south.png",
+          "west": "elf-thief/rotations/west.png",
+          "east": "elf-thief/rotations/east.png",
+          "north": "elf-thief/rotations/north.png"
+        },
+        "animations": {
+          "animating-15584ef6": {
+            "east": [
+              "elf-thief/animations/animating-15584ef6/east/frame_000.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_001.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_002.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_003.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_004.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_005.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_006.png",
+              "elf-thief/animations/animating-15584ef6/east/frame_007.png"
+            ]
+          },
+          "lunges_forward_with_a_quick_stab-ab4d0391": {
+            "east": [
+              "elf-thief/animations/lunges_forward_with_a_quick_stab-ab4d0391/east/frame_000.png",
+              "elf-thief/animations/lunges_forward_with_a_quick_stab-ab4d0391/east/frame_001.png",
+              "elf-thief/animations/lunges_forward_with_a_quick_stab-ab4d0391/east/frame_002.png",
+              "elf-thief/animations/lunges_forward_with_a_quick_stab-ab4d0391/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:09.807195"
+}

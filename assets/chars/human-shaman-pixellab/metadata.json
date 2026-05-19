@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "d8155eea-9407-4662-ab51-8f2ffc4bc78d",
+        "name": "human-shaman",
+        "prompt": "male human shaman in brown tribal robes with bone fetishes, holding a wooden totem staff with feathers, wise elder",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T01:45:54.031335+00:00"
+      },
+      "folder": "human-shaman",
+      "frames": {
+        "rotations": {
+          "south": "human-shaman/rotations/south.png",
+          "west": "human-shaman/rotations/west.png",
+          "east": "human-shaman/rotations/east.png",
+          "north": "human-shaman/rotations/north.png"
+        },
+        "animations": {
+          "animating-6882f223": {
+            "east": [
+              "human-shaman/animations/animating-6882f223/east/frame_000.png",
+              "human-shaman/animations/animating-6882f223/east/frame_001.png",
+              "human-shaman/animations/animating-6882f223/east/frame_002.png",
+              "human-shaman/animations/animating-6882f223/east/frame_003.png",
+              "human-shaman/animations/animating-6882f223/east/frame_004.png",
+              "human-shaman/animations/animating-6882f223/east/frame_005.png",
+              "human-shaman/animations/animating-6882f223/east/frame_006.png",
+              "human-shaman/animations/animating-6882f223/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-4a4cc8fe": {
+            "east": [
+              "human-shaman/animations/casting_a_fireball-4a4cc8fe/east/frame_000.png",
+              "human-shaman/animations/casting_a_fireball-4a4cc8fe/east/frame_001.png",
+              "human-shaman/animations/casting_a_fireball-4a4cc8fe/east/frame_002.png",
+              "human-shaman/animations/casting_a_fireball-4a4cc8fe/east/frame_003.png",
+              "human-shaman/animations/casting_a_fireball-4a4cc8fe/east/frame_004.png",
+              "human-shaman/animations/casting_a_fireball-4a4cc8fe/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:08.011706"
+}

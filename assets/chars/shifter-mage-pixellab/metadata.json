@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "831421a1-8b18-4f00-85de-0bdf87bfc90e",
+        "name": "shifter-mage",
+        "prompt": "tall hooded shifter mage with glowing eyes in shadowy robes, holding a twisted staff with glowing orb, otherworldly caster",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T10:57:20.980949+00:00"
+      },
+      "folder": "shifter-mage",
+      "frames": {
+        "rotations": {
+          "south": "shifter-mage/rotations/south.png",
+          "west": "shifter-mage/rotations/west.png",
+          "east": "shifter-mage/rotations/east.png",
+          "north": "shifter-mage/rotations/north.png"
+        },
+        "animations": {
+          "animating-2af3aed4": {
+            "east": [
+              "shifter-mage/animations/animating-2af3aed4/east/frame_000.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_001.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_002.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_003.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_004.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_005.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_006.png",
+              "shifter-mage/animations/animating-2af3aed4/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-652e29d2": {
+            "east": [
+              "shifter-mage/animations/casting_a_fireball-652e29d2/east/frame_000.png",
+              "shifter-mage/animations/casting_a_fireball-652e29d2/east/frame_001.png",
+              "shifter-mage/animations/casting_a_fireball-652e29d2/east/frame_002.png",
+              "shifter-mage/animations/casting_a_fireball-652e29d2/east/frame_003.png",
+              "shifter-mage/animations/casting_a_fireball-652e29d2/east/frame_004.png",
+              "shifter-mage/animations/casting_a_fireball-652e29d2/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:14.578024"
+}

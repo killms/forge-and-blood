@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "e4aa425f-4516-49b4-806d-33d31dc0bf4d",
+        "name": "orc-warlock",
+        "prompt": "male green-skinned orc warlock with tusks in bloodied dark robes with sigils, holding a fiery skull staff, demonic pact",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:07:26.048285+00:00"
+      },
+      "folder": "orc-warlock",
+      "frames": {
+        "rotations": {
+          "south": "orc-warlock/rotations/south.png",
+          "west": "orc-warlock/rotations/west.png",
+          "east": "orc-warlock/rotations/east.png",
+          "north": "orc-warlock/rotations/north.png"
+        },
+        "animations": {
+          "animating-dbba8e87": {
+            "east": [
+              "orc-warlock/animations/animating-dbba8e87/east/frame_000.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_001.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_002.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_003.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_004.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_005.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_006.png",
+              "orc-warlock/animations/animating-dbba8e87/east/frame_007.png"
+            ]
+          },
+          "casting_a_fireball-03bd4bdb": {
+            "east": [
+              "orc-warlock/animations/casting_a_fireball-03bd4bdb/east/frame_000.png",
+              "orc-warlock/animations/casting_a_fireball-03bd4bdb/east/frame_001.png",
+              "orc-warlock/animations/casting_a_fireball-03bd4bdb/east/frame_002.png",
+              "orc-warlock/animations/casting_a_fireball-03bd4bdb/east/frame_003.png",
+              "orc-warlock/animations/casting_a_fireball-03bd4bdb/east/frame_004.png",
+              "orc-warlock/animations/casting_a_fireball-03bd4bdb/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:11.893722"
+}

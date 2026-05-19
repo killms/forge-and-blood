@@ -1,0 +1,53 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "ea15905d-f016-4a73-b5f7-f1d337adefe4",
+        "name": "dwarf-warrior",
+        "prompt": "male stout bearded dwarf warrior in heavy iron armor with horned helmet, holding a massive two-handed battle axe, hardy mountain warrior",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-19T11:07:45.001035+00:00"
+      },
+      "folder": "dwarf-warrior",
+      "frames": {
+        "rotations": {
+          "south": "dwarf-warrior/rotations/south.png",
+          "west": "dwarf-warrior/rotations/west.png",
+          "east": "dwarf-warrior/rotations/east.png",
+          "north": "dwarf-warrior/rotations/north.png"
+        },
+        "animations": {
+          "animating-ff06ced5": {
+            "east": [
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_000.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_001.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_002.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_003.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_004.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_005.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_006.png",
+              "dwarf-warrior/animations/animating-ff06ced5/east/frame_007.png"
+            ]
+          },
+          "swings_weapon_forward_in_a_powerful_arc-a0f11033": {
+            "east": [
+              "dwarf-warrior/animations/swings_weapon_forward_in_a_powerful_arc-a0f11033/east/frame_000.png",
+              "dwarf-warrior/animations/swings_weapon_forward_in_a_powerful_arc-a0f11033/east/frame_001.png",
+              "dwarf-warrior/animations/swings_weapon_forward_in_a_powerful_arc-a0f11033/east/frame_002.png",
+              "dwarf-warrior/animations/swings_weapon_forward_in_a_powerful_arc-a0f11033/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-19T12:47:12.304009"
+}
