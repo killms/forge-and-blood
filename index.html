@@ -1007,11 +1007,12 @@
     z-index: 9;
     top: auto;
     bottom: -8px;
-    height: 28%;
+    height: 18%;
     background-position: bottom center;
     background-size: cover;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 25%, black 60%);
-            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 25%, black 60%);
+    opacity: 0.75;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(0,0,0,0.5) 60%, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(0,0,0,0.5) 60%, black 100%);
   }
   @keyframes sky-drift {
     0%, 100% { transform: translateX(-8px); }
@@ -1048,8 +1049,8 @@
   /* Fighters — absolute positioned, full body, no portrait box */
   .fighter {
     position: absolute;
-    bottom: 12%;
-    width: 180px;
+    bottom: 16%;
+    width: 140px;
     text-align: center;
     z-index: 6;
     transition: transform 0.18s ease;
@@ -1106,10 +1107,10 @@
   }
 
   .fighter-portrait {
-    width: 180px; height: 180px;
+    width: 140px; height: 140px;
     margin: 0 auto;
     display: flex; align-items: center; justify-content: center;
-    font-size: 90px; line-height: 1;
+    font-size: 70px; line-height: 1;
     user-select: none;
     position: relative;
     animation: idle-bob 2.6s ease-in-out infinite;
@@ -1128,7 +1129,7 @@
     content: '';
     position: absolute;
     bottom: -6px; left: 50%;
-    width: 120px; height: 16px;
+    width: 95px; height: 14px;
     background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
     transform: translateX(-50%);
     z-index: -1;
@@ -1147,18 +1148,18 @@
   /* HUD above each fighter — name + HP bar floats above the sprite */
   .fighter-hud {
     position: absolute;
-    bottom: 195px;
+    bottom: 150px;
     left: 50%;
     transform: translateX(-50%);
-    width: 160px;
+    width: 180px;
     text-align: center;
     pointer-events: none;
     text-shadow: 0 2px 4px rgba(0,0,0,0.95);
     z-index: 7;
   }
   .fighter-hud .bar {
-    width: 140px;
-    height: 9px;
+    width: 160px;
+    height: 8px;
     background: rgba(0,0,0,0.78);
     border: 1px solid rgba(255,255,255,0.22);
     margin: 0 auto;
@@ -1190,18 +1191,19 @@
 
   /* Small phones — shrink everything proportionally */
   @media (max-width: 600px) {
-    .fighter, .fighter-portrait { width: 130px; }
-    .fighter-portrait { height: 130px; font-size: 65px; }
-    .fighter-hud { bottom: 145px; width: 130px; }
-    .fighter-hud .bar { width: 110px; height: 7px; }
+    .fighter, .fighter-portrait { width: 110px; }
+    .fighter-portrait { height: 110px; font-size: 54px; }
+    .fighter-hud { bottom: 118px; width: 150px; }
+    .fighter-hud .bar { width: 130px; height: 7px; }
     .fighter-hud .bar-text { font-size: 8px; }
-    .fighter-portrait::after { width: 95px; height: 12px; }
+    .fighter-portrait::after { width: 80px; height: 12px; }
     .vs-indicator { font-size: 18px; }
   }
   @media (max-width: 380px) {
-    .fighter, .fighter-portrait { width: 110px; }
-    .fighter-portrait { height: 110px; font-size: 54px; }
-    .fighter-hud { bottom: 125px; }
+    .fighter, .fighter-portrait { width: 90px; }
+    .fighter-portrait { height: 90px; font-size: 44px; }
+    .fighter-hud { bottom: 96px; width: 130px; }
+    .fighter-hud .bar { width: 110px; }
     .fighter.hero  { left: 3%; }
     .fighter.enemy { right: 3%; }
   }
