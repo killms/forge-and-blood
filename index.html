@@ -1928,7 +1928,13 @@ const RACES = {
     mods: { atk: 2, def: 2, vit: 2, agi: 2 },
     summary: '+2 to all attributes',
     passive: { key: 'humanXp', name: 'Resilience', desc: '+10% XP from each victory.' },
-    portrait: { glyph: '⚔', tint: '#c9a557' },
+    portrait: {
+      glyph: '⚔', tint: '#c9a557',
+      sprites: {
+        idle:   'assets/chars/human-warrior-idle.gif',
+        attack: 'assets/chars/human-warrior-attack.gif'
+      }
+    },
     classes: ['knight', 'cleric', 'bountyHunter']
   },
   elf: {
