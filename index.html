@@ -304,10 +304,45 @@
     padding: 8px 10px; display: flex; gap: 10px; align-items: center;
     font-size: 12px;
   }
-  .ach-row.unlocked { border-color: var(--legendary); }
+  .ach-row.unlocked {
+    border-color: var(--legendary);
+    background: linear-gradient(110deg, var(--bg-deep) 60%, rgba(232,149,48,0.12) 100%);
+  }
   .ach-row.unlocked .ach-name { color: var(--legendary); }
   .ach-icon { font-size: 20px; line-height: 1; flex-shrink: 0; width: 24px; text-align: center; }
-  .ach-row.locked .ach-icon { filter: grayscale(1); opacity: 0.4; }
+  .ach-row.unlocked .ach-icon {
+    filter: drop-shadow(0 0 6px rgba(232,149,48,0.7));
+    animation: ach-shine 3s ease-in-out infinite;
+  }
+  @keyframes ach-shine {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(232,149,48,0.5)); }
+    50%      { filter: drop-shadow(0 0 10px rgba(232,149,48,0.95)); }
+  }
+  .ach-row.locked .ach-icon { opacity: 0.5; }
+  /* S32 G1 — "UNLOCKED" tag + collection progress bar */
+  .ach-tag {
+    font-size: 8px; letter-spacing: 1px;
+    color: var(--bg); background: var(--legendary);
+    padding: 1px 5px; border-radius: 2px; margin-left: 6px;
+    vertical-align: middle;
+  }
+  .ach-progress {
+    background: var(--bg-deep); border: 1px solid var(--gold);
+    padding: 8px 10px; margin-bottom: 8px;
+  }
+  .ach-progress-bar {
+    height: 10px; background: var(--bg); border: 1px solid var(--border);
+    overflow: hidden; margin-bottom: 4px;
+  }
+  .ach-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--legendary));
+    transition: width 0.4s; box-shadow: 0 0 8px rgba(232,149,48,0.5);
+  }
+  .ach-progress-label {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--gold-bright); text-align: center; letter-spacing: 1px;
+  }
   .ach-info { flex: 1; min-width: 0; }
   .ach-name {
     font-family: 'Cinzel', serif; font-size: 12px;
@@ -768,6 +803,29 @@
   .option-desc { font-size: 13px; color: var(--text-dim); font-style: italic; margin-top: 4px; }
   .option-stats { margin-top: 6px; font-size: 12px; color: var(--text); }
   .option-passive { margin-top: 4px; font-size: 12px; color: var(--epic); font-style: italic; }
+  /* S32 H1 — class info panel: role tag + stat bars */
+  .class-role {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px;
+    padding: 2px 7px; border: 1px solid currentColor;
+    vertical-align: middle; margin-left: 6px;
+  }
+  .role-tank   { color: #4a8fd6; }
+  .role-dps    { color: #cc4444; }
+  .role-caster { color: #a85fd6; }
+  .role-agile  { color: #e8c980; }
+  .role-hybrid { color: #5fa85f; }
+  .cstat-grid { margin-top: 8px; display: grid; gap: 3px; }
+  .cstat-row { display: grid; grid-template-columns: 32px 1fr 24px; gap: 6px; align-items: center; }
+  .cstat-label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: var(--text-dim); letter-spacing: 0.5px;
+  }
+  .cstat-bar {
+    height: 8px; background: var(--bg); border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .cstat-fill { display: block; height: 100%; transition: width 0.3s; }
+  .cstat-val { font-size: 10px; color: var(--text); text-align: right; font-family: 'Cinzel', serif; }
   input[type="text"] {
     width: 100%; padding: 12px; background: var(--bg-deep);
     border: 1px solid var(--border); color: var(--text);
@@ -1028,6 +1086,15 @@
     font-family: 'Cinzel', serif; color: var(--blood-bright);
     font-size: 16px; text-align: right;
   }
+  /* S32 I1 — win-chance preview pill on enemy cards */
+  .win-chance {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: bold;
+    padding: 3px 8px; border: 1px solid; margin-right: 10px;
+    letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .win-chance.wc-good { color: var(--uncommon); border-color: var(--uncommon); background: rgba(95,168,95,0.1); }
+  .win-chance.wc-even { color: var(--legendary); border-color: var(--legendary); background: rgba(232,149,48,0.1); }
+  .win-chance.wc-bad  { color: var(--blood-bright); border-color: var(--blood); background: rgba(204,40,40,0.1); }
   /* ============ S28 Phase E1: Full 2.5D combat scene ============ */
   /* Combat is now a cinematic 16:9 scene with parallax biome layers.
      Fighters are full-body sprites on the ground plane (no portrait box).
@@ -1517,6 +1584,22 @@
     padding: 8px 12px; margin-bottom: 12px;
     font-size: 13px; font-style: italic; color: var(--text-dim);
   }
+  /* S32 G2 — PvP record bar */
+  .pvp-record-bar {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    background: var(--bg-deep); border: 1px solid var(--gold);
+    padding: 8px 12px; margin-bottom: 12px;
+    font-family: 'Cinzel', serif; font-size: 13px;
+  }
+  .pvp-rec-w { color: var(--uncommon); font-weight: bold; }
+  .pvp-rec-l { color: var(--blood-bright); font-weight: bold; }
+  .pvp-rec-sep { color: var(--text-dim); }
+  .pvp-rec-rate { color: var(--gold-bright); margin-left: 4px; }
+  .pvp-streak {
+    color: #e89530; font-size: 12px;
+    margin-left: auto; animation: pulse-green 2s ease-in-out infinite;
+  }
+  .pvp-rec-best { color: var(--text-dim); font-size: 11px; }
 
   /* Compare-and-equip modal */
   .modal-overlay {
@@ -2119,6 +2202,7 @@
       <div class="panel">
         <div class="section-title">Blood Arena</div>
         <div class="pvp-info">Other heroes await. Each victory brings glory; each defeat, shame.</div>
+        <div id="pvp-record"></div>
         <div id="pvp-list"></div>
       </div>
     </div>
@@ -3867,6 +3951,11 @@ function ensureTracking(hero) {
   if (!hero.tracking.bossesByName) hero.tracking.bossesByName = {};
   if (!hero.tracking.itemsByRarity) hero.tracking.itemsByRarity = { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 };
   if (!hero.tracking.unlockedAchievements) hero.tracking.unlockedAchievements = [];
+  // S32 G2 — PvP win/loss record
+  if (typeof hero.tracking.pvpWins !== 'number') hero.tracking.pvpWins = 0;
+  if (typeof hero.tracking.pvpLosses !== 'number') hero.tracking.pvpLosses = 0;
+  if (typeof hero.tracking.pvpStreak !== 'number') hero.tracking.pvpStreak = 0;
+  if (typeof hero.tracking.pvpBestStreak !== 'number') hero.tracking.pvpBestStreak = 0;
   return hero.tracking;
 }
 
@@ -4061,6 +4150,22 @@ let state = {
 };
 
 // ============ CHARACTER CREATION ============
+// S32 H1 — derive a playstyle role label from a class's base stats
+function classRole(c) {
+  const b = c.base || {};
+  const int = c.baseInt || 5;
+  const isCaster = (typeof MAGICAL_CLASSES !== 'undefined') &&
+                   Object.keys(CLASSES).some(k => CLASSES[k] === c && MAGICAL_CLASSES.has(k));
+  const tank = (b.def || 0) + (b.vit || 0);
+  const dps  = (b.atk || 0);
+  if (isCaster && int >= 9)        return { name: 'CASTER', cls: 'role-caster' };
+  if (tank >= 22 && dps < 13)      return { name: 'TANK',   cls: 'role-tank' };
+  if ((b.agi || 0) >= 10)          return { name: 'AGILE',  cls: 'role-agile' };
+  if (dps >= 13)                   return { name: 'DPS',    cls: 'role-dps' };
+  if (isCaster)                    return { name: 'HYBRID', cls: 'role-hybrid' };
+  return { name: 'HYBRID', cls: 'role-hybrid' };
+}
+
 function renderCreation() {
   const title = document.getElementById('step-title');
   const content = document.getElementById('step-content');
@@ -4091,17 +4196,34 @@ function renderCreation() {
     next.disabled = !state.pendingHero.race;
     next.textContent = 'CONTINUE';
   }
+  // (classRole defined globally below)
   else if (state.step === 1) {
     title.textContent = 'CHOOSE YOUR CLASS';
     const availableClasses = RACES[state.pendingHero.race].classes;
     content.innerHTML = '<div class="options">' +
       availableClasses.map(k => {
         const c = CLASSES[k];
+        const role = classRole(c);
+        // Visual stat bars (S32 H1) — max ~16 for base stats
+        const stat = (label, val, color) => {
+          const pct = Math.min(100, Math.round((val / 16) * 100));
+          return `<div class="cstat-row">
+            <span class="cstat-label">${label}</span>
+            <span class="cstat-bar"><span class="cstat-fill" style="width:${pct}%; background:${color};"></span></span>
+            <span class="cstat-val">${val}</span>
+          </div>`;
+        };
         return `
           <div class="option ${state.pendingHero.class === k ? 'selected' : ''}" data-class="${k}">
-            <div class="option-title">${c.name}</div>
+            <div class="option-title">${c.name} <span class="class-role ${role.cls}">${role.name}</span></div>
             <div class="option-desc">${c.desc}</div>
-            <div class="option-stats">ATK ${c.base.atk} · DEF ${c.base.def} · VIT ${c.base.vit} · AGI ${c.base.agi}</div>
+            <div class="cstat-grid">
+              ${stat('ATK', c.base.atk, '#cc4444')}
+              ${stat('DEF', c.base.def, '#4a8fd6')}
+              ${stat('VIT', c.base.vit, '#5fa85f')}
+              ${stat('AGI', c.base.agi, '#e8c980')}
+              ${stat('INT', c.baseInt || 5, '#a85fd6')}
+            </div>
             <div class="option-passive">◈ ${c.passive.name}: ${c.passive.desc}</div>
           </div>`;
       }).join('') + '</div>';
@@ -4901,14 +5023,28 @@ function renderAchievements() {
   if (!list || !state.hero) return;
   ensureTracking(state.hero);
   const unlocked = state.hero.tracking.unlockedAchievements;
-  if (count) count.textContent = `(${unlocked.length}/${ACHIEVEMENTS.length})`;
-  list.innerHTML = ACHIEVEMENTS.map(ach => {
+  const total = ACHIEVEMENTS.length;
+  const got = unlocked.length;
+  if (count) count.textContent = `(${got}/${total})`;
+  // S32 G1 — collection progress bar at the top
+  const pct = total > 0 ? Math.round((got / total) * 100) : 0;
+  const progressBar = `<div class="ach-progress">
+    <div class="ach-progress-bar"><div class="ach-progress-fill" style="width:${pct}%;"></div></div>
+    <div class="ach-progress-label">${got} / ${total} unlocked · ${pct}%</div>
+  </div>`;
+  // Sort: unlocked first (so the trophy case feels rewarding)
+  const sorted = ACHIEVEMENTS.slice().sort((a, b) => {
+    const ua = unlocked.includes(a.key) ? 0 : 1;
+    const ub = unlocked.includes(b.key) ? 0 : 1;
+    return ua - ub;
+  });
+  list.innerHTML = progressBar + sorted.map(ach => {
     const isUnlocked = unlocked.includes(ach.key);
     const rewardStr = ach.reward ? formatReward(ach.reward) : '';
     return `<div class="ach-row ${isUnlocked ? 'unlocked' : 'locked'}">
-      <div class="ach-icon">${ach.icon || '🏆'}</div>
+      <div class="ach-icon">${isUnlocked ? (ach.icon || '🏆') : '🔒'}</div>
       <div class="ach-info">
-        <div class="ach-name">${ach.name}</div>
+        <div class="ach-name">${ach.name}${isUnlocked ? ' <span class="ach-tag">✓ UNLOCKED</span>' : ''}</div>
         <div class="ach-desc">${ach.desc}</div>
       </div>
       <div class="ach-reward">${rewardStr}</div>
@@ -6233,6 +6369,7 @@ function renderPve() {
               <div class="enemy-name">${m.name}</div>
               <div class="enemy-meta">Level ${m.level}</div>
             </div>
+            ${winChancePill(m)}
             <div class="enemy-power">⚔ ${power}</div>
           </div>`;
         }).join('')}</div>
@@ -6486,7 +6623,50 @@ function generatePvpOpponents() {
   }
 }
 
+// S32 I1 — estimate win chance vs an enemy by comparing turns-to-kill.
+// `enemy` needs atk/def/vit (and optionally int). Returns 3-97 integer %.
+function estimateWinChance(enemy) {
+  const h = state.hero;
+  if (!h || !h.stats) return null;
+  const hs = h.stats;
+  const heroDmg = Math.max(hs.atk || 0, hs.int || 0);
+  const heroHp  = h.maxHp || ((hs.vit || 0) * 5 + 20);
+  const enemyDmg = Math.max(enemy.atk || 0, enemy.int || 0);
+  const enemyHp  = enemy.maxHp || ((enemy.vit || 0) * 5 + 20);
+  const heroEff  = Math.max(1, heroDmg  - (enemy.def || 0) / 2);
+  const enemyEff = Math.max(1, enemyDmg - (hs.def  || 0) / 2);
+  const turnsToKillEnemy = enemyHp / heroEff;
+  const turnsToKillHero  = heroHp  / enemyEff;
+  const ratio = turnsToKillHero / (turnsToKillHero + turnsToKillEnemy);
+  return Math.round(Math.max(3, Math.min(97, ratio * 100)));
+}
+// Win-chance pill HTML, colour-coded
+function winChancePill(enemy) {
+  const wc = estimateWinChance(enemy);
+  if (wc == null) return '';
+  let cls = 'wc-even';
+  if (wc >= 65) cls = 'wc-good';
+  else if (wc < 38) cls = 'wc-bad';
+  return `<span class="win-chance ${cls}" title="Estimated win chance">${wc}%</span>`;
+}
+
 function renderPvp() {
+  // S32 G2 — PvP win/loss record banner
+  const recEl = document.getElementById('pvp-record');
+  if (recEl && state.hero) {
+    const tr = ensureTracking(state.hero);
+    const total = tr.pvpWins + tr.pvpLosses;
+    const winRate = total > 0 ? Math.round((tr.pvpWins / total) * 100) : 0;
+    const streakTxt = tr.pvpStreak >= 2 ? `<span class="pvp-streak">🔥 ${tr.pvpStreak} win streak</span>` : '';
+    recEl.innerHTML = `<div class="pvp-record-bar">
+      <span class="pvp-rec-w">${tr.pvpWins}W</span>
+      <span class="pvp-rec-sep">·</span>
+      <span class="pvp-rec-l">${tr.pvpLosses}L</span>
+      <span class="pvp-rec-rate">${winRate}% win rate</span>
+      ${streakTxt}
+      ${tr.pvpBestStreak >= 3 ? `<span class="pvp-rec-best">Best streak: ${tr.pvpBestStreak}</span>` : ''}
+    </div>`;
+  }
   const list = document.getElementById('pvp-list');
   list.innerHTML = state.pvpOpponents.map((o, idx) => {
     const power = o.atk + o.def + Math.floor(o.vit / 4) + o.agi;
@@ -6495,6 +6675,7 @@ function renderPvp() {
         <div class="enemy-name">${o.name}</div>
         <div class="enemy-meta">${RACES[o.race].name} ${CLASSES[o.class].name} · Lv ${o.level}</div>
       </div>
+      ${winChancePill(o)}
       <div class="enemy-power">⚔ ${power}</div>
     </div>`;
   }).join('');
@@ -6853,6 +7034,19 @@ async function resolveCombat(enemy, mode, log, token) {
   } else {
     _combatResult = 'draw';
     finishDefeat(log, true); // turn limit reached
+  }
+  // S32 G2 — record PvP win/loss + streak
+  if (mode === 'pvp') {
+    const tr = ensureTracking(state.hero);
+    if (_combatResult === 'victory') {
+      tr.pvpWins++;
+      tr.pvpStreak++;
+      if (tr.pvpStreak > tr.pvpBestStreak) tr.pvpBestStreak = tr.pvpStreak;
+    } else if (_combatResult === 'defeat') {
+      tr.pvpLosses++;
+      tr.pvpStreak = 0;
+    }
+    saveGame();
   }
   updateCombatBars(hero, foe);
   showCombatSummary(enemy, mode, rewards, hero, foe);
