@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge & Blood — Biome Variants</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080808; --bg-deep:#120c0a; --bg-panel:#1a1410; --border:#3a2d22;
+    --text:#d4c4a0; --text-dim:#8a7960; --gold:#c9a557; --gold-bright:#e8c980;
+    --blood:#8b1e1e; --blood-bright:#cc2828; --uncommon:#5fa85f;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:var(--bg); color:var(--text); font-family:'Crimson Text',serif; min-height:100vh; }
+  body { padding:24px 12px; }
+  .page-header { text-align:center; margin-bottom:18px; }
+  .page-header h1 {
+    font-family:'Cinzel',serif; font-weight:900; font-size:25px; letter-spacing:3px;
+    color:var(--gold-bright); text-shadow:0 0 12px rgba(232,201,128,0.4);
+  }
+  .page-header .subtitle { font-style:italic; color:var(--text-dim); margin-top:4px; font-size:13px; }
+
+  .controls { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin:20px auto 8px; max-width:880px; }
+  .biome-tab, .variant-tab {
+    font-family:'Cinzel',serif; font-size:12px; letter-spacing:1.5px;
+    padding:8px 14px; background:var(--bg-deep); border:1px solid var(--border);
+    color:var(--text-dim); cursor:pointer; transition:all 0.2s;
+  }
+  .biome-tab:hover, .variant-tab:hover { border-color:var(--gold); color:var(--gold-bright); }
+  .biome-tab.active { background:var(--gold); color:var(--bg); border-color:var(--gold); }
+  .variant-tab.active { background:var(--blood); color:#fff; border-color:var(--blood-bright); }
+  .variant-row { display:flex; justify-content:center; gap:8px; margin-bottom:14px; }
+
+  .arena-wrap {
+    max-width:880px; margin:0 auto;
+    border:2px solid var(--gold); box-shadow:0 0 32px rgba(201,165,87,0.3);
+    background:var(--bg-deep); position:relative; overflow:hidden;
+  }
+  .arena-header {
+    background:linear-gradient(180deg,rgba(0,0,0,0.85),rgba(0,0,0,0.6));
+    padding:8px 14px; border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+    position:relative; z-index:30;
+  }
+  .arena-title { font-family:'Cinzel',serif; font-size:13px; letter-spacing:2.5px; color:var(--gold-bright); }
+  .arena-biome-label { font-size:11px; color:var(--text-dim); letter-spacing:1px; }
+
+  .combat-scene { position:relative; aspect-ratio:16/9; max-height:460px; overflow:hidden; background:#0a0808; }
+  .bg-layer {
+    position:absolute; inset:-8px;
+    background-size:cover; background-position:center; background-repeat:no-repeat;
+    image-rendering:pixelated;
+  }
+  .bg-sky { z-index:1; filter:blur(0.8px) brightness(0.95); }
+  .bg-mountains { z-index:2; filter:blur(0.4px); }
+  .bg-trees { z-index:3; }
+  .bg-floor { z-index:4; }
+  .bg-foreground {
+    z-index:9; top:auto; bottom:-8px; height:28%;
+    background-position:bottom center; background-size:cover; opacity:0.85;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.35) 35%,black 100%);
+            mask-image:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.35) 35%,black 100%);
+  }
+  .combat-overlay {
+    position:absolute; inset:0; z-index:5;
+    background:radial-gradient(ellipse at center 75%,transparent 30%,rgba(0,0,0,0.45) 100%),
+      linear-gradient(180deg,rgba(0,0,0,0.18) 0%,transparent 25%,transparent 65%,rgba(0,0,0,0.5) 100%);
+    pointer-events:none;
+  }
+  /* Sample fighters for scale reference */
+  .fighter { position:absolute; bottom:14%; width:170px; z-index:6; text-align:center; }
+  .fighter.hero { left:6%; }
+  .fighter.enemy { right:6%; }
+  .fighter img {
+    width:170px; height:170px; object-fit:contain; image-rendering:pixelated;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+    animation:bob 2.8s ease-in-out infinite;
+  }
+  .fighter.enemy img { transform:scaleX(-1); }
+  @keyframes bob { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+  .fighter.enemy img { animation:bob-e 2.8s ease-in-out infinite; }
+  @keyframes bob-e { 0%,100%{transform:scaleX(-1) translateY(0);} 50%{transform:scaleX(-1) translateY(-5px);} }
+
+  /* Layer thumbnails */
+  .layers-grid {
+    max-width:880px; margin:14px auto;
+    display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+  }
+  .layer-card { background:var(--bg-deep); border:1px solid var(--border); padding:6px; text-align:center; }
+  .layer-card img { width:100%; aspect-ratio:1; object-fit:cover; image-rendering:pixelated; background:#050505; }
+  .layer-card .lbl { font-family:'Cinzel',serif; font-size:9px; color:var(--gold-bright); margin-top:4px; letter-spacing:1px; }
+
+  .notes {
+    max-width:880px; margin:20px auto 0; padding:14px 18px;
+    background:var(--bg-panel); border:1px solid var(--border);
+    font-size:13px; line-height:1.6; color:var(--text-dim);
+  }
+  .notes strong { color:var(--gold-bright); font-family:'Cinzel',serif; }
+  .notes ul { margin-left:18px; }
+  .notes li { margin:4px 0; }
+  .vlabel { color:var(--gold-bright); font-family:'Cinzel',serif; }
+
+  @media (max-width:600px) {
+    .layers-grid { grid-template-columns:repeat(3,1fr); }
+    .fighter, .fighter img { width:110px; }
+    .fighter img { height:110px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>BIOME VARIANTS — A1</h1>
+  <div class="subtitle">— 4 biomes × 2 estilos · escolhe a variante que queres para cada um —</div>
+</div>
+
+<div class="controls" id="biome-tabs">
+  <button class="biome-tab active" data-biome="crypt">⚰️ Cursed Crypt</button>
+  <button class="biome-tab" data-biome="lava">🌋 Burning Wastes</button>
+  <button class="biome-tab" data-biome="frost">❄️ Frostfell Pass</button>
+  <button class="biome-tab" data-biome="arena">⚔️ Blood Arena</button>
+</div>
+<div class="variant-row" id="variant-tabs">
+  <button class="variant-tab active" data-variant="a">VARIANTE A</button>
+  <button class="variant-tab" data-variant="b">VARIANTE B</button>
+</div>
+
+<div class="arena-wrap">
+  <div class="arena-header">
+    <div class="arena-title">⚔ COMBAT PREVIEW</div>
+    <div class="arena-biome-label" id="biome-label">Cursed Crypt · Variante A</div>
+  </div>
+  <div class="combat-scene" id="scene">
+    <div class="bg-layer bg-sky" id="l-sky"></div>
+    <div class="bg-layer bg-mountains" id="l-mountains"></div>
+    <div class="bg-layer bg-trees" id="l-trees"></div>
+    <div class="bg-layer bg-floor" id="l-floor"></div>
+    <div class="combat-overlay"></div>
+    <div class="fighter hero"><img src="../assets/chars/human-warrior-idle.gif" alt="hero"></div>
+    <div class="fighter enemy"><img src="../assets/chars/skeleton-warrior-idle.gif" alt="enemy"></div>
+    <div class="bg-layer bg-foreground" id="l-foreground"></div>
+  </div>
+</div>
+
+<div class="layers-grid" id="layers-grid"></div>
+
+<div class="notes">
+  <strong>Os dois estilos por biome</strong>
+  <ul>
+    <li><span class="vlabel">⚰️ Crypt</span> — A: gótico púrpura · B: ruína de pedra antiga musgosa</li>
+    <li><span class="vlabel">🌋 Lava</span> — A: hellfire laranja brilhante · B: obsidiana escura com brasas subtis</li>
+    <li><span class="vlabel">❄️ Frost</span> — A: aurora boreal nocturna · B: nevão diurno branco-cinza</li>
+    <li><span class="vlabel">⚔️ Arena</span> — A: coliseu ao pôr-do-sol dourado · B: poço subterrâneo de torchlight</li>
+  </ul>
+  <strong>Como escolher</strong>
+  <ul>
+    <li>Troca de biome (tabs de cima) e de variante (A/B). O combate em cima mostra como fica com os personagens.</li>
+    <li>Os 5 thumbnails em baixo são os layers individuais (sky / mountains / trees / floor / foreground).</li>
+    <li>Diz-me a tua escolha por biome — ex.: <em>"Crypt A, Lava B, Frost A, Arena A"</em>.</li>
+    <li>Eu copio os 5 layers escolhidos para os nomes finais (<code>crypt-sky.png</code> etc.) que o jogo já referencia, e fica live.</li>
+  </ul>
+</div>
+
+<script>
+  const LAYERS = ['sky','mountains','trees','floor','foreground'];
+  // foreground file is named *-grass.png (matches the game's convention)
+  const fileFor = (biome, variant, layer) => {
+    const l = layer === 'foreground' ? 'grass' : layer;
+    return `../assets/biomes/${biome}-${variant}-${l}.png`;
+  };
+  const BIOME_NAMES = {
+    crypt:'Cursed Crypt', lava:'Burning Wastes', frost:'Frostfell Pass', arena:'Blood Arena'
+  };
+  let curBiome='crypt', curVariant='a';
+
+  function render() {
+    LAYERS.forEach(layer => {
+      const el = document.getElementById('l-' + layer);
+      el.style.backgroundImage = `url('${fileFor(curBiome,curVariant,layer)}')`;
+    });
+    document.getElementById('biome-label').textContent =
+      `${BIOME_NAMES[curBiome]} · Variante ${curVariant.toUpperCase()}`;
+    // Thumbnails
+    document.getElementById('layers-grid').innerHTML = LAYERS.map(layer =>
+      `<div class="layer-card">
+        <img src="${fileFor(curBiome,curVariant,layer)}" alt="${layer}">
+        <div class="lbl">${layer.toUpperCase()}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('biome-tabs').addEventListener('click', e => {
+    if (!e.target.dataset.biome) return;
+    document.querySelectorAll('.biome-tab').forEach(t => t.classList.toggle('active', t===e.target));
+    curBiome = e.target.dataset.biome;
+    render();
+  });
+  document.getElementById('variant-tabs').addEventListener('click', e => {
+    if (!e.target.dataset.variant) return;
+    document.querySelectorAll('.variant-tab').forEach(t => t.classList.toggle('active', t===e.target));
+    curVariant = e.target.dataset.variant;
+    render();
+  });
+  render();
+</script>
+
+</body>
+</html>

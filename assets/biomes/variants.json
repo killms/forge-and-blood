@@ -1,0 +1,51 @@
+{
+  "layers": [
+    {"slug": "crypt-a-sky",        "desc": "dark gothic crypt ceiling, deep purple shadows, faint cold light, fantasy sidescroller background only sky no characters"},
+    {"slug": "crypt-a-mountains",  "desc": "distant ornate gothic stone arches and pillars in purple gloom, sidescroller background layer no characters"},
+    {"slug": "crypt-a-trees",      "desc": "tall carved stone pillars and stone tombs in a dark purple crypt, sidescroller midground no characters no ground"},
+    {"slug": "crypt-a-floor",      "desc": "cracked stone tomb floor with scattered bones, dark purple crypt, sidescroller ground only"},
+    {"slug": "crypt-a-grass",      "desc": "broken gravestones and bone piles in close foreground, dark crypt, sidescroller foreground props"},
+
+    {"slug": "crypt-b-sky",        "desc": "ruined ancient temple ceiling, grey stone, dim warm light through cracks, sidescroller background only sky"},
+    {"slug": "crypt-b-mountains",  "desc": "distant crumbling grey stone ruins and broken columns with moss, sidescroller background no characters"},
+    {"slug": "crypt-b-trees",      "desc": "weathered grey stone ruins and ivy-covered pillars, ancient temple, sidescroller midground no characters"},
+    {"slug": "crypt-b-floor",      "desc": "mossy cracked grey stone floor with rubble, ancient ruins, sidescroller ground only"},
+    {"slug": "crypt-b-grass",      "desc": "broken stone rubble and creeping green vines in close foreground, sidescroller foreground props"},
+
+    {"slug": "lava-a-sky",         "desc": "blazing volcanic sky, bright orange and red, glowing embers rising, sidescroller background only sky"},
+    {"slug": "lava-a-mountains",   "desc": "erupting volcanoes with bright orange lava flows in distance, sidescroller background no characters"},
+    {"slug": "lava-a-trees",       "desc": "jagged black rock spires with glowing bright orange cracks, volcanic, sidescroller midground no characters"},
+    {"slug": "lava-a-floor",       "desc": "molten lava ground with bright glowing rivers of magma, sidescroller ground only"},
+    {"slug": "lava-a-grass",       "desc": "burning rocks and bright lava bubbles in close foreground, sidescroller foreground props"},
+
+    {"slug": "lava-b-sky",         "desc": "dark smoky volcanic sky, deep red and black, ash falling, sidescroller background only sky"},
+    {"slug": "lava-b-mountains",   "desc": "dormant dark volcanic peaks, black obsidian rock, faint red glow, sidescroller background no characters"},
+    {"slug": "lava-b-trees",       "desc": "black obsidian rock formations with subtle dim red cracks, sidescroller midground no characters"},
+    {"slug": "lava-b-floor",       "desc": "cracked dark obsidian ground with thin glowing magma seams, sidescroller ground only"},
+    {"slug": "lava-b-grass",       "desc": "smoldering dark rocks and grey ash in close foreground, sidescroller foreground props"},
+
+    {"slug": "frost-a-sky",        "desc": "arctic night sky with green and purple aurora borealis and stars, sidescroller background only sky"},
+    {"slug": "frost-a-mountains",  "desc": "distant snow-capped mountains under aurora, dark blue night, sidescroller background no characters"},
+    {"slug": "frost-a-trees",      "desc": "frozen pine trees covered in snow at night, blue tones, sidescroller midground no characters"},
+    {"slug": "frost-a-floor",      "desc": "snow-covered ground glittering at night, sidescroller ground only"},
+    {"slug": "frost-a-grass",      "desc": "icy snowdrifts and frozen branches in close foreground at night, sidescroller foreground props"},
+
+    {"slug": "frost-b-sky",        "desc": "pale white and grey blizzard sky, heavy snowfall, dim daylight, sidescroller background only sky"},
+    {"slug": "frost-b-mountains",  "desc": "snow-blasted mountains barely visible through blizzard, white and grey, sidescroller background"},
+    {"slug": "frost-b-trees",      "desc": "snow-laden pine trees in a blizzard, white and grey, sidescroller midground no characters"},
+    {"slug": "frost-b-floor",      "desc": "deep fresh white snow ground in a blizzard, sidescroller ground only"},
+    {"slug": "frost-b-grass",      "desc": "windblown snowdrifts and ice shards in close foreground, blizzard, sidescroller foreground props"},
+
+    {"slug": "arena-a-sky",        "desc": "grand coliseum sky at golden sunset, warm orange clouds, sidescroller background only sky"},
+    {"slug": "arena-a-mountains",  "desc": "distant coliseum tiers and stone arches at sunset, warm light, sidescroller background no characters"},
+    {"slug": "arena-a-trees",      "desc": "coliseum stone walls with red banners and pillars, warm sunset light, sidescroller midground no characters"},
+    {"slug": "arena-a-floor",      "desc": "sandy arena floor in warm golden sunset light, sidescroller ground only"},
+    {"slug": "arena-a-grass",      "desc": "wooden barriers and weapon racks in close foreground, sidescroller foreground props"},
+
+    {"slug": "arena-b-sky",        "desc": "dark underground fighting pit ceiling, torch-lit, deep shadows, sidescroller background only sky"},
+    {"slug": "arena-b-mountains",  "desc": "distant dark stone pit walls with torches and hanging chains, sidescroller background no characters"},
+    {"slug": "arena-b-trees",      "desc": "rough dark stone pit walls with iron cages and burning torches, sidescroller midground no characters"},
+    {"slug": "arena-b-floor",      "desc": "blood-stained dirt arena floor in an underground pit, sidescroller ground only"},
+    {"slug": "arena-b-grass",      "desc": "iron spikes and broken weapons in close foreground, dark pit, sidescroller foreground props"}
+  ]
+}
