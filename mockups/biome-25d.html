@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge & Blood — 2.5D Scene Biomes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080808; --bg-deep:#120c0a; --bg-panel:#1a1410; --border:#3a2d22;
+    --text:#d4c4a0; --text-dim:#8a7960; --gold:#c9a557; --gold-bright:#e8c980;
+    --blood:#8b1e1e; --blood-bright:#cc2828; --uncommon:#5fa85f;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:var(--bg); color:var(--text); font-family:'Crimson Text',serif; min-height:100vh; }
+  body { padding:24px 12px; }
+  .page-header { text-align:center; margin-bottom:18px; }
+  .page-header h1 {
+    font-family:'Cinzel',serif; font-weight:900; font-size:25px; letter-spacing:3px;
+    color:var(--gold-bright); text-shadow:0 0 12px rgba(232,201,128,0.4);
+  }
+  .page-header .subtitle { font-style:italic; color:var(--text-dim); margin-top:4px; font-size:13px; }
+
+  .biome-tabs { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin:20px auto 14px; max-width:880px; }
+  .biome-tab {
+    font-family:'Cinzel',serif; font-size:12px; letter-spacing:1.5px;
+    padding:8px 16px; background:var(--bg-deep); border:1px solid var(--border);
+    color:var(--text-dim); cursor:pointer; transition:all 0.2s;
+  }
+  .biome-tab:hover { border-color:var(--gold); color:var(--gold-bright); }
+  .biome-tab.active { background:var(--gold); color:var(--bg); border-color:var(--gold); }
+
+  .arena-wrap {
+    max-width:880px; margin:0 auto;
+    border:2px solid var(--gold); box-shadow:0 0 32px rgba(201,165,87,0.3);
+    background:var(--bg-deep); position:relative; overflow:hidden;
+  }
+  .arena-header {
+    background:linear-gradient(180deg,rgba(0,0,0,0.85),rgba(0,0,0,0.6));
+    padding:8px 14px; border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center; position:relative; z-index:30;
+  }
+  .arena-title { font-family:'Cinzel',serif; font-size:13px; letter-spacing:2.5px; color:var(--gold-bright); }
+  .arena-biome-label { font-size:11px; color:var(--text-dim); letter-spacing:1px; }
+
+  .combat-scene { position:relative; aspect-ratio:16/9; max-height:460px; overflow:hidden; background:#0a0808; }
+  /* Single 2.5D scene image — baked perspective, no separate layers */
+  .scene-bg {
+    position:absolute; inset:0; z-index:1;
+    background-size:cover; background-position:center;
+    image-rendering:pixelated;
+  }
+  .combat-overlay {
+    position:absolute; inset:0; z-index:2;
+    background:radial-gradient(ellipse at center 72%,transparent 35%,rgba(0,0,0,0.4) 100%),
+      linear-gradient(180deg,rgba(0,0,0,0.15) 0%,transparent 22%,transparent 68%,rgba(0,0,0,0.45) 100%);
+    pointer-events:none;
+  }
+  .fighter { position:absolute; bottom:13%; width:170px; z-index:5; text-align:center; }
+  .fighter.hero { left:7%; }
+  .fighter.enemy { right:7%; }
+  .fighter img {
+    width:170px; height:170px; object-fit:contain; image-rendering:pixelated;
+    filter:drop-shadow(0 5px 7px rgba(0,0,0,0.7));
+  }
+  .fighter.hero img { animation:bob 2.8s ease-in-out infinite; }
+  .fighter.enemy img { animation:bobE 2.8s ease-in-out infinite; }
+  @keyframes bob  { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+  @keyframes bobE { 0%,100%{transform:scaleX(-1) translateY(0);} 50%{transform:scaleX(-1) translateY(-5px);} }
+  .fighter::after {
+    content:''; position:absolute; bottom:14px; left:50%;
+    width:115px; height:16px; transform:translateX(-50%);
+    background:radial-gradient(ellipse,rgba(0,0,0,0.6) 0%,transparent 70%);
+    z-index:-1;
+  }
+  .vs {
+    position:absolute; top:40%; left:50%; transform:translate(-50%,-50%);
+    font-family:'Cinzel',serif; font-weight:900; font-size:22px; color:var(--blood-bright);
+    text-shadow:0 0 12px rgba(204,40,40,0.8),0 2px 4px rgba(0,0,0,0.9); z-index:6;
+  }
+
+  .compare { max-width:880px; margin:14px auto; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .compare-card { background:var(--bg-deep); border:1px solid var(--border); padding:6px; text-align:center; }
+  .compare-card img { width:100%; aspect-ratio:16/9; object-fit:cover; image-rendering:pixelated; }
+  .compare-card .lbl { font-family:'Cinzel',serif; font-size:10px; color:var(--gold-bright); margin-top:4px; letter-spacing:1px; }
+
+  .notes {
+    max-width:880px; margin:20px auto 0; padding:14px 18px;
+    background:var(--bg-panel); border:1px solid var(--border);
+    font-size:13px; line-height:1.6; color:var(--text-dim);
+  }
+  .notes strong { color:var(--gold-bright); font-family:'Cinzel',serif; }
+  .notes ul { margin-left:18px; }
+  .notes li { margin:4px 0; }
+  .ok { color:var(--uncommon); }
+
+  @media (max-width:600px) {
+    .compare { grid-template-columns:1fr; }
+    .fighter, .fighter img { width:110px; }
+    .fighter img { height:110px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>2.5D SCENE BIOMES</h1>
+  <div class="subtitle">— cenário único com perspectiva e profundidade (em vez de 5 layers planos) —</div>
+</div>
+
+<div class="biome-tabs" id="tabs">
+  <button class="biome-tab active" data-biome="crypt">⚰️ Cursed Crypt</button>
+  <button class="biome-tab" data-biome="lava">🌋 Burning Wastes</button>
+  <button class="biome-tab" data-biome="forest">🌲 Whispering Woods</button>
+</div>
+
+<div class="arena-wrap">
+  <div class="arena-header">
+    <div class="arena-title">⚔ COMBAT — 2.5D SCENE</div>
+    <div class="arena-biome-label" id="biome-label">Cursed Crypt</div>
+  </div>
+  <div class="combat-scene">
+    <div class="scene-bg" id="scene-bg"></div>
+    <div class="combat-overlay"></div>
+    <div class="fighter hero"><img src="../assets/chars/human-warrior-idle.gif" alt="hero"></div>
+    <div class="vs">VS</div>
+    <div class="fighter enemy"><img src="../assets/chars/skeleton-warrior-idle.gif" alt="enemy"></div>
+  </div>
+</div>
+
+<div class="compare">
+  <div class="compare-card"><img src="../assets/biomes/crypt-25d.png" alt="crypt"><div class="lbl">CRYPT 2.5D</div></div>
+  <div class="compare-card"><img src="../assets/biomes/lava-25d.png" alt="lava"><div class="lbl">LAVA 2.5D</div></div>
+  <div class="compare-card"><img src="../assets/biomes/forest-25d.png" alt="forest"><div class="lbl">FOREST 2.5D</div></div>
+</div>
+
+<div class="notes">
+  <strong>2.5D scene vs 5-layer parallax — a diferença</strong>
+  <ul>
+    <li class="ok">✅ <strong>Imagem única</strong> com perspectiva pintada — pilares/rochas/árvores recuam até um ponto de fuga.</li>
+    <li class="ok">✅ Profundidade e atmosfera <strong>coerentes</strong> — a IA compõe a cena toda de uma vez, não 5 peças separadas.</li>
+    <li class="ok">✅ Muito mais <strong>rico e detalhado</strong> (high detail + detailed shading).</li>
+    <li>⚠️ Perde-se o parallax por layers — mas o efeito de profundidade já está pintado na imagem. Podemos adicionar um leve zoom/pan parallax na imagem inteira.</li>
+    <li>1 imagem por biome (em vez de 5) — mais simples de gerir.</li>
+  </ul>
+  <strong>Decisão</strong>
+  <ul>
+    <li>Se gostares deste estilo 2.5D — gero <strong>crypt, lava, frost, arena</strong> todos assim (4 imagens, ~8 gens com regenerações) + o forest já está.</li>
+    <li>Reescrevo o combat scene para usar 1 imagem em vez de 5 layers. Mais limpo.</li>
+    <li>Diz: <em>"vai com 2.5D scene"</em> ou se preferes o sistema de 5 layers.</li>
+  </ul>
+</div>
+
+<script>
+  const BIOMES = {
+    crypt:  { img:'../assets/biomes/crypt-25d.png',  name:'Cursed Crypt' },
+    lava:   { img:'../assets/biomes/lava-25d.png',   name:'Burning Wastes' },
+    forest: { img:'../assets/biomes/forest-25d.png', name:'Whispering Woods' }
+  };
+  const bg = document.getElementById('scene-bg');
+  const label = document.getElementById('biome-label');
+  function show(b) {
+    bg.style.backgroundImage = `url('${BIOMES[b].img}')`;
+    label.textContent = BIOMES[b].name;
+  }
+  document.getElementById('tabs').addEventListener('click', e => {
+    if (!e.target.dataset.biome) return;
+    document.querySelectorAll('.biome-tab').forEach(t => t.classList.toggle('active', t===e.target));
+    show(e.target.dataset.biome);
+  });
+  show('crypt');
+</script>
+
+</body>
+</html>
