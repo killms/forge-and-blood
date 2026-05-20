@@ -1,0 +1,45 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "df8d26f1-76aa-45b1-93bc-d0e1c441b59f",
+        "name": "Carrier Pigeon",
+        "prompt": "small grey pigeon with red feet, messenger bird",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "cat",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:36:06.037867+00:00"
+      },
+      "folder": "Carrier_Pigeon",
+      "frames": {
+        "rotations": {
+          "south": "Carrier_Pigeon/rotations/south.png",
+          "west": "Carrier_Pigeon/rotations/west.png",
+          "east": "Carrier_Pigeon/rotations/east.png",
+          "north": "Carrier_Pigeon/rotations/north.png"
+        },
+        "animations": {
+          "animation-79e9d048": {
+            "east": [
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_000.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_001.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_002.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_003.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_004.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_005.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_006.png",
+              "Carrier_Pigeon/animations/animation-79e9d048/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:25:02.431552"
+}

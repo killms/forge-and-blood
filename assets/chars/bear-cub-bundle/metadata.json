@@ -1,0 +1,47 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "4547b177-06db-4065-a35e-6304f73f9307",
+        "name": "Bear Cub",
+        "prompt": "small brown bear cub, fluffy and round, baby grizzly",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "bear",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.733193+00:00"
+      },
+      "folder": "Bear_Cub",
+      "frames": {
+        "rotations": {
+          "south": "Bear_Cub/rotations/south.png",
+          "west": "Bear_Cub/rotations/west.png",
+          "east": "Bear_Cub/rotations/east.png",
+          "north": "Bear_Cub/rotations/north.png"
+        },
+        "animations": {
+          "sitting_idle-db3b0466": {
+            "east": [
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_000.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_001.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_002.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_003.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_004.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_005.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_006.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_007.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_008.png",
+              "Bear_Cub/animations/sitting_idle-db3b0466/east/frame_009.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.980209"
+}

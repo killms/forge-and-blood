@@ -1,0 +1,45 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "c736cb4b-3969-45a2-9656-a5e4be5fafc4",
+        "name": "Stray Cat",
+        "prompt": "orange tabby cat with green eyes, fluffy fur, casual house cat",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "cat",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.641286+00:00"
+      },
+      "folder": "Stray_Cat",
+      "frames": {
+        "rotations": {
+          "south": "Stray_Cat/rotations/south.png",
+          "west": "Stray_Cat/rotations/west.png",
+          "east": "Stray_Cat/rotations/east.png",
+          "north": "Stray_Cat/rotations/north.png"
+        },
+        "animations": {
+          "animation-16f6a7f9": {
+            "east": [
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_000.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_001.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_002.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_003.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_004.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_005.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_006.png",
+              "Stray_Cat/animations/animation-16f6a7f9/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.321570"
+}

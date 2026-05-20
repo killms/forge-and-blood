@@ -1,0 +1,41 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "04b05ef3-7bbc-4147-bc3c-2ef1e2705b01",
+        "name": "Arcane Eye",
+        "prompt": "small floating eyeball with magical purple tendrils, single large arcane eye",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T01:20:06.628207+00:00"
+      },
+      "folder": "Arcane_Eye",
+      "frames": {
+        "rotations": {
+          "south": "Arcane_Eye/rotations/south.png",
+          "west": "Arcane_Eye/rotations/west.png",
+          "east": "Arcane_Eye/rotations/east.png",
+          "north": "Arcane_Eye/rotations/north.png"
+        },
+        "animations": {
+          "animating-3b3eddd3": {
+            "east": [
+              "Arcane_Eye/animations/animating-3b3eddd3/east/frame_000.png",
+              "Arcane_Eye/animations/animating-3b3eddd3/east/frame_001.png",
+              "Arcane_Eye/animations/animating-3b3eddd3/east/frame_002.png",
+              "Arcane_Eye/animations/animating-3b3eddd3/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.176045"
+}

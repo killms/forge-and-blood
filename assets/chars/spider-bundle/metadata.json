@@ -1,0 +1,45 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "c793de4d-a557-4a78-8d9c-dd4691533599",
+        "name": "Spider",
+        "prompt": "large black spider with red eyes and hairy legs, fanged",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "cat",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.750862+00:00"
+      },
+      "folder": "Spider",
+      "frames": {
+        "rotations": {
+          "south": "Spider/rotations/south.png",
+          "west": "Spider/rotations/west.png",
+          "east": "Spider/rotations/east.png",
+          "north": "Spider/rotations/north.png"
+        },
+        "animations": {
+          "animation-e38eda90": {
+            "east": [
+              "Spider/animations/animation-e38eda90/east/frame_000.png",
+              "Spider/animations/animation-e38eda90/east/frame_001.png",
+              "Spider/animations/animation-e38eda90/east/frame_002.png",
+              "Spider/animations/animation-e38eda90/east/frame_003.png",
+              "Spider/animations/animation-e38eda90/east/frame_004.png",
+              "Spider/animations/animation-e38eda90/east/frame_005.png",
+              "Spider/animations/animation-e38eda90/east/frame_006.png",
+              "Spider/animations/animation-e38eda90/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:25:01.046281"
+}

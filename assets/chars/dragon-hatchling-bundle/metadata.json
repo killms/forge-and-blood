@@ -1,0 +1,46 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "0ebbd4e2-2d77-49de-831c-6bdfd17b4ee4",
+        "name": "Dragon Hatchling",
+        "prompt": "tiny red dragon hatchling with oversized wings, baby drake creature",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "lion",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T01:20:05.858408+00:00"
+      },
+      "folder": "Dragon_Hatchling",
+      "frames": {
+        "rotations": {
+          "south": "Dragon_Hatchling/rotations/south.png",
+          "west": "Dragon_Hatchling/rotations/west.png",
+          "east": "Dragon_Hatchling/rotations/east.png",
+          "north": "Dragon_Hatchling/rotations/north.png"
+        },
+        "animations": {
+          "animation-e8ea534c": {
+            "east": [
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_000.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_001.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_002.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_003.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_004.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_005.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_006.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_007.png",
+              "Dragon_Hatchling/animations/animation-e8ea534c/east/frame_008.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.010057"
+}

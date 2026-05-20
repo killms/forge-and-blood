@@ -1,0 +1,52 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "dda40d31-1687-4ac8-880c-e014041fdd1d",
+        "name": "Glacial Golem",
+        "prompt": "massive ice golem with crystalline body, cracked blue glowing surfaces, slow imposing construct",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.675141+00:00"
+      },
+      "folder": "Glacial_Golem",
+      "frames": {
+        "rotations": {
+          "south": "Glacial_Golem/rotations/south.png",
+          "west": "Glacial_Golem/rotations/west.png",
+          "east": "Glacial_Golem/rotations/east.png",
+          "north": "Glacial_Golem/rotations/north.png"
+        },
+        "animations": {
+          "animating-fcf3976a": {
+            "east": [
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_000.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_001.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_002.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_003.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_004.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_005.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_006.png",
+              "Glacial_Golem/animations/animating-fcf3976a/east/frame_007.png"
+            ]
+          },
+          "jab_attack-486ee4b6": {
+            "east": [
+              "Glacial_Golem/animations/jab_attack-486ee4b6/east/frame_000.png",
+              "Glacial_Golem/animations/jab_attack-486ee4b6/east/frame_001.png",
+              "Glacial_Golem/animations/jab_attack-486ee4b6/east/frame_002.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.751476"
+}

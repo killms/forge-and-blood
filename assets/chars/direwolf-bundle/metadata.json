@@ -1,0 +1,45 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "6b3639e9-cf73-4016-8475-c4671616d62b",
+        "name": "Direwolf",
+        "prompt": "huge grey direwolf with white frosted fur, fierce predator",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "dog",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.80604+00:00"
+      },
+      "folder": "Direwolf",
+      "frames": {
+        "rotations": {
+          "south": "Direwolf/rotations/south.png",
+          "west": "Direwolf/rotations/west.png",
+          "east": "Direwolf/rotations/east.png",
+          "north": "Direwolf/rotations/north.png"
+        },
+        "animations": {
+          "animation-ad948c03": {
+            "east": [
+              "Direwolf/animations/animation-ad948c03/east/frame_000.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_001.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_002.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_003.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_004.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_005.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_006.png",
+              "Direwolf/animations/animation-ad948c03/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.581832"
+}

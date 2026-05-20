@@ -1,0 +1,45 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "7468b813-43d4-46fb-8dbb-379946803cee",
+        "name": "Wolf Cub",
+        "prompt": "young grey wolf cub, fluffy baby canine, small wolf",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "dog",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T01:20:05.485768+00:00"
+      },
+      "folder": "Wolf_Cub",
+      "frames": {
+        "rotations": {
+          "south": "Wolf_Cub/rotations/south.png",
+          "west": "Wolf_Cub/rotations/west.png",
+          "east": "Wolf_Cub/rotations/east.png",
+          "north": "Wolf_Cub/rotations/north.png"
+        },
+        "animations": {
+          "animation-9eb6544d": {
+            "east": [
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_000.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_001.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_002.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_003.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_004.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_005.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_006.png",
+              "Wolf_Cub/animations/animation-9eb6544d/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:57.970074"
+}

@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "dcf4f659-9b04-4278-9838-07ec307adbae",
+        "name": "Frost Wolf",
+        "prompt": "snow-white wolf with icy blue eyes, frost-covered fur, arctic predator",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "dog",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:36:05.24156+00:00"
+      },
+      "folder": "Frost_Wolf",
+      "frames": {
+        "rotations": {
+          "south": "Frost_Wolf/rotations/south.png",
+          "west": "Frost_Wolf/rotations/west.png",
+          "east": "Frost_Wolf/rotations/east.png",
+          "north": "Frost_Wolf/rotations/north.png"
+        },
+        "animations": {
+          "barking-f01af79a": {
+            "east": [
+              "Frost_Wolf/animations/barking-f01af79a/east/frame_000.png",
+              "Frost_Wolf/animations/barking-f01af79a/east/frame_001.png",
+              "Frost_Wolf/animations/barking-f01af79a/east/frame_002.png",
+              "Frost_Wolf/animations/barking-f01af79a/east/frame_003.png",
+              "Frost_Wolf/animations/barking-f01af79a/east/frame_004.png",
+              "Frost_Wolf/animations/barking-f01af79a/east/frame_005.png"
+            ]
+          },
+          "animation-1200fecb": {
+            "east": [
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_000.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_001.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_002.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_003.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_004.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_005.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_006.png",
+              "Frost_Wolf/animations/animation-1200fecb/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.540238"
+}

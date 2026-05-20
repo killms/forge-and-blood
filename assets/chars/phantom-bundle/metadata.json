@@ -1,0 +1,41 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "95181032-1719-4ac4-a9a8-e850d7e74927",
+        "name": "Phantom",
+        "prompt": "small ghostly humanoid in tattered robes, see-through, hollow eyes",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.756961+00:00"
+      },
+      "folder": "Phantom",
+      "frames": {
+        "rotations": {
+          "south": "Phantom/rotations/south.png",
+          "west": "Phantom/rotations/west.png",
+          "east": "Phantom/rotations/east.png",
+          "north": "Phantom/rotations/north.png"
+        },
+        "animations": {
+          "animating-0981114c": {
+            "east": [
+              "Phantom/animations/animating-0981114c/east/frame_000.png",
+              "Phantom/animations/animating-0981114c/east/frame_001.png",
+              "Phantom/animations/animating-0981114c/east/frame_002.png",
+              "Phantom/animations/animating-0981114c/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.230566"
+}

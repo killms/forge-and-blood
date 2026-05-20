@@ -1,0 +1,23 @@
+{
+  "monsters": {
+    "frost-wolf":    { "id": "dcf4f659-9b04-4278-9838-07ec307adbae", "kind": "quadruped", "tmpl": "dog" },
+    "ice-wraith":    { "id": "d44da90c-edfa-44c7-bde8-a8fbdbbbe1c7", "kind": "humanoid",  "caster": true },
+    "glacial-golem": { "id": "dda40d31-1687-4ac8-880c-e014041fdd1d", "kind": "humanoid",  "caster": false }
+  },
+  "pets": {
+    "stray-cat":         { "id": "c736cb4b-3969-45a2-9656-a5e4be5fafc4", "kind": "quadruped", "tmpl": "cat" },
+    "carrier-pigeon":    { "id": "df8d26f1-76aa-45b1-93bc-d0e1c441b59f", "kind": "quadruped", "tmpl": "cat" },
+    "wolf-cub":          { "id": "7468b813-43d4-46fb-8dbb-379946803cee", "kind": "quadruped", "tmpl": "dog" },
+    "owl":               { "id": "1213e08c-c3d8-4a0d-826e-1d5d3c377382", "kind": "quadruped", "tmpl": "cat" },
+    "spider":            { "id": "c793de4d-a557-4a78-8d9c-dd4691533599", "kind": "quadruped", "tmpl": "cat" },
+    "bear-cub":          { "id": "4547b177-06db-4065-a35e-6304f73f9307", "kind": "quadruped", "tmpl": "bear" },
+    "salamander":        { "id": "5b1992aa-573a-4720-83d9-f60800e02131", "kind": "quadruped", "tmpl": "lion" },
+    "phantom":           { "id": "95181032-1719-4ac4-a9a8-e850d7e74927", "kind": "humanoid" },
+    "direwolf":          { "id": "6b3639e9-cf73-4016-8475-c4671616d62b", "kind": "quadruped", "tmpl": "dog" },
+    "iron-golem":        { "id": "8d1b1549-f431-4ae6-b224-423163483eae", "kind": "humanoid" },
+    "arcane-eye":        { "id": "04b05ef3-7bbc-4147-bc3c-2ef1e2705b01", "kind": "humanoid" },
+    "dragon-hatchling":  { "id": "0ebbd4e2-2d77-49de-831c-6bdfd17b4ee4", "kind": "quadruped", "tmpl": "lion" },
+    "phoenix":           { "id": "764747d3-5508-4ab6-b943-99cf955e171f", "kind": "quadruped", "tmpl": "cat" },
+    "lich-familiar":     { "id": "1e27df7e-654c-4166-8e8e-e89c1f639109", "kind": "humanoid" }
+  }
+}

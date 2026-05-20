@@ -1,0 +1,46 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "5b1992aa-573a-4720-83d9-f60800e02131",
+        "name": "Salamander",
+        "prompt": "small red salamander lizard with smoke trailing, fire-themed",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "lion",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.790601+00:00"
+      },
+      "folder": "Salamander",
+      "frames": {
+        "rotations": {
+          "south": "Salamander/rotations/south.png",
+          "west": "Salamander/rotations/west.png",
+          "east": "Salamander/rotations/east.png",
+          "north": "Salamander/rotations/north.png"
+        },
+        "animations": {
+          "animation-cdad16e9": {
+            "east": [
+              "Salamander/animations/animation-cdad16e9/east/frame_000.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_001.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_002.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_003.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_004.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_005.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_006.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_007.png",
+              "Salamander/animations/animation-cdad16e9/east/frame_008.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:58.956702"
+}

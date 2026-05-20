@@ -2324,10 +2324,31 @@ const MONSTER_PORTRAITS = {
     sprites: { idle: 'assets/chars/lava-hound-idle.gif',       attack: 'assets/chars/lava-hound-attack.gif' } },
   'Salamander King':  { glyph: '🦎', tint: '#e89530',
     sprites: { idle: 'assets/chars/salamander-king-idle.gif',  attack: 'assets/chars/salamander-king-attack.gif' } },
-  // Frozen Spires — sprites pending (still emoji)
-  'Frost Wolf':       { glyph: '❄️', tint: '#9ec5d8' },
-  'Ice Wraith':       { glyph: '👻', tint: '#cfe0ff' },
-  'Glacial Golem':    { glyph: '🗿', tint: '#7fa3c8' }
+  // Frozen Spires — S30 F2 sprites
+  'Frost Wolf':       { glyph: '❄️', tint: '#9ec5d8',
+    sprites: { idle: 'assets/chars/frost-wolf-idle.gif',    attack: 'assets/chars/frost-wolf-attack.gif' } },
+  'Ice Wraith':       { glyph: '👻', tint: '#cfe0ff',
+    sprites: { idle: 'assets/chars/ice-wraith-idle.gif',    attack: 'assets/chars/ice-wraith-attack.gif' } },
+  'Glacial Golem':    { glyph: '🗿', tint: '#7fa3c8',
+    sprites: { idle: 'assets/chars/glacial-golem-idle.gif', attack: 'assets/chars/glacial-golem-attack.gif' } }
+};
+
+// S30 F3 — pet sprites (idle only; pets are small badges in combat)
+const PET_SPRITES = {
+  'Stray Cat':        'assets/chars/stray-cat-idle.gif',
+  'Carrier Pigeon':   'assets/chars/carrier-pigeon-idle.gif',
+  'Wolf Cub':         'assets/chars/wolf-cub-idle.gif',
+  'Owl':              'assets/chars/owl-idle.gif',
+  'Spider':           'assets/chars/spider-idle.gif',
+  'Bear Cub':         'assets/chars/bear-cub-idle.gif',
+  'Salamander':       'assets/chars/salamander-idle.gif',
+  'Phantom':          'assets/chars/phantom-idle.gif',
+  'Direwolf':         'assets/chars/direwolf-idle.gif',
+  'Iron Golem':       'assets/chars/iron-golem-idle.gif',
+  'Arcane Eye':       'assets/chars/arcane-eye-idle.gif',
+  'Dragon Hatchling': 'assets/chars/dragon-hatchling-idle.gif',
+  'Phoenix':          'assets/chars/phoenix-idle.gif',
+  'Lich Familiar':    'assets/chars/lich-familiar-idle.gif'
 };
 
 // ============ CLASSES ============
@@ -7659,7 +7680,14 @@ function renderPetBadge(hero) {
   const badge = document.getElementById('f1-pet');
   if (!badge) return;
   if (hero && (hero.petCombat || hero.petName)) {
-    badge.textContent = hero.petGlyph || '🐾';
+    // S30 F3 — prefer PixelLab sprite over emoji glyph
+    const spriteSrc = (typeof PET_SPRITES !== 'undefined') && PET_SPRITES[hero.petName];
+    if (spriteSrc) {
+      badge.innerHTML = `<img src="${spriteSrc}" alt="${hero.petName}" style="width:100%; height:100%; object-fit:contain; image-rendering:pixelated;">`;
+    } else {
+      badge.innerHTML = '';
+      badge.textContent = hero.petGlyph || '🐾';
+    }
     badge.classList.remove('hidden');
     if (hero.petRarity) badge.style.borderColor = (PET_TINTS && PET_TINTS[hero.petRarity]) || 'var(--gold)';
   } else {

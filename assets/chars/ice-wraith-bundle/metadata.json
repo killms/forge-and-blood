@@ -1,0 +1,55 @@
+{
+  "group_id": null,
+  "states": [
+    {
+      "character": {
+        "id": "d44da90c-edfa-44c7-bde8-a8fbdbbbe1c7",
+        "name": "Ice Wraith",
+        "prompt": "ghostly humanoid figure made of frozen mist, tattered icy robes, hollow glowing eyes, undead spirit",
+        "size": {
+          "width": 92,
+          "height": 92
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-05-20T00:35:15.652499+00:00"
+      },
+      "folder": "Ice_Wraith",
+      "frames": {
+        "rotations": {
+          "south": "Ice_Wraith/rotations/south.png",
+          "west": "Ice_Wraith/rotations/west.png",
+          "east": "Ice_Wraith/rotations/east.png",
+          "north": "Ice_Wraith/rotations/north.png"
+        },
+        "animations": {
+          "casting_a_fireball-fff27be0": {
+            "east": [
+              "Ice_Wraith/animations/casting_a_fireball-fff27be0/east/frame_000.png",
+              "Ice_Wraith/animations/casting_a_fireball-fff27be0/east/frame_001.png",
+              "Ice_Wraith/animations/casting_a_fireball-fff27be0/east/frame_002.png",
+              "Ice_Wraith/animations/casting_a_fireball-fff27be0/east/frame_003.png",
+              "Ice_Wraith/animations/casting_a_fireball-fff27be0/east/frame_004.png",
+              "Ice_Wraith/animations/casting_a_fireball-fff27be0/east/frame_005.png"
+            ]
+          },
+          "animating-ad410106": {
+            "east": [
+              "Ice_Wraith/animations/animating-ad410106/east/frame_000.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_001.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_002.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_003.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_004.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_005.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_006.png",
+              "Ice_Wraith/animations/animating-ad410106/east/frame_007.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.0",
+  "export_date": "2026-05-20T01:24:59.569919"
+}
