@@ -104,7 +104,7 @@
   /* Reduce motion — kills cosmetic animations (a11y / battery / preference) */
   .reduce-motion .fighter-portrait,
   .reduce-motion .fighter-portrait::after,
-  .reduce-motion .bg-sky,
+  .reduce-motion .scene-bg,
   .reduce-motion .fighter,
   .reduce-motion .floater { animation: none !important; }
   /* Hide floaters — for users who find damage numbers distracting */
@@ -1110,70 +1110,35 @@
     box-shadow: 0 0 20px rgba(201,165,87,0.25);
     background: #0a0808;
   }
-  .bg-layer {
-    position: absolute; inset: -8px;
+  /* S33 — single 2.5D scene image per biome (baked perspective depth).
+     Replaces the old 5-layer parallax stack. */
+  .scene-bg {
+    position: absolute; inset: 0;
     background-size: cover; background-position: center;
     background-repeat: no-repeat;
     image-rendering: pixelated;
     pointer-events: none;
-    will-change: transform;
+    z-index: 1;
+    /* slow breathe-zoom so the static scene still feels alive */
+    animation: scene-breathe 26s ease-in-out infinite;
   }
-  .bg-sky        { z-index: 1; filter: blur(0.8px) brightness(0.95); animation: sky-drift 90s linear infinite; }
-  .bg-mountains  { z-index: 2; filter: blur(0.4px); }
-  .bg-trees      { z-index: 3; }
-  .bg-floor      { z-index: 4; }
+  @keyframes scene-breathe {
+    0%, 100% { transform: scale(1.05) translate(-1%, 0); }
+    50%      { transform: scale(1.09) translate(1%, -1%); }
+  }
   .combat-overlay {
     position: absolute; inset: 0; z-index: 5;
     background:
-      radial-gradient(ellipse at center 75%, transparent 30%, rgba(0,0,0,0.4) 100%),
-      linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 25%, transparent 65%, rgba(0,0,0,0.5) 100%);
+      radial-gradient(ellipse at center 72%, transparent 35%, rgba(0,0,0,0.40) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 22%, transparent 68%, rgba(0,0,0,0.48) 100%);
     pointer-events: none;
   }
-  /* S28: foreground PNG moved BEHIND fighters to eliminate the visible "bar"
-     issue. It now blends into the back scene as additional floor/decoration.
-     Loss of depth-of-field "grass at feet" effect, but the scene reads clean. */
-  .bg-foreground {
-    z-index: 4;  /* behind fighters (6) and overlay (5) — pure backdrop now */
-    top: auto;
-    bottom: -8px;
-    height: 28%;
-    background-position: bottom center;
-    background-size: cover;
-    opacity: 0.85;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 35%, black 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 35%, black 100%);
-  }
-  @keyframes sky-drift {
-    0%, 100% { transform: translateX(-8px); }
-    50%      { transform: translateX(8px); }
-  }
-
-  /* Biome backdrops — generated via PixelLab (assets/biomes/*.png) */
-  .combat-scene.b-forest .bg-sky        { background-image: url('assets/biomes/forest-sky.png'); }
-  .combat-scene.b-forest .bg-mountains  { background-image: url('assets/biomes/forest-mountains.png'); }
-  .combat-scene.b-forest .bg-trees      { background-image: url('assets/biomes/forest-trees.png'); }
-  .combat-scene.b-forest .bg-floor      { background-image: url('assets/biomes/forest-floor.png'); }
-  .combat-scene.b-forest .bg-foreground { background-image: url('assets/biomes/forest-grass.png'); }
-  .combat-scene.b-crypt .bg-sky        { background-image: url('assets/biomes/crypt-sky.png'); }
-  .combat-scene.b-crypt .bg-mountains  { background-image: url('assets/biomes/crypt-mountains.png'); }
-  .combat-scene.b-crypt .bg-trees      { background-image: url('assets/biomes/crypt-trees.png'); }
-  .combat-scene.b-crypt .bg-floor      { background-image: url('assets/biomes/crypt-floor.png'); }
-  .combat-scene.b-crypt .bg-foreground { background-image: url('assets/biomes/crypt-grass.png'); }
-  .combat-scene.b-lava .bg-sky        { background-image: url('assets/biomes/lava-sky.png'); }
-  .combat-scene.b-lava .bg-mountains  { background-image: url('assets/biomes/lava-mountains.png'); }
-  .combat-scene.b-lava .bg-trees      { background-image: url('assets/biomes/lava-trees.png'); }
-  .combat-scene.b-lava .bg-floor      { background-image: url('assets/biomes/lava-floor.png'); }
-  .combat-scene.b-lava .bg-foreground { background-image: url('assets/biomes/lava-grass.png'); }
-  .combat-scene.b-frost .bg-sky        { background-image: url('assets/biomes/frost-sky.png'); }
-  .combat-scene.b-frost .bg-mountains  { background-image: url('assets/biomes/frost-mountains.png'); }
-  .combat-scene.b-frost .bg-trees      { background-image: url('assets/biomes/frost-trees.png'); }
-  .combat-scene.b-frost .bg-floor      { background-image: url('assets/biomes/frost-floor.png'); }
-  .combat-scene.b-frost .bg-foreground { background-image: url('assets/biomes/frost-grass.png'); }
-  .combat-scene.b-arena .bg-sky        { background-image: url('assets/biomes/arena-sky.png'); }
-  .combat-scene.b-arena .bg-mountains  { background-image: url('assets/biomes/arena-mountains.png'); }
-  .combat-scene.b-arena .bg-trees      { background-image: url('assets/biomes/arena-trees.png'); }
-  .combat-scene.b-arena .bg-floor      { background-image: url('assets/biomes/arena-floor.png'); }
-  .combat-scene.b-arena .bg-foreground { background-image: url('assets/biomes/arena-grass.png'); }
+  /* Biome scenes — one PixelLab image each, perspective baked in */
+  .combat-scene.b-forest .scene-bg { background-image: url('assets/biomes/forest-25d.png'); }
+  .combat-scene.b-crypt  .scene-bg { background-image: url('assets/biomes/crypt-25d.png'); }
+  .combat-scene.b-lava   .scene-bg { background-image: url('assets/biomes/lava-25d.png'); }
+  .combat-scene.b-frost  .scene-bg { background-image: url('assets/biomes/frost-25d.png'); }
+  .combat-scene.b-arena  .scene-bg { background-image: url('assets/biomes/arena-25d.png'); }
 
   /* Fighters — absolute positioned, full body, no portrait box */
   .fighter {
@@ -2254,10 +2219,7 @@
       <div class="panel">
         <div class="section-title" id="combat-title">Combat</div>
         <div class="combat-scene b-forest" id="combat-scene">
-          <div class="bg-layer bg-sky"></div>
-          <div class="bg-layer bg-mountains"></div>
-          <div class="bg-layer bg-trees"></div>
-          <div class="bg-layer bg-floor"></div>
+          <div class="scene-bg"></div>
           <div class="combat-overlay"></div>
           <div class="fighter hero" id="f1">
             <div class="fighter-hud">
@@ -2285,7 +2247,6 @@
             <div class="combat-effects" id="f2-effects"></div>
             <div class="float-stage" id="f2-floats"></div>
           </div>
-          <div class="bg-layer bg-foreground"></div>
         </div>
         <div class="combat-abilities" id="combat-abilities"></div>
         <div class="combat-log" id="combat-log"></div>
