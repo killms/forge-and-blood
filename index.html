@@ -1153,6 +1153,8 @@
   .combat-scene.b-lava   .scene-bg { background-image: url('assets/biomes/lava-25d.png'); }
   .combat-scene.b-frost  .scene-bg { background-image: url('assets/biomes/frost-25d.png'); }
   .combat-scene.b-arena  .scene-bg { background-image: url('assets/biomes/arena-25d.png'); }
+  .combat-scene.b-temple .scene-bg { background-image: url('assets/biomes/temple-25d.png'); }
+  .combat-scene.b-peaks  .scene-bg { background-image: url('assets/biomes/peaks-25d.png'); }
 
   /* Fighters — absolute positioned, full body, no portrait box */
   .fighter {
@@ -2393,7 +2395,25 @@ const MONSTER_PORTRAITS = {
   'Ice Wraith':       { glyph: '👻', tint: '#cfe0ff',
     sprites: { idle: 'assets/chars/ice-wraith-idle.gif',    attack: 'assets/chars/ice-wraith-attack.gif' } },
   'Glacial Golem':    { glyph: '🗿', tint: '#7fa3c8',
-    sprites: { idle: 'assets/chars/glacial-golem-idle.gif', attack: 'assets/chars/glacial-golem-attack.gif' } }
+    sprites: { idle: 'assets/chars/glacial-golem-idle.gif', attack: 'assets/chars/glacial-golem-attack.gif' } },
+  // Sunken Temple — S33 C2 sprites
+  'Drowned Acolyte':  { glyph: '🌊', tint: '#3aa8a8',
+    sprites: { idle: 'assets/chars/drowned-acolyte-idle.gif', attack: 'assets/chars/drowned-acolyte-attack.gif' } },
+  'Reef Serpent':     { glyph: '🐍', tint: '#2e9988',
+    sprites: { idle: 'assets/chars/reef-serpent-idle.gif',    attack: 'assets/chars/reef-serpent-attack.gif' } },
+  'Coral Golem':      { glyph: '🪸', tint: '#5fb8a8',
+    sprites: { idle: 'assets/chars/coral-golem-idle.gif',     attack: 'assets/chars/coral-golem-attack.gif' } },
+  'Tide Priest':      { glyph: '🔱', tint: '#3ac9c9',
+    sprites: { idle: 'assets/chars/tide-priest-idle.gif',     attack: 'assets/chars/tide-priest-attack.gif' } },
+  // Sky Peaks — S33 C2 sprites
+  'Harpy':            { glyph: '🪶', tint: '#c5b8e0',
+    sprites: { idle: 'assets/chars/harpy-idle.gif',           attack: 'assets/chars/harpy-attack.gif' } },
+  'Storm Eagle':      { glyph: '🦅', tint: '#b8c5e0',
+    sprites: { idle: 'assets/chars/storm-eagle-idle.gif',     attack: 'assets/chars/storm-eagle-attack.gif' } },
+  'Cloud Giant':      { glyph: '☁️', tint: '#a8b5d0',
+    sprites: { idle: 'assets/chars/cloud-giant-idle.gif',     attack: 'assets/chars/cloud-giant-attack.gif' } },
+  'Thunder Roc':      { glyph: '⚡', tint: '#d0c5f0',
+    sprites: { idle: 'assets/chars/thunder-roc-idle.gif',     attack: 'assets/chars/thunder-roc-attack.gif' } }
 };
 
 // S30 F3 — pet sprites (idle only; pets are small badges in combat)
@@ -3216,7 +3236,19 @@ const MONSTERS = [
   // === Frozen Spires (ice biome) ===
   { name: 'Frost Wolf', tier: 4, baseAtk: 18, baseDef: 6, baseVit: 22, baseAgi: 13, baseInt: 0, abilities: ['rend', 'icy_bite'] },
   { name: 'Ice Wraith', tier: 6, baseAtk: 16, baseDef: 8, baseVit: 32, baseAgi: 14, baseInt: 28, abilities: ['frost_bolt', 'chilling_touch', 'drain_life'] },
-  { name: 'Glacial Golem', tier: 9, baseAtk: 36, baseDef: 24, baseVit: 75, baseAgi: 4, baseInt: 10, abilities: ['smash', 'ice_armor', 'frost_bolt'] }
+  { name: 'Glacial Golem', tier: 9, baseAtk: 36, baseDef: 24, baseVit: 75, baseAgi: 4, baseInt: 10, abilities: ['smash', 'ice_armor', 'frost_bolt'] },
+
+  // === Sunken Temple (water biome) — S33 C2 ===
+  { name: 'Drowned Acolyte', tier: 6, baseAtk: 18, baseDef: 8,  baseVit: 34, baseAgi: 10, baseInt: 26, abilities: ['riptide', 'arcane_bolt'] },
+  { name: 'Reef Serpent',    tier: 7, baseAtk: 26, baseDef: 10, baseVit: 40, baseAgi: 18, baseInt: 0,  abilities: ['rend', 'tidal_crush'] },
+  { name: 'Coral Golem',     tier: 8, baseAtk: 28, baseDef: 26, baseVit: 60, baseAgi: 4,  baseInt: 8,  abilities: ['smash', 'coral_armor'] },
+  { name: 'Tide Priest',     tier: 10, baseAtk: 32, baseDef: 16, baseVit: 70, baseAgi: 12, baseInt: 34, abilities: ['tsunami', 'riptide', 'drain_life'] },
+
+  // === Sky Peaks (wind biome) — S33 C2 ===
+  { name: 'Harpy',       tier: 6, baseAtk: 20, baseDef: 6,  baseVit: 30, baseAgi: 20, baseInt: 8,  abilities: ['quick_jab', 'dive_bomb'] },
+  { name: 'Storm Eagle', tier: 7, baseAtk: 24, baseDef: 8,  baseVit: 36, baseAgi: 22, baseInt: 18, abilities: ['dive_bomb', 'storm_call'] },
+  { name: 'Cloud Giant', tier: 9, baseAtk: 38, baseDef: 22, baseVit: 78, baseAgi: 6,  baseInt: 14, abilities: ['smash', 'gale_force'] },
+  { name: 'Thunder Roc', tier: 10, baseAtk: 40, baseDef: 18, baseVit: 82, baseAgi: 16, baseInt: 24, abilities: ['thunderclap', 'dive_bomb', 'storm_call'] }
 ];
 
 // Monster-only abilities (not class talents). Keyed by id, referenced from
@@ -3243,7 +3275,17 @@ const MONSTER_ABILITIES = {
   icy_bite:      { name: 'Icy Bite',     type: 'active', school: 'melee',   ability: { dmgMult: 1.3, debuffAgi: 0.3, dur: 2, cd: 4 } },
   frost_bolt:    { name: 'Frost Bolt',   type: 'active', school: 'magical', ability: { dmgMult: 1.5, magical: true, debuffAgi: 0.4, dur: 3, cd: 4 } },
   chilling_touch:{ name: 'Chilling Touch', type: 'active', school: 'magical', ability: { dmgMult: 1.2, magical: true, debuffAtk: 0.35, dur: 3, cd: 5 } },
-  ice_armor:     { name: 'Ice Armor',    type: 'active', school: 'magical', ability: { buffDef: 0.8, magical: true, dur: 3, cd: 6 } }
+  ice_armor:     { name: 'Ice Armor',    type: 'active', school: 'magical', ability: { buffDef: 0.8, magical: true, dur: 3, cd: 6 } },
+  // S33 C2 — Sunken Temple (water biome)
+  riptide:       { name: 'Riptide',      type: 'active', school: 'magical', ability: { dmgMult: 1.4, magical: true, dot: 8, dur: 3, debuffAgi: 0.3, cd: 5 } },
+  tidal_crush:   { name: 'Tidal Crush',  type: 'active', school: 'melee',   ability: { dmgMult: 1.7, stun: 1, cd: 5 } },
+  coral_armor:   { name: 'Coral Armor',  type: 'active', school: 'melee',   ability: { buffDef: 0.7, dur: 3, cd: 6 } },
+  tsunami:       { name: 'Tsunami',      type: 'active', school: 'magical', ability: { dmgMult: 2.5, magical: true, dot: 10, dur: 3, cd: 6 } },
+  // S33 C2 — Sky Peaks (wind biome)
+  dive_bomb:     { name: 'Dive Bomb',    type: 'active', school: 'melee',   ability: { dmgMult: 2, armorPen: 0.5, cd: 5 } },
+  storm_call:    { name: 'Storm Call',   type: 'active', school: 'magical', ability: { dmgMult: 1.7, magical: true, dot: 6, dur: 3, cd: 4 } },
+  gale_force:    { name: 'Gale Force',   type: 'active', school: 'melee',   ability: { debuffAtk: 0.35, debuffAgi: 0.3, dur: 3, cd: 6 } },
+  thunderclap:   { name: 'Thunderclap',  type: 'active', school: 'magical', ability: { dmgMult: 2.2, magical: true, stun: 1, cd: 5 } }
 };
 
 // Scale a monster template by hero level. Effective monster level matches
@@ -3346,6 +3388,32 @@ const EXPEDITIONS = [
     monsters: ['Frost Wolf', 'Skeleton Warrior', 'Ice Wraith', 'Cave Ogre'],
     boss: 'Glacial Golem',
     treasureChance: 0.20,
+    eventChance: 0.15
+  },
+  {
+    key: 'sunken-temple',
+    name: 'The Sunken Temple',
+    desc: 'Drowned halls where a forgotten god still listens.',
+    glyph: '🔱',
+    tint: '#3aa8a8',
+    minLevel: 55,
+    nodes: 8,
+    monsters: ['Drowned Acolyte', 'Reef Serpent', 'Ice Wraith', 'Coral Golem'],
+    boss: 'Tide Priest',
+    treasureChance: 0.20,
+    eventChance: 0.15
+  },
+  {
+    key: 'sky-peaks',
+    name: 'The Sky Peaks',
+    desc: 'Above the clouds, the storm itself has teeth.',
+    glyph: '⛰️',
+    tint: '#b8c5e0',
+    minLevel: 70,
+    nodes: 9,
+    monsters: ['Harpy', 'Storm Eagle', 'Glacial Golem', 'Cloud Giant'],
+    boss: 'Thunder Roc',
+    treasureChance: 0.18,
     eventChance: 0.15
   }
 ];
@@ -6721,8 +6789,12 @@ const MONSTER_BIOME = {
   'Skeleton Warrior': 'crypt', 'Cave Ogre': 'crypt', 'Awakened Lich': 'crypt',
   // Lava / volcanic
   'Young Dragon': 'lava', 'Fire Imp': 'lava', 'Lava Hound': 'lava', 'Salamander King': 'lava',
-  // Frost (if monsters exist for it)
-  'Frost Wolf': 'frost', 'Ice Troll': 'frost', 'Yeti': 'frost'
+  // Frost
+  'Frost Wolf': 'frost', 'Ice Wraith': 'frost', 'Glacial Golem': 'frost',
+  // S33 C2 — Sunken Temple (water)
+  'Drowned Acolyte': 'temple', 'Reef Serpent': 'temple', 'Coral Golem': 'temple', 'Tide Priest': 'temple',
+  // S33 C2 — Sky Peaks (wind)
+  'Harpy': 'peaks', 'Storm Eagle': 'peaks', 'Cloud Giant': 'peaks', 'Thunder Roc': 'peaks'
 };
 // Maps expedition.key → biome (overrides monster bias when an expedition is active)
 const EXPEDITION_BIOME = {
@@ -6730,7 +6802,9 @@ const EXPEDITION_BIOME = {
   'cursed-crypt':     'crypt',
   'dragons-lair':     'lava',
   'burning-wastes':   'lava',
-  'frostfell-pass':   'frost'
+  'frozen-spires':    'frost',
+  'sunken-temple':    'temple',
+  'sky-peaks':        'peaks'
 };
 function resolveBiomeForCombat(enemy, mode) {
   // PvP always uses the Arena
