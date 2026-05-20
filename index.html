@@ -384,6 +384,51 @@
   }
   .exp-card-desc { font-size: 13px; color: var(--text-dim); font-style: italic; margin-bottom: 6px; }
   .exp-card-meta { font-size: 11px; color: var(--gold); letter-spacing: 0.5px; }
+  /* S33 C1 — Boss Gauntlet card */
+  .gauntlet-card {
+    background: linear-gradient(110deg, var(--bg-deep) 55%, rgba(204,40,40,0.14) 100%);
+    border: 1px solid var(--blood-bright);
+    padding: 12px; margin-bottom: 10px;
+    display: flex; gap: 14px; align-items: center;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 0 14px rgba(204,40,40,0.18);
+  }
+  .gauntlet-card:hover { background: linear-gradient(110deg, rgba(204,40,40,0.1) 55%, rgba(204,40,40,0.22) 100%); transform: translateX(2px); }
+  .gauntlet-card-icon {
+    font-size: 38px; line-height: 1; flex-shrink: 0; width: 48px; text-align: center;
+    filter: drop-shadow(0 0 8px var(--blood-bright));
+  }
+  .gauntlet-card-name {
+    font-family: 'Cinzel', serif; font-size: 15px;
+    color: var(--blood-bright); margin-bottom: 4px;
+  }
+  .gauntlet-card-desc { font-size: 13px; color: var(--text-dim); font-style: italic; margin-bottom: 6px; }
+  .gauntlet-card-meta { font-size: 11px; color: var(--gold); letter-spacing: 0.5px; }
+  /* Gauntlet interstitial — next boss panel */
+  .gauntlet-next {
+    background: var(--bg-deep); border: 1px solid var(--blood);
+    padding: 10px; margin: 4px 0;
+  }
+  .gauntlet-next-label {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+  .gauntlet-next-name {
+    font-family: 'Cinzel', serif; font-size: 17px;
+    color: var(--blood-bright); margin-top: 2px;
+    text-shadow: 0 0 8px rgba(204,40,40,0.5);
+  }
+  /* S33 C1 — boss fighter visual: bigger sprite + red glow */
+  .fighter.boss-enemy .fighter-portrait { transform: scale(1.28); transform-origin: bottom center; }
+  .fighter.boss-enemy .fighter-portrait img {
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)) drop-shadow(0 0 10px rgba(204,40,40,0.55));
+  }
+  .boss-tag {
+    position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+    color: #fff; background: var(--blood); padding: 2px 8px;
+    border: 1px solid var(--blood-bright); z-index: 8;
+  }
   .hunt-quick {
     margin-top: 16px; padding-top: 12px;
     border-top: 1px dashed rgba(74,56,38,0.5);
@@ -2413,7 +2458,14 @@ const MONSTER_PORTRAITS = {
   'Cloud Giant':      { glyph: '☁️', tint: '#a8b5d0',
     sprites: { idle: 'assets/chars/cloud-giant-idle.gif',     attack: 'assets/chars/cloud-giant-attack.gif' } },
   'Thunder Roc':      { glyph: '⚡', tint: '#d0c5f0',
-    sprites: { idle: 'assets/chars/thunder-roc-idle.gif',     attack: 'assets/chars/thunder-roc-attack.gif' } }
+    sprites: { idle: 'assets/chars/thunder-roc-idle.gif',     attack: 'assets/chars/thunder-roc-attack.gif' } },
+  // Boss Gauntlet super-bosses — S33 C1
+  'Bone Sovereign':    { glyph: '💀', tint: '#c9b8d8',
+    sprites: { idle: 'assets/chars/bone-sovereign-idle.gif',    attack: 'assets/chars/bone-sovereign-attack.gif' } },
+  'Infernal Colossus': { glyph: '🔥', tint: '#e8702a',
+    sprites: { idle: 'assets/chars/infernal-colossus-idle.gif', attack: 'assets/chars/infernal-colossus-attack.gif' } },
+  'World Serpent':     { glyph: '🐲', tint: '#7a5fd6',
+    sprites: { idle: 'assets/chars/world-serpent-idle.gif',     attack: 'assets/chars/world-serpent-attack.gif' } }
 };
 
 // S30 F3 — pet sprites (idle only; pets are small badges in combat)
@@ -3248,7 +3300,12 @@ const MONSTERS = [
   { name: 'Harpy',       tier: 6, baseAtk: 20, baseDef: 6,  baseVit: 30, baseAgi: 20, baseInt: 8,  abilities: ['quick_jab', 'dive_bomb'] },
   { name: 'Storm Eagle', tier: 7, baseAtk: 24, baseDef: 8,  baseVit: 36, baseAgi: 22, baseInt: 18, abilities: ['dive_bomb', 'storm_call'] },
   { name: 'Cloud Giant', tier: 9, baseAtk: 38, baseDef: 22, baseVit: 78, baseAgi: 6,  baseInt: 14, abilities: ['smash', 'gale_force'] },
-  { name: 'Thunder Roc', tier: 10, baseAtk: 40, baseDef: 18, baseVit: 82, baseAgi: 16, baseInt: 24, abilities: ['thunderclap', 'dive_bomb', 'storm_call'] }
+  { name: 'Thunder Roc', tier: 10, baseAtk: 40, baseDef: 18, baseVit: 82, baseAgi: 16, baseInt: 24, abilities: ['thunderclap', 'dive_bomb', 'storm_call'] },
+
+  // === Boss Gauntlet super-bosses — S33 C1 (exclusive to the gauntlet) ===
+  { name: 'Bone Sovereign',    tier: 10, baseAtk: 44, baseDef: 24, baseVit: 90,  baseAgi: 12, baseInt: 28, abilities: ['bone_strike', 'curse_mob', 'soul_rend'] },
+  { name: 'Infernal Colossus', tier: 10, baseAtk: 52, baseDef: 32, baseVit: 110, baseAgi: 6,  baseInt: 20, abilities: ['molten_strike', 'fire_breath', 'smash'] },
+  { name: 'World Serpent',     tier: 10, baseAtk: 50, baseDef: 26, baseVit: 130, baseAgi: 16, baseInt: 40, abilities: ['cataclysm', 'tsunami', 'drain_life', 'thunderclap'] }
 ];
 
 // Monster-only abilities (not class talents). Keyed by id, referenced from
@@ -3285,7 +3342,10 @@ const MONSTER_ABILITIES = {
   dive_bomb:     { name: 'Dive Bomb',    type: 'active', school: 'melee',   ability: { dmgMult: 2, armorPen: 0.5, cd: 5 } },
   storm_call:    { name: 'Storm Call',   type: 'active', school: 'magical', ability: { dmgMult: 1.7, magical: true, dot: 6, dur: 3, cd: 4 } },
   gale_force:    { name: 'Gale Force',   type: 'active', school: 'melee',   ability: { debuffAtk: 0.35, debuffAgi: 0.3, dur: 3, cd: 6 } },
-  thunderclap:   { name: 'Thunderclap',  type: 'active', school: 'magical', ability: { dmgMult: 2.2, magical: true, stun: 1, cd: 5 } }
+  thunderclap:   { name: 'Thunderclap',  type: 'active', school: 'magical', ability: { dmgMult: 2.2, magical: true, stun: 1, cd: 5 } },
+  // S33 C1 — Boss Gauntlet super-boss abilities
+  soul_rend:     { name: 'Soul Rend',    type: 'active', school: 'magical', ability: { dmgMult: 2.8, magical: true, lifestealOnce: 0.5, cd: 6 } },
+  cataclysm:     { name: 'Cataclysm',    type: 'active', school: 'magical', ability: { dmgMult: 3, magical: true, dot: 14, dur: 3, cd: 7 } }
 };
 
 // Scale a monster template by hero level. Effective monster level matches
@@ -6430,10 +6490,22 @@ function renderPve() {
         </div>
       </div>`;
     }).join('');
+    // S33 C1 — Boss Gauntlet card
+    const gBest = (state.hero.tracking && state.hero.tracking.gauntletBest) || 0;
+    const gauntletCard = `
+      <div class="gauntlet-card" id="gauntlet-card">
+        <div class="gauntlet-card-icon">👑</div>
+        <div class="gauntlet-card-body">
+          <div class="gauntlet-card-name">The Boss Gauntlet</div>
+          <div class="gauntlet-card-desc">Ten bosses, one breath between each. No retreat without glory.</div>
+          <div class="gauntlet-card-meta">${GAUNTLET.length} bosses · 45% heal between · best: ${gBest}/${GAUNTLET.length}</div>
+        </div>
+      </div>`;
     list.innerHTML = `
       <div class="vista vista-dungeon" aria-hidden="true"></div>
       <div class="hunt-intro">Choose a path. Each expedition is a sequence of encounters — combat, treasure, choices, and a boss at the end.</div>
       ${cards}
+      ${gauntletCard}
       <details class="hunt-quick">
         <summary>Or — direct hunt (one-off fights)</summary>
         <div class="hunt-quick-list">${MONSTERS.map((tpl, idx) => {
@@ -6455,6 +6527,13 @@ function renderPve() {
         if (el.classList.contains('locked')) return;
         startExpedition(el.dataset.exp);
       });
+    });
+    // S33 C1 — Boss Gauntlet entry
+    const gCard = document.getElementById('gauntlet-card');
+    if (gCard) gCard.addEventListener('click', () => {
+      if (confirm('Enter the Boss Gauntlet?\n\n10 bosses in a row. You heal 45% between fights. Lose once and the run ends — but you keep all loot and gold earned.')) {
+        startGauntlet();
+      }
     });
     list.querySelectorAll('[data-monster]').forEach(el => {
       el.addEventListener('click', () => {
@@ -6761,6 +6840,140 @@ function renderPvp() {
   });
 }
 
+// ============ S33 C1 — BOSS GAUNTLET ============
+// A 10-boss escalating rush. Win → 45% heal + next boss. Lose → run ends.
+// Clearing all 10 grants a legendary crate. Tracks furthest boss reached.
+const GAUNTLET = [
+  'Cave Ogre', 'Salamander King', 'Glacial Golem', 'Awakened Lich',
+  'Tide Priest', 'Thunder Roc', 'Young Dragon',
+  'Bone Sovereign', 'Infernal Colossus', 'World Serpent'
+];
+
+function startGauntlet() {
+  const h = state.hero;
+  if (!h || h.hp <= 0) return;
+  state.gauntlet = { active: true, index: 0 };
+  h.hp = h.maxHp;
+  if (h.maxMp) h.mp = h.maxMp;
+  startGauntletFight();
+}
+
+function startGauntletFight() {
+  const g = state.gauntlet;
+  if (!g) return;
+  const tpl = MONSTERS.find(m => m.name === GAUNTLET[g.index]);
+  if (!tpl) { endGauntlet(false); return; }
+  const boss = scaleMonster(tpl, state.hero.level);
+  // Escalating toughness — each boss in the chain hits harder
+  const mult = 1.2 + g.index * 0.07;
+  boss.atk = Math.floor(boss.atk * mult);
+  boss.def = Math.floor(boss.def * mult);
+  boss.vit = Math.floor(boss.vit * mult);
+  boss.gold = [Math.floor(boss.gold[0] * 1.6), Math.floor(boss.gold[1] * 1.6)];
+  boss.xp = Math.floor(boss.xp * 1.6);
+  boss.isBoss = true;
+  boss.isGauntlet = true;
+  startCombat(boss, 'gauntlet');
+}
+
+// Called from closeCombat when a gauntlet fight just ended.
+function gauntletProgress() {
+  const g = state.gauntlet;
+  if (!g || !g.active) return;
+  if (_combatResult === 'victory') {
+    g.index++;
+    // Track furthest reached
+    const tr = ensureTracking(state.hero);
+    if (g.index > (tr.gauntletBest || 0)) tr.gauntletBest = g.index;
+    if (g.index >= GAUNTLET.length) {
+      endGauntlet(true);
+      return;
+    }
+    // Partial heal between bosses — keeps the run tense
+    const h = state.hero;
+    h.hp = Math.min(h.maxHp, h.hp + Math.floor(h.maxHp * 0.45));
+    if (h.maxMp) h.mp = h.maxMp;
+    saveGame();
+    showGauntletInterstitial();
+  } else {
+    endGauntlet(false);
+  }
+}
+
+function showGauntletInterstitial() {
+  const g = state.gauntlet;
+  const nextName = GAUNTLET[g.index];
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'gauntlet-modal';
+  overlay.innerHTML = `
+    <div class="modal-panel" style="max-width:420px; text-align:center;">
+      <div class="section-title">⚔ BOSS ${g.index} DEFEATED</div>
+      <div style="font-size:13px; color:var(--text-dim); margin:8px 0 14px;">
+        You recover — <span style="color:var(--uncommon);">+45% HP restored</span>.
+        <br>${GAUNTLET.length - g.index} boss${GAUNTLET.length - g.index === 1 ? '' : 'es'} remain.
+      </div>
+      <div class="gauntlet-next">
+        <div class="gauntlet-next-label">NEXT BOSS</div>
+        <div class="gauntlet-next-name">${nextName}</div>
+      </div>
+      <div class="modal-actions" style="margin-top:12px;">
+        <button class="btn" id="gauntlet-continue">FACE THE NEXT BOSS</button>
+        <button class="btn btn-cancel" id="gauntlet-retreat">RETREAT (keep rewards)</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('gauntlet-continue').addEventListener('click', () => {
+    overlay.remove();
+    startGauntletFight();
+  });
+  document.getElementById('gauntlet-retreat').addEventListener('click', () => {
+    overlay.remove();
+    endGauntlet(false, true);
+  });
+}
+
+function endGauntlet(completed, retreated) {
+  const g = state.gauntlet;
+  const reached = g ? g.index : 0;
+  state.gauntlet = null;
+  const h = state.hero;
+  // Completion bonus — a legendary crate
+  let bonusMsg = '';
+  if (completed) {
+    const loot = generateItem('legendary', null, h.level);
+    h.inventory.push(loot);
+    const bonusGold = 500 + h.level * 20;
+    h.gold += bonusGold;
+    sfxGold();
+    bonusMsg = `<div class="reward" style="margin-top:10px;">
+      GAUNTLET CLEARED · +${bonusGold} ◊
+      <span class="reward-item r-legendary">✦ ${loot.name}</span>
+    </div>`;
+  }
+  saveGame();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-panel" style="max-width:420px; text-align:center;">
+      <div class="section-title">${completed ? '👑 GAUNTLET CLEARED' : (retreated ? '— RETREAT —' : '— GAUNTLET ENDED —')}</div>
+      <div style="font-size:14px; color:var(--gold-bright); font-family:'Cinzel',serif; margin:10px 0;">
+        ${completed ? 'All 10 bosses fell before you.' : `You reached boss ${reached + (retreated ? 0 : 1)} of ${GAUNTLET.length}.`}
+      </div>
+      <div style="font-size:12px; color:var(--text-dim);">Best run: boss ${ensureTracking(h).gauntletBest || 0} / ${GAUNTLET.length}</div>
+      ${bonusMsg}
+      <div class="modal-actions" style="margin-top:12px;">
+        <button class="btn" id="gauntlet-done">RETURN</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('gauntlet-done').addEventListener('click', () => {
+    overlay.remove();
+    switchTab('pve');
+    renderAll();
+  });
+}
+
 // ============ COMBAT ============
 // Pure idle: zero clicks during combat. After the fight ends the panel
 // shows a summary with metrics and a CONCLUDE button.
@@ -6849,7 +7062,18 @@ function startCombat(enemy, mode) {
   document.getElementById('f1-floats').innerHTML = '';
   document.getElementById('f2-floats').innerHTML = '';
   document.getElementById('f1').classList.remove('dead', 'shake', 'shake-crit', 'heal-flash', 'casting', 'lunge-l', 'lunge-r');
-  document.getElementById('f2').classList.remove('dead', 'shake', 'shake-crit', 'heal-flash', 'casting', 'lunge-l', 'lunge-r');
+  const f2El = document.getElementById('f2');
+  f2El.classList.remove('dead', 'shake', 'shake-crit', 'heal-flash', 'casting', 'lunge-l', 'lunge-r');
+  // S33 C1 — boss visual: bigger sprite + red glow + BOSS tag
+  f2El.classList.toggle('boss-enemy', !!enemy.isBoss);
+  const oldTag = f2El.querySelector('.boss-tag');
+  if (oldTag) oldTag.remove();
+  if (enemy.isBoss) {
+    const tag = document.createElement('div');
+    tag.className = 'boss-tag';
+    tag.textContent = 'BOSS';
+    f2El.appendChild(tag);
+  }
   const log = document.getElementById('combat-log');
   log.innerHTML = '';
   const token = ++_combatToken;
@@ -6861,6 +7085,12 @@ function closeCombat() {
   document.querySelector('#game .tabs').classList.remove('hidden');
   document.getElementById('persistent-header').classList.remove('hidden');
   stopAmbient(); // S32 E1 — stop biome ambient when leaving combat
+  // S33 C1 — gauntlet fight just ended: chain to next boss or end the run
+  if (state.gauntlet && state.gauntlet.active) {
+    switchTab('pve');
+    gauntletProgress();
+    return;
+  }
   switchTab(_previousTab || 'hero');
   // If a combat was part of an active expedition, advance the expedition.
   if (state.expedition && state.expedition._awaitingCombat) {
