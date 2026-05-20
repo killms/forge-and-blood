@@ -1027,7 +1027,12 @@
     font-size: 10px; color: var(--text-dim);
     letter-spacing: 2px; text-transform: uppercase;
   }
-  .slot-item { font-family: 'Cinzel', serif; font-size: 13px; margin-top: 4px; }
+  .slot-item {
+    font-family: 'Cinzel', serif; font-size: 13px; margin-top: 4px;
+    display: flex; align-items: center; gap: 6px; justify-content: center;
+  }
+  /* S33 A4 — smaller item icon inside equipment slot tiles */
+  .slot-item .item-icon { width: 28px; height: 28px; padding: 1px; }
   .slot-empty { color: var(--text-dim); font-style: italic; font-size: 13px; margin-top: 4px; }
   .r-common { color: var(--common); }
   .r-uncommon { color: var(--uncommon); }
@@ -1054,8 +1059,17 @@
   .inv-item {
     background: var(--bg-deep); border: 1px solid var(--border);
     padding: 10px; cursor: pointer; transition: all 0.2s;
+    display: flex; gap: 10px; align-items: center;
   }
   .inv-item:hover { border-color: var(--gold); }
+  /* S33 A4 — item icon */
+  .item-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    object-fit: contain; image-rendering: pixelated;
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    padding: 2px;
+  }
+  .inv-item-body { flex: 1; min-width: 0; }
   .inv-item-header { display: flex; justify-content: space-between; align-items: center; }
   .inv-item-name { font-family: 'Cinzel', serif; font-size: 14px; }
   .inv-item-slot {
@@ -5161,6 +5175,32 @@ function gemBonusDesc(gem) {
 }
 
 // Compact badge for slot displays: shows +N enhancement pill and tiny socket dots
+// S33 A4 — map an item to its PixelLab icon path
+const WEAPON_NOUNS = ['sword','axe','dagger','hammer','spear','mace','bow','staff','wand','scythe'];
+function itemIconSrc(item) {
+  if (!item) return null;
+  if (item.slot === 'weapon') {
+    const n = (item.name || '').toLowerCase();
+    for (const w of WEAPON_NOUNS) {
+      if (n.includes(w)) return `assets/items/weapon-${w}.png`;
+    }
+    // flagship weapons with no noun keyword — caster gear → staff, else sword
+    if ((item.stats && (item.stats.int || 0) > (item.stats.atk || 0))) return 'assets/items/weapon-staff.png';
+    return 'assets/items/weapon-sword.png';
+  }
+  const slot = (item.slot === 'ring1' || item.slot === 'ring2') ? 'ring' : item.slot;
+  if (['helm','amulet','armor','vest','pants','boots','ring'].includes(slot)) {
+    return `assets/items/slot-${slot}.png`;
+  }
+  return null; // pet — no icon
+}
+// Small icon <img> for inventory rows
+function itemIconHtml(item) {
+  const src = itemIconSrc(item);
+  if (!src) return '';
+  return `<img class="item-icon" src="${src}" alt="" loading="lazy">`;
+}
+
 function itemBadgeHtml(item) {
   if (!item) return '';
   const lvl = item.enhanceLevel || 0;
@@ -5537,7 +5577,7 @@ function renderHero() {
     const rarityCls = item ? `rarity-${item.rarity}` : '';
     return `<div class="slot ${rarityCls}" data-slot="${key}">
       <div class="slot-label">${SLOT_LABELS[key]}</div>
-      ${item ? `<div class="slot-item r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</div>` : `<div class="slot-empty">— empty —</div>`}
+      ${item ? `<div class="slot-item r-${item.rarity}">${itemIconHtml(item)}<span>${item.name}${itemBadgeHtml(item)}</span></div>` : `<div class="slot-empty">— empty —</div>`}
     </div>`;
   }).join('');
   eq.querySelectorAll('[data-slot]').forEach(el => {
@@ -5724,7 +5764,7 @@ function renderInventory() {
       const rarityCls = item ? `rarity-${item.rarity}` : '';
       return `<div class="slot ${rarityCls}" data-bagslot="${key}">
         <div class="slot-label">${SLOT_LABELS[key]}</div>
-        ${item ? `<div class="slot-item r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</div>` : `<div class="slot-empty">— empty —</div>`}
+        ${item ? `<div class="slot-item r-${item.rarity}">${itemIconHtml(item)}<span>${item.name}${itemBadgeHtml(item)}</span></div>` : `<div class="slot-empty">— empty —</div>`}
       </div>`;
     }).join('');
     eqPanel.querySelectorAll('[data-bagslot]').forEach(el => {
@@ -5750,12 +5790,15 @@ function renderInventory() {
       ? `<span class="item-lvl-tag">Lv ${item.minLevel}+</span>`
       : '';
     return `<div class="inv-item rarity-${item.rarity}" data-idx="${idx}">
-      <div class="inv-item-header">
-        <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
-        <span class="inv-item-slot">${lvlTag}${slotLabel}</span>
+      ${itemIconHtml(item)}
+      <div class="inv-item-body">
+        <div class="inv-item-header">
+          <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
+          <span class="inv-item-slot">${lvlTag}${slotLabel}</span>
+        </div>
+        <div class="inv-item-stats">${statStr}</div>
+        ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
       </div>
-      <div class="inv-item-stats">${statStr}</div>
-      ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
     </div>`;
   }).join('');
   list.querySelectorAll('[data-idx]').forEach(el => {
@@ -6009,12 +6052,15 @@ function openSlotPicker(slotKey) {
       const eff = effectiveItemStats(item);
       const statStr = Object.entries(eff).map(([k, v]) => `+${v} ${statLabel(k)}`).join(' · ');
       return `<div class="inv-item rarity-${item.rarity}" data-picker-idx="${idx}">
-        <div class="inv-item-header">
-          <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
-          <span class="inv-item-slot">${item.rarity}</span>
+        ${itemIconHtml(item)}
+        <div class="inv-item-body">
+          <div class="inv-item-header">
+            <span class="inv-item-name r-${item.rarity}">${item.name}${itemBadgeHtml(item)}</span>
+            <span class="inv-item-slot">${item.rarity}</span>
+          </div>
+          <div class="inv-item-stats">${statStr}</div>
+          ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
         </div>
-        <div class="inv-item-stats">${statStr}</div>
-        ${item.effect ? `<div class="inv-item-effect">✦ ${item.effect.desc}</div>` : ''}
       </div>`;
     }).join('');
     list.querySelectorAll('[data-picker-idx]').forEach(el => {
