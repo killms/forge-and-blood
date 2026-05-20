@@ -70,6 +70,45 @@
     padding: 0 6px;
   }
   .ph-mute:hover { border-color: var(--gold); color: var(--gold-bright); }
+
+  /* ============ S29 D4: Settings panel + a11y toggles ============ */
+  .settings-group {
+    margin: 12px 0; padding: 10px;
+    background: var(--bg-deep); border: 1px solid var(--border);
+  }
+  .settings-row {
+    display: grid; grid-template-columns: 130px auto 1fr;
+    align-items: center; gap: 10px;
+    cursor: pointer;
+  }
+  .settings-label {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 1.5px; color: var(--gold-bright);
+  }
+  .settings-row input[type="checkbox"] {
+    width: 18px; height: 18px; accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .settings-hint {
+    font-size: 11px; color: var(--text-dim); font-style: italic;
+  }
+  .settings-speed {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 1px; padding: 4px 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .settings-speed:hover { color: var(--gold-bright); border-color: var(--gold); }
+  .settings-speed.on { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+  /* Reduce motion — kills cosmetic animations (a11y / battery / preference) */
+  .reduce-motion .fighter-portrait,
+  .reduce-motion .fighter-portrait::after,
+  .reduce-motion .bg-sky,
+  .reduce-motion .fighter,
+  .reduce-motion .floater { animation: none !important; }
+  /* Hide floaters — for users who find damage numbers distracting */
+  .hide-floaters .floater { display: none !important; }
   .ph-bars { display: grid; gap: 3px; }
   .ph-bar-row { display: grid; grid-template-columns: 18px 1fr 70px; gap: 6px; align-items: center; font-size: 11px; }
   .ph-bar-row .icon { width: 13px; height: 13px; }
@@ -1464,10 +1503,50 @@
     letter-spacing: 2px; color: var(--gold); text-transform: uppercase;
     margin-bottom: 6px;
   }
-  .delta-row { display: flex; justify-content: space-between; padding: 2px 0; }
+  .delta-row {
+    display: grid; grid-template-columns: 56px 1fr 48px; gap: 8px;
+    align-items: center; padding: 3px 0;
+  }
+  .delta-label {
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--text-dim); font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+  }
+  .delta-bars { display: flex; align-items: center; gap: 4px; }
+  .delta-bar {
+    flex: 1; height: 14px; position: relative;
+    background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .delta-bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, #5a6a7a, #8ab8e0);
+    transition: width 0.3s;
+  }
+  .delta-bar-new .delta-bar-fill { background: linear-gradient(90deg, var(--gold), var(--gold-bright)); }
+  .delta-bar-num {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    color: var(--text); letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+  }
+  .delta-arrow { font-size: 12px; padding: 0 2px; flex-shrink: 0; }
+  .delta-diff {
+    text-align: right; font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: bold;
+  }
   .delta-positive { color: var(--uncommon); }
   .delta-negative { color: var(--blood-bright); }
   .delta-neutral { color: var(--text-dim); }
+  .delta-verdict {
+    margin-top: 10px; padding: 6px 8px; text-align: center;
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1.5px;
+    border: 1px solid;
+  }
+  .delta-verdict.positive { color: var(--uncommon); border-color: var(--uncommon); background: rgba(95,168,95,0.08); }
+  .delta-verdict.negative { color: var(--blood-bright); border-color: var(--blood); background: rgba(204,40,40,0.08); }
+  .delta-verdict.neutral  { color: var(--text-dim); border-color: var(--border); background: rgba(0,0,0,0.2); }
   .modal-actions {
     display: grid; gap: 6px; grid-template-columns: 1fr; margin-top: 8px;
   }
@@ -4229,6 +4308,7 @@ function renderPersistentHeader() {
         <svg class="icon"><use href="#i-coin"/></svg>${h.gold}
       </div>
       <button class="ph-mute" id="ph-mute-btn" title="Toggle sound">${_audioMuted ? '🔇' : '🔊'}</button>
+      <button class="ph-mute" id="ph-settings-btn" title="Settings">⚙</button>
       ${user ? `<button class="ph-logout" id="ph-logout-btn">${user}</button>` : ''}
     </div>
     <div class="ph-bars">
@@ -4251,6 +4331,127 @@ function renderPersistentHeader() {
   });
   const muteBtn = document.getElementById('ph-mute-btn');
   if (muteBtn) muteBtn.addEventListener('click', toggleAudio);
+  const settingsBtn = document.getElementById('ph-settings-btn');
+  if (settingsBtn) settingsBtn.addEventListener('click', openSettingsModal);
+}
+
+// ============ SETTINGS PANEL (S29 D4) ============
+const SETTINGS_DEFAULTS = {
+  audioMuted: false,
+  reduceMotion: false,
+  combatSpeed: 1.0,   // multiplier for combat sleep durations (0.5 = 2× faster, 2 = half speed)
+  showFloaters: true, // damage / heal number popups
+  confirmSellAll: true
+};
+function getSettings() {
+  try {
+    const raw = localStorage.getItem('forgeBlood.v2.settings');
+    if (!raw) return { ...SETTINGS_DEFAULTS };
+    return { ...SETTINGS_DEFAULTS, ...JSON.parse(raw) };
+  } catch (e) {
+    return { ...SETTINGS_DEFAULTS };
+  }
+}
+function saveSettings(s) {
+  try { localStorage.setItem('forgeBlood.v2.settings', JSON.stringify(s)); } catch (e) {}
+  applySettings(s);
+}
+function applySettings(s) {
+  document.documentElement.classList.toggle('reduce-motion', !!s.reduceMotion);
+  // combat speed multiplier picked up by sleep() in resolveCombat
+  window._combatSpeedMult = s.combatSpeed || 1.0;
+  // hide damage floaters
+  document.documentElement.classList.toggle('hide-floaters', !s.showFloaters);
+}
+// Apply on load
+applySettings(getSettings());
+
+function openSettingsModal() {
+  // Remove any existing settings modal first
+  const existing = document.getElementById('settings-modal');
+  if (existing) existing.remove();
+  const s = getSettings();
+  const modal = document.createElement('div');
+  modal.id = 'settings-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-panel" style="max-width:420px;">
+      <div class="section-title">⚙ Settings</div>
+
+      <div class="settings-group">
+        <label class="settings-row">
+          <span class="settings-label">Audio</span>
+          <input type="checkbox" id="set-audio" ${!s.audioMuted ? 'checked' : ''}>
+          <span class="settings-hint">SFX during combat</span>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-row">
+          <span class="settings-label">Reduce motion</span>
+          <input type="checkbox" id="set-motion" ${s.reduceMotion ? 'checked' : ''}>
+          <span class="settings-hint">Disable idle bob, sky drift, sprite shake</span>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-row">
+          <span class="settings-label">Damage numbers</span>
+          <input type="checkbox" id="set-floaters" ${s.showFloaters ? 'checked' : ''}>
+          <span class="settings-hint">Show floating combat numbers</span>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-row">
+          <span class="settings-label">Combat speed</span>
+          <span style="display:flex; gap:4px;">
+            <button class="settings-speed ${s.combatSpeed === 1.5 ? 'on' : ''}" data-speed="1.5">SLOW</button>
+            <button class="settings-speed ${s.combatSpeed === 1.0 ? 'on' : ''}" data-speed="1.0">NORMAL</button>
+            <button class="settings-speed ${s.combatSpeed === 0.6 ? 'on' : ''}" data-speed="0.6">FAST</button>
+            <button class="settings-speed ${s.combatSpeed === 0.3 ? 'on' : ''}" data-speed="0.3">TURBO</button>
+          </span>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <label class="settings-row">
+          <span class="settings-label">Confirm sell-all</span>
+          <input type="checkbox" id="set-confirm" ${s.confirmSellAll ? 'checked' : ''}>
+          <span class="settings-hint">Ask before mass selling bag</span>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" id="settings-close">CLOSE</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  const upd = () => {
+    const newS = {
+      audioMuted: !document.getElementById('set-audio').checked,
+      reduceMotion: document.getElementById('set-motion').checked,
+      showFloaters: document.getElementById('set-floaters').checked,
+      confirmSellAll: document.getElementById('set-confirm').checked,
+      combatSpeed: parseFloat(modal.querySelector('.settings-speed.on')?.dataset.speed || '1.0')
+    };
+    // Audio also syncs with the legacy mute toggle
+    _audioMuted = newS.audioMuted;
+    try { localStorage.setItem('forgeBlood.v1.audioMuted', _audioMuted ? '1' : '0'); } catch (e) {}
+    saveSettings(newS);
+    renderPersistentHeader();
+  };
+  modal.querySelectorAll('input').forEach(i => i.addEventListener('change', upd));
+  modal.querySelectorAll('.settings-speed').forEach(b => {
+    b.addEventListener('click', () => {
+      modal.querySelectorAll('.settings-speed').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      upd();
+    });
+  });
+  document.getElementById('settings-close').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
 }
 
 // ============ TUTORIAL ============
@@ -5173,27 +5374,49 @@ function renderItemCell(item, labelText, isNew) {
 }
 
 function renderDeltas(current, candidate) {
+  // S29 D3 — richer comparison: per-stat bar + delta arrow + overall verdict
   const stats = ['atk', 'int', 'def', 'vit', 'agi'];
   const cur = current ? effectiveItemStats(current) : {};
   const cand = effectiveItemStats(candidate);
   const rows = [];
+  let totalGain = 0;
   for (const s of stats) {
     const a = cur[s] || 0;
     const b = cand[s] || 0;
-    const diff = b - a;
     if (a === 0 && b === 0) continue;
+    const diff = b - a;
+    totalGain += diff;
+    // Build a visual bar — the larger of the two anchors width
+    const peak = Math.max(a, b, 1);
+    const aPct = Math.round((a / peak) * 100);
+    const bPct = Math.round((b / peak) * 100);
+    let arrow = '·';
     let cls = 'delta-neutral';
-    let sign = '';
-    if (diff > 0) { cls = 'delta-positive'; sign = '+'; }
-    else if (diff < 0) { cls = 'delta-negative'; sign = ''; }
-    rows.push(`<div class="delta-row"><span>${statLabel(s)}</span><span class="${cls}">${a} → ${b} (${sign}${diff})</span></div>`);
+    if (diff > 0) { arrow = '▲'; cls = 'delta-positive'; }
+    else if (diff < 0) { arrow = '▼'; cls = 'delta-negative'; }
+    const sign = diff > 0 ? '+' : '';
+    rows.push(`<div class="delta-row">
+      <span class="delta-label">${statLabel(s)}</span>
+      <span class="delta-bars">
+        <span class="delta-bar delta-bar-cur"><span class="delta-bar-fill" style="width:${aPct}%;"></span><span class="delta-bar-num">${a}</span></span>
+        <span class="delta-arrow ${cls}">${arrow}</span>
+        <span class="delta-bar delta-bar-new"><span class="delta-bar-fill" style="width:${bPct}%;"></span><span class="delta-bar-num">${b}</span></span>
+      </span>
+      <span class="delta-diff ${cls}">${sign}${diff}</span>
+    </div>`);
   }
   if (rows.length === 0) {
     rows.push('<div class="delta-row"><span class="delta-neutral">No stat changes.</span></div>');
   }
+  // Overall verdict pill
+  let verdict = '';
+  if (totalGain > 0)      verdict = `<div class="delta-verdict positive">▲ NET GAIN  +${totalGain} total</div>`;
+  else if (totalGain < 0) verdict = `<div class="delta-verdict negative">▼ NET LOSS  ${totalGain} total</div>`;
+  else if (rows.length > 0) verdict = `<div class="delta-verdict neutral">≈ TRADE-OFF  same total</div>`;
   return `<div class="compare-deltas">
     <div class="compare-deltas-title">Stat changes</div>
     ${rows.join('')}
+    ${verdict}
   </div>`;
 }
 
@@ -5216,7 +5439,8 @@ function sellAllBag() {
   // Count gems that will be salvaged from socketed items
   const salvagedGems = h.inventory.reduce((arr, it) => arr.concat((it.socketed || []).filter(Boolean)), []);
   const gemNote = salvagedGems.length ? `\n\n${salvagedGems.length} gem${salvagedGems.length === 1 ? '' : 's'} will return to your stash.` : '';
-  if (!confirm(`Sell all ${h.inventory.length} items in your bag for ${total} ◊?\n\nYour equipped gear is safe.${gemNote}`)) return;
+  // S29 D4 — settings: confirmSellAll (default true) allows the user to skip the confirm
+  if (getSettings().confirmSellAll && !confirm(`Sell all ${h.inventory.length} items in your bag for ${total} ◊?\n\nYour equipped gear is safe.${gemNote}`)) return;
   h.gold += total;
   // Salvage socketed gems back into the stash before discarding the items
   salvagedGems.forEach(g => h.gems.push(g));
@@ -5963,7 +6187,9 @@ let _combatStats = null; // per-fight metrics, reset in resolveCombat
 let _combatResult = null; // 'victory' | 'defeat' | 'draw' — set at end
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  // S29 D4 — respect user's combat speed setting (1=normal, 0.3=turbo, 1.5=slow)
+  const mult = window._combatSpeedMult || 1.0;
+  return new Promise(resolve => setTimeout(resolve, Math.max(1, ms * mult)));
 }
 
 // S28 Phase E1 — biome mapping for combat backdrops.
