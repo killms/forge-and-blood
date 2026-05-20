@@ -1643,10 +1643,31 @@
   }
 
   /* Hero's ability cooldown / mana panel under the arena */
-  .combat-abilities {
-    display: flex; flex-wrap: wrap; gap: 4px;
-    margin-top: 10px; min-height: 0;
+  .combat-abilities { margin-top: 10px; }
+  /* Turn bar — prompt that it's the player's move + AUTO toggle */
+  .combat-turn-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 6px;
   }
+  .ct-prompt {
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+  .ct-prompt.ct-your-turn {
+    color: var(--gold-bright); animation: ct-pulse 1.3s ease-in-out infinite;
+  }
+  .ct-prompt.ct-auto-on { color: var(--rare); }
+  @keyframes ct-pulse { 0%,100% { opacity: 0.65; } 50% { opacity: 1; } }
+  .ct-auto-btn {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+    padding: 4px 10px; background: var(--bg-deep);
+    border: 1px solid var(--border); color: var(--text-dim);
+    cursor: pointer; border-radius: 3px; transition: all 0.18s; flex-shrink: 0;
+  }
+  .ct-auto-btn:hover { border-color: var(--gold); color: var(--gold-bright); }
+  .ct-auto-btn.on { border-color: var(--rare); color: var(--rare); }
+  .ability-tiles { display: flex; flex-wrap: wrap; gap: 4px; }
+  .ability-tiles.locked { opacity: 0.72; }
   .ability-cd {
     flex: 1; min-width: 95px;
     background: var(--bg-deep); border: 1px solid var(--rare);
@@ -1686,6 +1707,19 @@
   .ability-cd.nomana { opacity: 0.45; border-color: #4a3826; }
   .ability-cd.nomana .ability-cd-name { color: var(--text-dim); }
   .ability-cd.magical .ability-cd-name::after { content: ' ✦'; color: var(--rare); }
+  /* Basic-attack tile — always available, gold-tinted */
+  .ability-cd.basic { border-color: var(--gold); }
+  .ability-cd.basic .ability-cd-icon,
+  .ability-cd.basic .ability-cd-name { color: var(--gold-bright); }
+  .ability-cd.basic .ability-cd-status { color: var(--gold); }
+  /* Clickable tiles — the player's turn */
+  .ability-cd.clickable { cursor: pointer; }
+  .ability-cd.clickable:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(232,201,128,0.5);
+  }
+  .ability-cd.clickable:active { transform: translateY(0) scale(0.97); }
 
   .combat-log {
     background: var(--bg-deep); border: 1px solid var(--border);
@@ -4916,7 +4950,8 @@ const SETTINGS_DEFAULTS = {
   reduceMotion: false,
   combatSpeed: 1.0,   // multiplier for combat sleep durations (0.5 = 2× faster, 2 = half speed)
   showFloaters: true, // damage / heal number popups
-  confirmSellAll: true
+  confirmSellAll: true,
+  combatAuto: false   // true = hero auto-picks (classic auto-battler); false = player chooses
 };
 function getSettings() {
   try {
@@ -7171,6 +7206,8 @@ let _previousTab = 'hero';
 let _combatToken = 0; // bumped on every new combat; lets stale awaits bail
 let _combatStats = null; // per-fight metrics, reset in resolveCombat
 let _combatResult = null; // 'victory' | 'defeat' | 'draw' — set at end
+let _pendingPlayerAction = null; // resolve fn while the loop waits for the player's combat choice
+let _combatAuto = false; // when true the hero auto-picks (classic auto-battler)
 
 function sleep(ms) {
   // S29 D4 — respect user's combat speed setting (1=normal, 0.3=turbo, 1.5=slow)
@@ -7261,6 +7298,9 @@ function startCombat(enemy, mode) {
   }
   const log = document.getElementById('combat-log');
   log.innerHTML = '';
+  // Interactive combat: load the player's AUTO preference, drop any stale wait
+  _combatAuto = !!getSettings().combatAuto;
+  _pendingPlayerAction = null;
   const token = ++_combatToken;
   resolveCombat(enemy, mode, log, token);
 }
@@ -7688,24 +7728,48 @@ async function takeAction(attacker, defender, log) {
     return;
   }
 
-  // Choose ability: both heroes and AI fighters now use their pool when
-  // available. Falls back to a basic attack if none are off-cooldown / affordable.
-  let abilityToUse = null;
-  if (attacker.abilities && attacker.abilities.length > 0) {
-    abilityToUse = chooseAbility(attacker, defender);
+  // Pick the action. On the hero's turn (and AUTO off) the loop pauses and
+  // waits for the player to tap a skill. Otherwise the AI decides.
+  // Result is a talent object, the string 'basic', or null (= basic attack).
+  let choice = null;
+  if (attacker.isHero && !_combatAuto) {
+    choice = await awaitPlayerChoice(attacker, defender);
+  } else if (attacker.abilities && attacker.abilities.length > 0) {
+    choice = chooseAbility(attacker, defender);
   }
 
-  if (abilityToUse) {
-    await executeAbility(attacker, defender, abilityToUse, log);
+  if (choice && choice !== 'basic') {
+    await executeAbility(attacker, defender, choice, log);
   } else {
     await executeBasicAttack(attacker, defender, log);
   }
 }
 
+// Pause the combat loop until the player taps an action in the ability panel.
+// Resolves with a talent object or the string 'basic'. The AUTO toggle (or
+// turning AUTO on) also resolves it with the AI's pick.
+function awaitPlayerChoice(hero, foe) {
+  return new Promise(resolve => {
+    let done = false;
+    _pendingPlayerAction = (choice) => {
+      if (done) return;
+      done = true;
+      _pendingPlayerAction = null;
+      renderCombatAbilities(hero, { awaitingInput: false });
+      resolve(choice);
+    };
+    renderCombatAbilities(hero, { awaitingInput: true });
+  });
+}
+
+// Smart combat AI — used by enemies and by the hero in AUTO mode.
+// Scores every usable ability by situational value and picks the best:
+//   • executes a low enemy, heals when actually hurt (never at high HP)
+//   • sets up self-buffs early, lands debuffs/stuns/DoTs that aren't applied
+//   • cleanses when ailing, otherwise leans on its strongest damage
+// Returns a talent object, or null = basic attack.
 function chooseAbility(attacker, defender) {
-  // Priority logic: heals if low HP, executes if enemy low HP, otherwise highest damage.
-  // Also respects mana costs and cooldowns. Falls back to null = basic attack.
-  const available = attacker.abilities.filter(a => {
+  const available = (attacker.abilities || []).filter(a => {
     if (attacker.cooldowns[a.key]) return false;
     const mpCost = abilityMpCost(a, attacker.class);
     if (mpCost > 0 && (attacker.mp || 0) < mpCost) return false;
@@ -7715,19 +7779,57 @@ function chooseAbility(attacker, defender) {
 
   const hpPct = attacker.hp / attacker.maxHp;
   const defHpPct = defender.hp / defender.maxHp;
+  const selfHas = t => attacker.statusBuffs.some(b => b.type === t);
+  const foeHas  = t => defender.statusBuffs.some(b => b.type === t);
+  const ailing  = attacker.statusBuffs.some(b => ['debuffAtk', 'debuffAgi', 'stun'].includes(b.type))
+                  || (attacker.dots && attacker.dots.length > 0);
 
-  if (hpPct < 0.5) {
-    const heal = available.find(a => a.ability.heal);
-    if (heal) return heal;
-  }
-  const exec = available.find(a => a.ability.execThreshold && defHpPct < a.ability.execThreshold);
-  if (exec) return exec;
+  // Basic attack is the baseline — an ability must beat this score to be worth it.
+  let best = null, bestScore = 1.0;
 
-  const damaging = available.filter(a => a.ability.dmgMult || a.ability.multiHit);
-  if (damaging.length > 0) {
-    return damaging[Math.floor(Math.random() * damaging.length)];
+  for (const t of available) {
+    const a = t.ability || {};
+    let score = 0;
+
+    // --- Heal: only when genuinely hurt, never a waste at high HP ---
+    if (a.heal) {
+      if (hpPct < 0.30)      score = Math.max(score, 11);
+      else if (hpPct < 0.50) score = Math.max(score, 6);
+      else if (hpPct < 0.72) score = Math.max(score, 1.6);
+    }
+    // --- Execute: huge value when it can finish the enemy ---
+    if (a.execThreshold && defHpPct < a.execThreshold) score = Math.max(score, 14);
+    // --- Direct damage: scale by expected output ---
+    if (a.dmgMult !== undefined || a.multiHit) {
+      const mult = Array.isArray(a.dmgMult) ? (a.dmgMult[0] + a.dmgMult[1]) / 2 : (a.dmgMult || 1);
+      const hits = a.multiHit || 1;
+      score = Math.max(score, 2 + mult * hits * 1.3
+        + (a.armorPen ? 1 : 0) + (a.trueDmg ? 1.6 : 0) + (a.guaranteedCrit ? 1.6 : 0));
+    }
+    // --- DoT: worth it once, not stacked on itself ---
+    if (a.dot && !(defender.dots || []).some(d => d.label === t.name)) {
+      score = Math.max(score, 3 + a.dot * 0.12);
+    }
+    // --- Control / debuffs: only if not already on the target ---
+    if (a.stun && !foeHas('stun'))           score = Math.max(score, 8);
+    if (a.debuffAtk && !foeHas('debuffAtk')) score = Math.max(score, 4);
+    if (a.debuffAgi && !foeHas('debuffAgi')) score = Math.max(score, 3);
+    // --- Self setup: buff early, not at death's door ---
+    if (a.buffAtk && !selfHas('buffAtk') && hpPct > 0.30) score = Math.max(score, 3.5 + a.buffAtk * 5);
+    if (a.buffDef && !selfHas('buffDef'))    score = Math.max(score, 3 + (hpPct < 0.5 ? 2.5 : 0));
+    if (a.regenBuff && !selfHas('regenBuff') && hpPct < 0.75) score = Math.max(score, 3.5);
+    if (a.dodgeBuff && !selfHas('dodgeBuff')) score = Math.max(score, 2.5);
+    if (a.thornsBuff && !selfHas('thorns'))   score = Math.max(score, 2.5);
+    if (a.turret && !selfHas('turret'))       score = Math.max(score, 4);
+    if (a.mimic && !selfHas('mimic'))         score = Math.max(score, 3.5);
+    // --- Cleanse: only when actually suffering an ailment ---
+    if (a.cleanse && ailing) score = Math.max(score, 7);
+
+    // Small jitter so fights aren't perfectly deterministic
+    score *= 0.88 + Math.random() * 0.24;
+    if (score > bestScore) { bestScore = score; best = t; }
   }
-  return available[Math.floor(Math.random() * available.length)];
+  return best;
 }
 
 // Classes whose toolkit is treated as magical by default. Their active
@@ -8503,35 +8605,84 @@ function getAbilityIcon(ability) {
   return 'i-sword';
 }
 
-function renderCombatAbilities(hero) {
+// Render the interactive combat action panel: a turn prompt + AUTO toggle,
+// then the Attack tile and every ability tile. When it's the player's turn
+// (opts.awaitingInput && AUTO off) the usable tiles become clickable.
+function renderCombatAbilities(hero, opts) {
+  opts = opts || {};
+  const awaitingInput = !!opts.awaitingInput;
   const el = document.getElementById('combat-abilities');
   if (!el) return;
-  if (!hero || !hero.abilities || hero.abilities.length === 0) {
-    el.innerHTML = '';
-    return;
-  }
-  el.innerHTML = hero.abilities.map(a => {
+  if (!hero) { el.innerHTML = ''; return; }
+
+  const clickable = awaitingInput && !_combatAuto;
+
+  // --- Turn bar: prompt + AUTO toggle ---
+  const prompt = _combatAuto
+    ? `<span class="ct-prompt ct-auto-on">⚙ AUTO — combate automático</span>`
+    : (awaitingInput
+        ? `<span class="ct-prompt ct-your-turn">⚔ O TEU TURNO — escolhe uma ação</span>`
+        : `<span class="ct-prompt">A aguardar…</span>`);
+  const bar = `<div class="combat-turn-bar">${prompt}` +
+    `<button class="ct-auto-btn ${_combatAuto ? 'on' : ''}" id="ct-auto">` +
+    `AUTO: ${_combatAuto ? 'ON' : 'OFF'}</button></div>`;
+
+  // --- Tiles: basic attack first, then abilities ---
+  const tiles = [];
+  tiles.push(`<div class="ability-cd basic ready ${clickable ? 'clickable' : ''}" ` +
+    `data-act="basic" title="Ataque básico — sem custo de mana">` +
+    `<svg class="ability-cd-icon"><use href="#i-sword"/></svg>` +
+    `<div class="ability-cd-name">Attack</div>` +
+    `<div class="ability-cd-status">BÁSICO</div></div>`);
+
+  for (const a of (hero.abilities || [])) {
     const cd = hero.cooldowns[a.key] || 0;
     const mpCost = abilityMpCost(a, hero.class);
     const magical = isTalentMagical(a, hero.class);
     let status, cssClass;
     if (cd > 0) {
-      status = `CD ${cd}`;
-      cssClass = 'cooling';
+      status = `CD ${cd}`; cssClass = 'cooling';
     } else if (mpCost > 0 && (hero.mp || 0) < mpCost) {
-      status = `${mpCost} MP`;
-      cssClass = 'nomana';
+      status = `${mpCost} MP`; cssClass = 'nomana';
     } else {
-      status = mpCost > 0 ? `READY · ${mpCost} MP` : 'READY';
-      cssClass = 'ready';
+      status = mpCost > 0 ? `READY · ${mpCost} MP` : 'READY'; cssClass = 'ready';
     }
+    const usable = cssClass === 'ready';
     const iconId = getAbilityIcon(a);
-    return `<div class="ability-cd ${cssClass} ${magical ? 'magical' : ''}" title="${a.desc || a.name}">
-      <svg class="ability-cd-icon"><use href="#${iconId}"/></svg>
-      <div class="ability-cd-name">${a.name}</div>
-      <div class="ability-cd-status">${status}</div>
-    </div>`;
-  }).join('');
+    tiles.push(`<div class="ability-cd ${cssClass} ${magical ? 'magical' : ''} ` +
+      `${clickable && usable ? 'clickable' : ''}" data-act="ability" data-key="${a.key}" ` +
+      `title="${a.desc || a.name}">` +
+      `<svg class="ability-cd-icon"><use href="#${iconId}"/></svg>` +
+      `<div class="ability-cd-name">${a.name}</div>` +
+      `<div class="ability-cd-status">${status}</div></div>`);
+  }
+  el.innerHTML = bar +
+    `<div class="ability-tiles ${clickable ? 'live' : 'locked'}">${tiles.join('')}</div>`;
+
+  // --- AUTO toggle ---
+  const autoEl = document.getElementById('ct-auto');
+  if (autoEl) autoEl.addEventListener('click', () => {
+    _combatAuto = !_combatAuto;
+    const s = getSettings(); s.combatAuto = _combatAuto; saveSettings(s);
+    if (_combatAuto && _pendingPlayerAction) {
+      // Switching to AUTO mid-decision: let the AI take this turn
+      _pendingPlayerAction(chooseAbility(_currentFighters.hero, _currentFighters.foe) || 'basic');
+    } else {
+      renderCombatAbilities(hero, { awaitingInput });
+    }
+  });
+
+  // --- Tile clicks (only while awaiting the player) ---
+  if (clickable) {
+    el.querySelectorAll('.ability-cd.clickable').forEach(tile => {
+      tile.addEventListener('click', () => {
+        if (!_pendingPlayerAction) return;
+        if (tile.dataset.act === 'basic') { _pendingPlayerAction('basic'); return; }
+        const talent = (hero.abilities || []).find(x => x.key === tile.dataset.key);
+        _pendingPlayerAction(talent || 'basic');
+      });
+    });
+  }
 }
 
 function refreshCombatUI() {
