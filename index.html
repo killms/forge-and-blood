@@ -1247,7 +1247,9 @@
   /* Fighters — absolute positioned, full body, no portrait box */
   .fighter {
     position: absolute;
-    bottom: 14%;
+    /* Vertically centred: the 180px portrait sits on the scene's mid-line.
+       (combat-effects chips add ~22px below the portrait inside .fighter) */
+    bottom: calc(50% - 112px);
     width: 180px;
     text-align: center;
     z-index: 6;
@@ -1411,6 +1413,7 @@
   /* Small phones — shrink everything proportionally */
   @media (max-width: 600px) {
     .fighter, .fighter-portrait { width: 130px; }
+    .fighter { bottom: calc(50% - 87px); }      /* 130px portrait + 22px chips */
     .fighter-portrait { height: 130px; font-size: 65px; }
     .fighter-hud { bottom: 140px; width: 170px; }
     .fighter-hud .bar { width: 150px; height: 8px; }
@@ -1420,6 +1423,7 @@
   }
   @media (max-width: 380px) {
     .fighter, .fighter-portrait { width: 105px; }
+    .fighter { bottom: calc(50% - 75px); }      /* 105px portrait + 22px chips */
     .fighter-portrait { height: 105px; font-size: 52px; }
     .fighter-hud { bottom: 115px; width: 145px; }
     .fighter-hud .bar { width: 125px; height: 7px; }
