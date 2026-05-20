@@ -8859,7 +8859,10 @@ function resolvePortrait(source, isHero) {
     }
     return racePortrait;
   }
-  return MONSTER_PORTRAITS[source.name] || { glyph: '👹', tint: '#8b1e1e' };
+  // Expedition bosses are renamed "Boss · <Monster>" — strip that prefix so
+  // the sprite/GIF still resolves from MONSTER_PORTRAITS.
+  const lookupName = source.name ? source.name.replace(/^Boss · /, '') : source.name;
+  return MONSTER_PORTRAITS[lookupName] || { glyph: '👹', tint: '#8b1e1e' };
 }
 
 // Resolve which sprite URL to use for a given animation state. Returns null
