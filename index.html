@@ -1203,9 +1203,9 @@
      Enemy faces left via scaleX(-1) on its sprite. */
   .combat-scene {
     position: relative;
-    aspect-ratio: 16 / 9;
-    max-height: 520px;
-    min-height: 360px;
+    width: 100%;              /* definite width — height derives from it */
+    aspect-ratio: 4 / 3;      /* tall enough for full-body fighters */
+    max-height: 330px;
     overflow: hidden;
     margin-bottom: 12px;
     border: 1px solid var(--gold);
@@ -1410,7 +1410,6 @@
 
   /* Small phones — shrink everything proportionally */
   @media (max-width: 600px) {
-    .combat-scene { max-height: 360px; }
     .fighter, .fighter-portrait { width: 130px; }
     .fighter-portrait { height: 130px; font-size: 65px; }
     .fighter-hud { bottom: 140px; width: 170px; }
@@ -1420,7 +1419,6 @@
     .vs-indicator { font-size: 19px; }
   }
   @media (max-width: 380px) {
-    .combat-scene { max-height: 280px; }
     .fighter, .fighter-portrait { width: 105px; }
     .fighter-portrait { height: 105px; font-size: 52px; }
     .fighter-hud { bottom: 115px; width: 145px; }
