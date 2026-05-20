@@ -4806,10 +4806,74 @@ function sfxDefeat() {
   notes.forEach((f, i) => setTimeout(() => playTone({ freq: f, dur: 0.32, type: 'sawtooth', volume: 0.18 }), i * 140));
 }
 
+// S32 E2 — extra SFX
+function sfxGold() {
+  [880, 1320, 1100].forEach((f, i) =>
+    setTimeout(() => playTone({ freq: f, dur: 0.08, type: 'square', volume: 0.11 }), i * 45));
+}
+function sfxAbilityCast() {
+  playTone({ freq: 300, dur: 0.22, type: 'triangle', volume: 0.16, freqEnd: 760 });
+}
+
+// ============ S32 E1 — procedural ambient music per biome ============
+// A soft sustained drone (root + intervals) with slow detune LFOs so it
+// "breathes". Very low volume — background only. One per combat, swapped
+// by biome. No audio files needed.
+let _ambient = null;
+const BIOME_AMBIENT = {
+  forest: { root: 110, type: 'sine',     intervals: [1, 1.5, 2.0] },   // A2 — calm
+  crypt:  { root: 98,  type: 'triangle', intervals: [1, 1.19, 1.5] },  // dissonant minor
+  lava:   { root: 73,  type: 'sawtooth', intervals: [1, 1.33, 1.78] }, // tense low
+  frost:  { root: 146, type: 'sine',     intervals: [1, 1.5, 2.5] },   // cold + airy
+  arena:  { root: 110, type: 'triangle', intervals: [1, 1.25, 1.5] }   // heroic major
+};
+function startAmbient(biome) {
+  stopAmbient();
+  if (_audioMuted) return;
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  try {
+    const cfg = BIOME_AMBIENT[biome] || BIOME_AMBIENT.forest;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 2.5); // gentle fade-in
+    master.connect(ctx.destination);
+    const nodes = [];
+    cfg.intervals.forEach((mult, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = cfg.type;
+      osc.frequency.value = cfg.root * mult;
+      // slow detune LFO so the drone subtly shifts
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = 0.04 + i * 0.025;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 1.5 + i;
+      lfo.connect(lfoGain).connect(osc.frequency);
+      const g = ctx.createGain();
+      g.gain.value = 0.34 / cfg.intervals.length;
+      osc.connect(g).connect(master);
+      osc.start();
+      lfo.start();
+      nodes.push(osc, lfo);
+    });
+    _ambient = { nodes, master };
+  } catch (e) { /* ambient is non-essential */ }
+}
+function stopAmbient() {
+  if (!_ambient) return;
+  const amb = _ambient;
+  _ambient = null;
+  try {
+    if (_audioCtx) amb.master.gain.linearRampToValueAtTime(0.0001, _audioCtx.currentTime + 1);
+    setTimeout(() => amb.nodes.forEach(n => { try { n.stop(); } catch (e) {} }), 1100);
+  } catch (e) {}
+}
+
 function toggleAudio() {
   _audioMuted = !_audioMuted;
   try { localStorage.setItem('forgeBlood.v1.audioMuted', _audioMuted ? '1' : '0'); } catch (e) {}
   renderPersistentHeader();
+  if (_audioMuted) stopAmbient();
   if (!_audioMuted) sfxClick();
 }
 
@@ -6063,6 +6127,7 @@ function expeditionOpenTreasure() {
   const gold = randInt(20, 60) + h.level * 4;
   h.gold += gold;
   exp.gold += gold;
+  sfxGold(); // S32 E2
   let lootName = '';
   let lootRarity = null;
   if (Math.random() < 0.7) {
@@ -6511,7 +6576,9 @@ function startCombat(enemy, mode) {
   if (summary) summary.classList.add('hidden');
   document.getElementById('combat-title').textContent = mode === 'pvp' ? 'ARENA DUEL' : 'HUNT';
   // S28 — pick biome backdrop based on mode / expedition / monster
-  setCombatBiome(resolveBiomeForCombat(enemy, mode));
+  const _biome = resolveBiomeForCombat(enemy, mode);
+  setCombatBiome(_biome);
+  startAmbient(_biome); // S32 E1 — biome ambient drone
   document.getElementById('f1-name').textContent = h.name;
   document.getElementById('f2-name').textContent = enemy.name;
   setPortrait('f1-portrait', h, true);
@@ -6531,6 +6598,7 @@ function closeCombat() {
   document.getElementById('combat').classList.add('hidden');
   document.querySelector('#game .tabs').classList.remove('hidden');
   document.getElementById('persistent-header').classList.remove('hidden');
+  stopAmbient(); // S32 E1 — stop biome ambient when leaving combat
   switchTab(_previousTab || 'hero');
   // If a combat was part of an active expedition, advance the expedition.
   if (state.expedition && state.expedition._awaitingCombat) {
@@ -7012,6 +7080,7 @@ async function executeAbility(attacker, defender, talent, log) {
   }
   const tag = magical ? ' ✦' : '';
   appendLog(log, `<span class="log-ability">⚔ ${attacker.name} uses ${talent.name}${tag}!</span>`);
+  sfxAbilityCast(); // S32 E2 — ability cast whoosh
   refreshCombatUI();
   // Magical abilities get a wind-up glow on the caster
   if (magical) playCastAnimation(attacker);
@@ -7484,6 +7553,7 @@ function finishVictory(enemy, mode, log, heroFighter) {
   }
   appendLog(log, `<div class="log-victory">⚔ VICTORY ⚔</div>`);
   appendLog(log, `<div class="reward">+${gold} gold · +${xp} XP${lootMsg}</div>`);
+  sfxGold(); // S32 E2 — coin jingle on victory reward
 
   // Level up. Each level grants 1 stat point and 1 talent point.
   // Base stats no longer auto-increment — the player allocates them.
