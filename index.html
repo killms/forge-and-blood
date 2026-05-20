@@ -180,6 +180,30 @@
   }
   .tab.active .tab-icon { transform: scale(1.08); filter: drop-shadow(0 0 4px var(--gold)); }
   .tab:hover:not(.active) { color: var(--text); }
+  /* S29 D2 — tiny screens: hide tab labels, icon-only nav so the 7 tabs fit */
+  @media (max-width: 420px) {
+    .tab { padding: 8px 0; font-size: 0; gap: 0; }
+    .tab span { display: none; }
+    .tab-icon { width: 20px; height: 20px; }
+  }
+  /* Wider compare cells on desktop, stack on tight screens */
+  @media (max-width: 480px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    .delta-row { grid-template-columns: 50px 1fr 44px; gap: 6px; }
+    .settings-row { grid-template-columns: 110px auto 1fr; }
+  }
+  /* Persistent header — tighter on small screens */
+  @media (max-width: 420px) {
+    .ph-top { gap: 4px; }
+    .ph-class { display: none; }
+    .ph-logout { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+  /* Touch target minimum: 44×44 on all primary buttons (a11y / WCAG 2.5.5) */
+  @media (pointer: coarse) {
+    button.btn, button.tab, .ph-mute, .ph-logout {
+      min-height: 44px;
+    }
+  }
 
   /* Decorative vista images (Kenney 3D renders used as flat backgrounds).
      Treated with a vignette + gradient so they blend with the dark theme. */
@@ -4422,6 +4446,18 @@ function openSettingsModal() {
         </label>
       </div>
 
+      <div class="settings-group">
+        <div class="settings-row" style="display:block;">
+          <div class="settings-label" style="margin-bottom:6px;">Save backup</div>
+          <div class="settings-hint" style="margin-bottom:10px;">Move your hero to another browser/device. Export copies the save to clipboard as a code. Import pastes it back.</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn" id="save-export" style="flex:1; min-width:130px;">📋 EXPORT TO CLIPBOARD</button>
+            <button class="btn" id="save-import" style="flex:1; min-width:130px;">📥 IMPORT FROM CLIPBOARD</button>
+          </div>
+          <div id="save-status" style="margin-top:8px; font-size:12px; color:var(--text-dim); min-height:16px;"></div>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button class="btn" id="settings-close">CLOSE</button>
       </div>
@@ -4451,6 +4487,64 @@ function openSettingsModal() {
     });
   });
   document.getElementById('settings-close').addEventListener('click', () => modal.remove());
+  // S29 D5a — save export / import via clipboard
+  const status = document.getElementById('save-status');
+  const setStatus = (msg, ok) => {
+    if (!status) return;
+    status.textContent = msg;
+    status.style.color = ok ? 'var(--uncommon)' : (ok === false ? 'var(--blood-bright)' : 'var(--text-dim)');
+  };
+  document.getElementById('save-export').addEventListener('click', async () => {
+    try {
+      const payload = {
+        v: 1,
+        exportedAt: new Date().toISOString(),
+        accounts: getAccounts(),
+        activeUser: getActiveUser(),
+        settings: getSettings()
+      };
+      // Base64 encode so the blob can be pasted anywhere without escape issues
+      const json = JSON.stringify(payload);
+      const code = 'FB1:' + btoa(unescape(encodeURIComponent(json)));
+      await navigator.clipboard.writeText(code);
+      setStatus('✓ Save copied to clipboard (' + Math.round(code.length / 1024) + ' KB). Paste it on another device.', true);
+    } catch (e) {
+      setStatus('Clipboard blocked — copy this from the console instead: ' + e.message, false);
+      console.log('=== FORGE & BLOOD SAVE ===');
+      console.log('FB1:' + btoa(unescape(encodeURIComponent(JSON.stringify({
+        v: 1, exportedAt: new Date().toISOString(),
+        accounts: getAccounts(), activeUser: getActiveUser(), settings: getSettings()
+      })))));
+    }
+  });
+  document.getElementById('save-import').addEventListener('click', async () => {
+    try {
+      const code = (await navigator.clipboard.readText()).trim();
+      if (!code.startsWith('FB1:')) {
+        setStatus('Clipboard does not contain a Forge & Blood save (expected FB1: prefix).', false);
+        return;
+      }
+      const json = decodeURIComponent(escape(atob(code.slice(4))));
+      const payload = JSON.parse(json);
+      if (!payload.accounts || typeof payload.accounts !== 'object') {
+        setStatus('Save looks invalid (no accounts).', false);
+        return;
+      }
+      const heroCount = Object.keys(payload.accounts).length;
+      if (!confirm(`Import save with ${heroCount} account(s)?\n\nThis OVERWRITES your current local save. Make sure you exported your current progress first if you want to keep it.`)) {
+        setStatus('Import cancelled.', null);
+        return;
+      }
+      // Write into the v2 storage keys
+      localStorage.setItem('forgeBlood.v2.accounts', JSON.stringify(payload.accounts));
+      if (payload.activeUser) localStorage.setItem('forgeBlood.v2.activeUser', payload.activeUser);
+      if (payload.settings) saveSettings(payload.settings);
+      setStatus('✓ Imported. Reloading…', true);
+      setTimeout(() => location.reload(), 800);
+    } catch (e) {
+      setStatus('Failed to read clipboard: ' + e.message, false);
+    }
+  });
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
 }
 
