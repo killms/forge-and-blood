@@ -1410,6 +1410,95 @@
     25%  { opacity: 1; width: 130px; }
     100% { opacity: 0; width: 160px; transform: translate(-50%, -50%) rotate(-25deg) translateX(20px); }
   }
+  /* ============ S33 — projectiles (ranged & spell attacks) ============ */
+  .projectile {
+    position: absolute; z-index: 8;
+    width: 26px; height: 26px;
+    margin: -13px 0 0 -13px;            /* centre on the (left,top) anchor */
+    pointer-events: none;
+    will-change: transform;
+  }
+  .proj-flip { transform: scaleX(-1); }  /* base flip — JS adds travel transform after */
+  /* Arrow — a thin pointed streak */
+  .proj-arrow {
+    width: 34px; height: 6px; margin: -3px 0 0 -17px;
+    background: linear-gradient(90deg, transparent, #8a6a3a 35%, #d8b878 80%, #fff);
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(0,0,0,0.6);
+    clip-path: polygon(0 40%, 80% 0, 100% 50%, 80% 100%, 0 60%);
+  }
+  /* Fire — orange glowing ball */
+  .proj-fire {
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #ffd040 30%, #ff7020 60%, transparent 75%);
+    box-shadow: 0 0 14px #ff8030, 0 0 24px rgba(255,90,20,0.6);
+    animation: proj-flicker 0.12s steps(2) infinite;
+  }
+  /* Ice — cyan crystal shard */
+  .proj-ice {
+    background: linear-gradient(135deg, #fff, #8fe0ff 50%, #3a9fd0);
+    clip-path: polygon(50% 0, 100% 35%, 75% 100%, 25% 100%, 0 35%);
+    box-shadow: 0 0 12px #7fd8ff, 0 0 20px rgba(100,200,255,0.5);
+  }
+  /* Magic — purple arcane orb */
+  .proj-magic {
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #d8a0ff 35%, #a850e0 65%, transparent 78%);
+    box-shadow: 0 0 14px #c060f0, 0 0 26px rgba(168,80,224,0.6);
+    animation: proj-flicker 0.14s steps(2) infinite;
+  }
+  /* Lightning — fast jagged yellow streak */
+  .proj-lightning {
+    width: 38px; height: 10px; margin: -5px 0 0 -19px;
+    background: linear-gradient(90deg, transparent, #fff080 40%, #fff 70%, #fff080);
+    clip-path: polygon(0 45%, 30% 0, 45% 55%, 70% 10%, 100% 50%, 70% 90%, 45% 45%, 30% 100%);
+    box-shadow: 0 0 12px #ffe040, 0 0 22px rgba(255,224,64,0.6);
+  }
+  /* Holy — golden radiant spark */
+  .proj-holy {
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #ffe89a 35%, #e8b030 65%, transparent 80%);
+    box-shadow: 0 0 16px #ffd060, 0 0 28px rgba(255,200,80,0.7);
+  }
+  /* Dark — shadowy purple-black wisp */
+  .proj-dark {
+    border-radius: 50%;
+    background: radial-gradient(circle, #9050c0 0%, #50206a 45%, #1a0828 70%, transparent 82%);
+    box-shadow: 0 0 14px rgba(120,40,180,0.7), 0 0 26px rgba(60,10,90,0.6);
+    animation: proj-flicker 0.16s steps(2) infinite;
+  }
+  /* Poison — green toxic blob */
+  .proj-poison {
+    border-radius: 50% 50% 50% 30%;
+    background: radial-gradient(circle, #d8ff80 0%, #6ac030 40%, #3a7818 70%, transparent 82%);
+    box-shadow: 0 0 12px #8fd84a, 0 0 20px rgba(106,192,48,0.5);
+  }
+  @keyframes proj-flicker {
+    0%   { filter: brightness(1); }
+    100% { filter: brightness(1.35); }
+  }
+  /* Impact bursts — fired where the projectile lands */
+  .impact-burst {
+    position: absolute; left: 50%; top: 45%;
+    width: 70px; height: 70px;
+    margin: -35px 0 0 -35px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: burst-pop 0.4s ease-out forwards;
+  }
+  @keyframes burst-pop {
+    0%   { opacity: 0; transform: scale(0.3); }
+    35%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+  .burst-arrow     { background: radial-gradient(circle, rgba(216,184,120,0.85) 0%, transparent 60%); }
+  .burst-fire      { background: radial-gradient(circle, #fff 0%, #ff8030 35%, transparent 65%); }
+  .burst-ice       { background: radial-gradient(circle, #fff 0%, #7fd8ff 35%, transparent 65%); }
+  .burst-magic     { background: radial-gradient(circle, #fff 0%, #c060f0 35%, transparent 65%); }
+  .burst-lightning { background: radial-gradient(circle, #fff 0%, #ffe040 35%, transparent 65%); }
+  .burst-holy      { background: radial-gradient(circle, #fff 0%, #ffd060 40%, transparent 68%); }
+  .burst-dark      { background: radial-gradient(circle, #9050c0 0%, #2a0a40 40%, transparent 68%); }
+  .burst-poison    { background: radial-gradient(circle, #d8ff80 0%, #6ac030 35%, transparent 65%); }
   .fighter-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold-bright); margin-bottom: 4px; }
   /* Floating combat numbers / text */
   .float-stage {
@@ -7131,6 +7220,8 @@ function buildFighter(source, isHero) {
   const f = {
     name: source.name,
     isHero,
+    isMonster: !!source.isMonster,
+    isPlayer: !!source.isPlayer,
     hp: 0, maxHp: 0,
     mp: 0, maxMp: 0,
     atk: 0, def: 0, agi: 0, int: 0,
@@ -7980,18 +8071,31 @@ async function doDamage(attacker, defender, log, opts) {
   if (blocked) msg += ` <span class="log-effect">(blocked)</span>`;
   msg += ` for <span class="log-hit">${dmg} damage</span>.`;
   appendLog(log, msg);
-  // Floating number on the defender, shake, lunge from attacker, slash overlay
-  spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
-  shakeFighter(defender, isCrit ? 'crit' : 'hit');
-  lungeFighter(attacker);
-  // Sprite swaps: attacker → attack pose, defender → hurt pose
-  playAttackAnim(attacker);
-  playHurtAnim(defender);
+  // S33 — dynamic combat: ranged/caster attacks fire a projectile; melee lunges.
+  const projType = attackProjectileType(attacker, opts);
   const slashKind = isCrit ? 'crit' : (opts.magical ? 'magic' : '');
-  spawnSlashFx(defender, slashKind);
-  if (blocked) { spawnFloater(defender, 'BLOCK', 'block'); sfxBlock(); }
-  // SFX (crit takes priority over hit)
-  if (isCrit) sfxCrit(); else sfxHit();
+  playAttackAnim(attacker); // attacker plays its attack/cast pose either way
+  if (projType) {
+    // Ranged / spell — projectile flies, impact visuals land when it arrives
+    spawnProjectile(attacker, defender, projType);
+    setTimeout(() => {
+      spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
+      shakeFighter(defender, isCrit ? 'crit' : 'hit');
+      playHurtAnim(defender);
+      spawnImpactBurst(defender, projType);
+      if (blocked) { spawnFloater(defender, 'BLOCK', 'block'); sfxBlock(); }
+      if (isCrit) sfxCrit(); else sfxHit();
+    }, 250);
+  } else {
+    // Melee — lunge toward the target + slash overlay
+    spawnFloater(defender, '-' + dmg, isCrit ? 'crit' : 'damage');
+    shakeFighter(defender, isCrit ? 'crit' : 'hit');
+    lungeFighter(attacker);
+    playHurtAnim(defender);
+    spawnSlashFx(defender, slashKind);
+    if (blocked) { spawnFloater(defender, 'BLOCK', 'block'); sfxBlock(); }
+    if (isCrit) sfxCrit(); else sfxHit();
+  }
   // If this hit killed the defender, play the death animation + sfx
   if (defender.hp <= 0) {
     setFighterAnim(defender, 'dead');
@@ -8495,6 +8599,79 @@ function spawnSlashFx(defender, kind) {
   el.style.transform = `translate(-50%, -50%) rotate(${angle.toFixed(1)}deg)`;
   stage.appendChild(el);
   setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 360);
+}
+
+// ============ S33 — DYNAMIC PROJECTILES ============
+// Ranged & spell attacks fly a projectile from attacker to defender.
+const CLASS_PROJ = {
+  hunter: 'arrow',
+  mage: 'magic', necromancer: 'dark', warlock: 'dark',
+  shaman: 'lightning', druid: 'holy'
+};
+// Classify a skill name → projectile type (or null for physical melee skills)
+function skillProjType(name) {
+  const n = (name || '').toLowerCase();
+  if (/fire|flame|burn|ember|inferno|molten|combust|lava|pyro|blaze/.test(n)) return 'fire';
+  if (/frost|ice|glaci|chill|frozen|blizzard/.test(n)) return 'ice';
+  if (/storm|lightning|thunder|spark|shock|gale|tempest|chaos bolt/.test(n)) return 'lightning';
+  if (/holy|light|smite|divine|crusad|sacred|dawn|radian|moonfire|verdict/.test(n)) return 'holy';
+  if (/curse|dark|shadow|soul|death|necro|drain|hex|doom|wither|reaper|coil/.test(n)) return 'dark';
+  if (/poison|venom|plague|toxic|corros|riptide|tidal|tsunami|wave/.test(n)) return 'poison';
+  if (/arrow|shot|volley|bow|aim|sniper|piercing|headshot|trap|quiver/.test(n)) return 'arrow';
+  if (/bolt|missile|arcane|ether|magic|nova|spell/.test(n)) return 'magic';
+  return null;
+}
+// Decide whether an attack is ranged (projectile) or melee (null = lunge+slash)
+function attackProjectileType(attacker, opts) {
+  if (opts && opts.abilityLabel) {
+    const t = skillProjType(opts.abilityLabel);
+    if (t) return t;
+    if (opts.magical) return 'magic'; // unnamed magical ability → arcane bolt
+    return null;                       // physical melee ability → lunge + slash
+  }
+  // Basic attack
+  if (attacker.isHero) return CLASS_PROJ[state.hero.class] || null;
+  if (attacker.isPlayer && attacker.class) return CLASS_PROJ[attacker.class] || null;
+  if (attacker.isMonster) {
+    if (opts && opts.magical) return 'magic';
+    if ((attacker.int || 0) > (attacker.atk || 0)) return 'magic';
+    return null;
+  }
+  return null;
+}
+// Fly a projectile from attacker to defender inside the combat scene.
+function spawnProjectile(attacker, defender, type) {
+  const scene = document.getElementById('combat-scene');
+  const aEl = fighterEl(attacker), dEl = fighterEl(defender);
+  if (!scene || !aEl || !dEl) return;
+  const sR = scene.getBoundingClientRect();
+  const aR = aEl.getBoundingClientRect();
+  const dR = dEl.getBoundingClientRect();
+  const x0 = aR.left + aR.width / 2 - sR.left;
+  const y0 = aR.top + aR.height * 0.42 - sR.top;
+  const x1 = dR.left + dR.width / 2 - sR.left;
+  const y1 = dR.top + dR.height * 0.42 - sR.top;
+  const proj = document.createElement('div');
+  proj.className = 'projectile proj-' + type;
+  proj.style.left = x0 + 'px';
+  proj.style.top = y0 + 'px';
+  // Orient arrows/wisps toward travel direction
+  if (x1 < x0) proj.classList.add('proj-flip');
+  scene.appendChild(proj);
+  requestAnimationFrame(() => {
+    proj.style.transition = 'transform 0.24s linear';
+    proj.style.transform = `translate(${(x1 - x0).toFixed(0)}px, ${(y1 - y0).toFixed(0)}px)`;
+  });
+  setTimeout(() => { if (proj.parentNode) proj.remove(); }, 320);
+}
+// Burst effect where a projectile lands.
+function spawnImpactBurst(defender, type) {
+  const stage = floatStageEl(defender);
+  if (!stage) return;
+  const burst = document.createElement('div');
+  burst.className = 'impact-burst burst-' + type;
+  stage.appendChild(burst);
+  setTimeout(() => { if (burst.parentNode) burst.remove(); }, 420);
 }
 
 // Fighter falls over and fades when HP reaches 0.
