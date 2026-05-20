@@ -1143,10 +1143,12 @@
     62% { transform: translateX(6px) rotate(2deg); }
     80% { transform: translateX(-3px); }
   }
-  /* Hit flash — red filter on the SPRITE (was background on the old box) */
+  /* S29 B2 — hit flash with sprite tint + tiny pause/recoil */
   @keyframes hit-flash {
-    0%, 100% { filter: none; }
-    35% { filter: brightness(1.4) sepia(0.9) hue-rotate(-50deg) saturate(3); }
+    0%, 100% { filter: none; transform: scale(1); }
+    20% { filter: brightness(1.5) sepia(0.9) hue-rotate(-50deg) saturate(3); transform: scale(0.96) translateX(-3px); }
+    50% { filter: brightness(1.2) sepia(0.6) hue-rotate(-40deg) saturate(2); transform: scale(0.98); }
+    80% { filter: brightness(1.05); transform: scale(1); }
   }
   @keyframes heal-pulse {
     0%   { filter: brightness(1); transform: scale(1); }
@@ -1160,12 +1162,31 @@
     50%  { transform: scale(1.22); filter: brightness(1.3) drop-shadow(0 0 18px rgba(74,143,214,0.85)); }
     100% { transform: scale(1); filter: none; }
   }
-  /* Death */
-  .fighter.dead .fighter-portrait { animation: death-fall 1s ease forwards; }
+  /* S29 B1 — death animation: rotate fall + blood splash + fade-out */
+  .fighter.dead .fighter-portrait { animation: death-fall 1.2s ease forwards; }
+  .fighter.dead .fighter-portrait::before {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 50%;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(120,20,20,0.9) 0%, rgba(180,30,30,0.55) 30%, transparent 65%);
+    transform: translateX(-50%) scale(0);
+    border-radius: 50%;
+    opacity: 0;
+    animation: blood-splash 1.2s ease forwards;
+    pointer-events: none;
+    z-index: -1;
+  }
   @keyframes death-fall {
     0%   { transform: rotate(0) scale(1); opacity: 1; }
-    35%  { transform: rotate(-15deg) translateY(-4px) scale(1.06); opacity: 1; }
-    100% { transform: rotate(-90deg) translateY(20px) scale(0.7); opacity: 0.25; filter: grayscale(1) brightness(0.5); }
+    20%  { transform: rotate(-20deg) translateY(-6px) scale(1.08); opacity: 1; filter: brightness(1.3) saturate(1.5); }
+    40%  { transform: rotate(-50deg) translateY(8px) scale(0.95); opacity: 0.85; filter: brightness(1) saturate(0.7); }
+    100% { transform: rotate(-90deg) translateY(28px) scale(0.65); opacity: 0.18; filter: grayscale(1) brightness(0.4); }
+  }
+  @keyframes blood-splash {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0); }
+    20%  { opacity: 0.9; transform: translateX(-50%) scale(1.1); }
+    100% { opacity: 0.55; transform: translateX(-50%) scale(1.4); }
   }
 
   .fighter-portrait {
@@ -1312,18 +1333,30 @@
     animation: floater-rise 1.2s ease-out forwards;
     white-space: nowrap;
   }
-  .floater.damage   { color: var(--blood-bright); font-size: 22px; }
-  .floater.crit     { color: var(--legendary); font-size: 30px; text-shadow: 1px 1px 0 #000, 0 0 12px rgba(232,149,48,0.9); }
-  .floater.heal     { color: var(--uncommon); font-size: 20px; }
-  .floater.miss     { color: var(--text-dim); font-size: 16px; font-style: italic; }
-  .floater.dodge    { color: var(--rare); font-size: 18px; font-style: italic; }
-  .floater.block    { color: var(--rare); font-size: 16px; }
-  .floater.dot      { color: #e89530; font-size: 16px; }
+  /* S29 B5 — damage numbers polish: crits are dramatic, heals get + sign,
+     miss/block are gray and italic */
+  .floater.damage   { color: var(--blood-bright); font-size: 26px; }
+  .floater.crit     {
+    color: var(--legendary); font-size: 42px;
+    text-shadow: 2px 2px 0 #000, 0 0 14px #f7b04f, 0 0 28px rgba(232,149,48,0.7);
+    animation: floater-crit-rise 1.5s ease-out forwards !important;
+  }
+  .floater.heal     { color: var(--uncommon); font-size: 22px; text-shadow: 1px 1px 0 #000, 0 0 8px rgba(95,168,95,0.7); }
+  .floater.miss     { color: var(--text-dim); font-size: 16px; font-style: italic; letter-spacing: 1.5px; }
+  .floater.dodge    { color: var(--rare); font-size: 18px; font-style: italic; letter-spacing: 1.5px; }
+  .floater.block    { color: var(--rare); font-size: 16px; letter-spacing: 1px; }
+  .floater.dot      { color: #e89530; font-size: 16px; font-style: italic; }
   .floater.mana     { color: #5fa8d6; font-size: 14px; }
   @keyframes floater-rise {
     0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.7); }
     15%  { opacity: 1; transform: translate(-50%, -8px) scale(1.15); }
     100% { opacity: 0; transform: translate(-50%, -80px) scale(1); }
+  }
+  @keyframes floater-crit-rise {
+    0%   { opacity: 0; transform: translate(-50%, 8px) scale(0.6) rotate(-6deg); }
+    10%  { opacity: 1; transform: translate(-50%, -8px) scale(1.5) rotate(4deg); }
+    25%  { transform: translate(-50%, -16px) scale(1.25) rotate(-2deg); }
+    100% { opacity: 0; transform: translate(-50%, -100px) scale(1.1); }
   }
   /* HP bar pulse when low */
   .bar-fill.hp.hp-low {
@@ -1388,13 +1421,28 @@
     margin-top: 10px; min-height: 0;
   }
   .ability-cd {
-    flex: 1; min-width: 90px;
+    flex: 1; min-width: 95px;
     background: var(--bg-deep); border: 1px solid var(--rare);
     padding: 4px 6px; font-size: 11px;
-    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
     border-radius: 3px;
-    transition: opacity 0.2s, border-color 0.2s;
+    transition: opacity 0.2s, border-color 0.2s, transform 0.18s;
     position: relative; overflow: hidden;
+  }
+  /* S29 B3 — ability icon on top of name */
+  .ability-cd-icon {
+    width: 18px; height: 18px;
+    color: var(--rare);
+    transition: filter 0.2s;
+  }
+  .ability-cd.ready .ability-cd-icon {
+    color: var(--uncommon);
+    filter: drop-shadow(0 0 4px rgba(95,168,95,0.5));
+  }
+  .ability-cd.ready { animation: ability-ready-pulse 2.2s ease-in-out infinite; }
+  @keyframes ability-ready-pulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(95,168,95,0.25); }
+    50%      { box-shadow: 0 0 14px rgba(95,168,95,0.55); }
   }
   .ability-cd-name {
     font-family: 'Cinzel', serif; font-size: 11px;
@@ -1415,11 +1463,13 @@
   .combat-log {
     background: var(--bg-deep); border: 1px solid var(--border);
     padding: 12px; max-height: 280px; overflow-y: auto; font-size: 13px;
+    scroll-behavior: smooth;
   }
   .log-entry {
     padding: 3px 0; border-bottom: 1px dashed rgba(74,56,38,0.2);
     animation: appear 0.3s;
   }
+  .log-entry:last-child { background: rgba(201,165,87,0.04); }
   .log-entry.log-summary {
     padding: 5px 4px; margin-top: 2px;
     background: rgba(201,165,87,0.06);
@@ -1428,17 +1478,25 @@
     font-weight: 600;
   }
   @keyframes appear {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateX(-4px); }
+    to { opacity: 1; transform: translateX(0); }
   }
+  /* S29 B4 — turn header is a horizontal divider, more visible */
   .log-turn {
     color: var(--gold); font-family: 'Cinzel', serif;
-    font-size: 11px; letter-spacing: 2px; margin-top: 8px;
+    font-size: 11px; letter-spacing: 2px; margin-top: 10px;
+    display: flex; align-items: center; gap: 8px;
   }
-  .log-hit { color: var(--blood-bright); }
-  .log-crit { color: var(--legendary); font-weight: 600; }
+  .log-turn::before, .log-turn::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .log-hit { color: var(--blood-bright); font-weight: 600; }
+  .log-crit { color: var(--legendary); font-weight: 700; text-shadow: 0 0 4px rgba(232,149,48,0.4); }
   .log-effect { color: var(--epic); font-style: italic; }
   .log-ability { color: var(--rare); font-weight: 600; }
+  .log-heal { color: var(--uncommon); font-weight: 600; }
+  .log-miss { color: var(--text-dim); font-style: italic; }
   .log-victory {
     color: var(--gold-bright); font-family: 'Cinzel', serif;
     text-align: center; padding: 12px;
@@ -7530,6 +7588,31 @@ function renderCombatEffects(fighter, slotId) {
 // Render the hero's abilities as cooldown / mana chips below the arena.
 // Foe abilities are hidden (intentional — keeps the player focused on their
 // own kit and adds a bit of fog-of-war on enemy intentions).
+// S29 B3 — derive an icon from the ability name/effect for the cooldown card
+function getAbilityIcon(ability) {
+  const name = (ability.name || '').toLowerCase();
+  const desc = (ability.desc || '').toLowerCase();
+  const ab = ability.ability || {};
+  // Heal / restore
+  if (ab.heal || /heal|mend|renew|restore|rejuvenat/.test(name + desc)) return 'i-heart';
+  // Magical / spell / arcane
+  if (/bolt|spell|arcane|ether|magic|nova|drain|curse|fireball|frost|ice|storm|lightning/.test(name + desc)) return 'i-magic';
+  // Fire / burn
+  if (ab.dot && /fire|burn|flame|inferno|ember|combust/.test(name + desc)) return 'i-flame';
+  // Shield / block / defensive
+  if (/shield|block|guard|fortif|bulwark|ward|parry|stance/.test(name + desc)) return 'i-shield';
+  // Stun / disorient
+  if (ab.stun || /stun|smash|crush|knockout|daze/.test(name + desc)) return 'i-hammer';
+  // Crit / precision
+  if (ab.guaranteedCrit || /crit|precise|aim|focus|backstab|vital/.test(name + desc)) return 'i-star';
+  // Execute / lethal
+  if (ab.execThreshold || /execut|annihilat|finish|deathblow|reaper/.test(name + desc)) return 'i-skull';
+  // Buff / aura
+  if (ab.buffAtk || /buff|rage|frenzy|fury|empower|battle/.test(name + desc)) return 'i-crown';
+  // Default: sword
+  return 'i-sword';
+}
+
 function renderCombatAbilities(hero) {
   const el = document.getElementById('combat-abilities');
   if (!el) return;
@@ -7552,7 +7635,9 @@ function renderCombatAbilities(hero) {
       status = mpCost > 0 ? `READY · ${mpCost} MP` : 'READY';
       cssClass = 'ready';
     }
-    return `<div class="ability-cd ${cssClass} ${magical ? 'magical' : ''}">
+    const iconId = getAbilityIcon(a);
+    return `<div class="ability-cd ${cssClass} ${magical ? 'magical' : ''}" title="${a.desc || a.name}">
+      <svg class="ability-cd-icon"><use href="#${iconId}"/></svg>
       <div class="ability-cd-name">${a.name}</div>
       <div class="ability-cd-status">${status}</div>
     </div>`;
